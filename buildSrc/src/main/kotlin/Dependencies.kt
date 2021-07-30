@@ -15,13 +15,14 @@
  */
 
 object Dependencies {
-    const val RULER_GRADLE_PLUGIN = "com.spotify.ruler:ruler-gradle-plugin:$RULER_PLUGIN_VERSION"
+    const val RULER_GRADLE_PLUGIN = "$RULER_PLUGIN_GROUP:ruler-gradle-plugin:$RULER_PLUGIN_VERSION"
 
     const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:${Versions.ANDROID_GRADLE_PLUGIN}"
     const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.KOTLIN}"
     const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-serialization:${Versions.KOTLIN}"
     const val KOTLIN_REACT_FUNCTION_GRADLE_PLUGIN = "gradle.plugin.com.bnorm.react:kotlin-react-function-gradle:${Versions.KOTLIN_REACT_FUNCTION}"
     const val DETEKT_GRADLE_PLUGIN = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${Versions.DETEKT_GRADLE_PLUGIN}"
+    const val NEXUS_PUBLISH_GRADLE_PLUGIN = "io.github.gradle-nexus.publish-plugin:io.github.gradle-nexus.publish-plugin.gradle.plugin:${Versions.NEXUS_PUBLISH_GRADLE_PLUGIN}"
 
     const val APK_ANALYZER = "com.android.tools.apkparser:apkanalyzer:${Versions.APK_ANALYZER}"
     const val KOTLINX_SERIALIZATION_CORE = "org.jetbrains.kotlinx:kotlinx-serialization-core:${Versions.KOTLINX_SERIALIZATION}"
@@ -47,6 +48,7 @@ object Dependencies {
         const val KOTLIN = "1.5.21" // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
         const val KOTLIN_REACT_FUNCTION = "0.5.1" // https://mvnrepository.com/artifact/com.bnorm.react.kotlin-react-function/com.bnorm.react.kotlin-react-function.gradle.plugin
         const val DETEKT_GRADLE_PLUGIN = "1.17.1" // https://mvnrepository.com/artifact/io.gitlab.arturbosch.detekt/detekt-gradle-plugin
+        const val NEXUS_PUBLISH_GRADLE_PLUGIN = "1.1.0" // https://mvnrepository.com/artifact/io.github.gradle-nexus.publish-plugin/io.github.gradle-nexus.publish-plugin.gradle.plugin
 
         const val APK_ANALYZER = "27.2.2" // https://mvnrepository.com/artifact/com.android.tools.apkparser/apkanalyzer
         const val KOTLINX_SERIALIZATION = "1.2.2" // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core

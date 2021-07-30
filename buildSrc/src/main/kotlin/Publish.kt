@@ -23,6 +23,7 @@ import org.gradle.kotlin.dsl.extra
 import org.gradle.plugins.signing.SigningExtension
 import java.net.URI
 
+const val RULER_PLUGIN_GROUP = "com.spotify.ruler"
 const val RULER_PLUGIN_VERSION = "0.1.0" // Also adapt this version in the README
 
 const val EXT_POM_NAME = "POM_NAME"
@@ -39,18 +40,8 @@ fun PublishingExtension.configurePublications(project: Project) {
         archiveClassifier.set("javadoc") // Use empty javadoc JAR until Dokka supports Kotlin Multiplatform projects
     }
 
-    repositories {
-        maven {
-            name = "sonatype"
-            url = URI.create("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = System.getenv(ENV_SONATYPE_USERNAME)
-                password = System.getenv(ENV_SONATYPE_PASSWORD)
-            }
-        }
-    }
     publications.withType(MavenPublication::class.java) {
-        groupId = "com.spotify.ruler"
+        groupId = RULER_PLUGIN_GROUP
         version = RULER_PLUGIN_VERSION
 
         artifact(javadocJar)

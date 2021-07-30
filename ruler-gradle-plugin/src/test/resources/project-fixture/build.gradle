@@ -6,7 +6,11 @@ buildscript {
             }
         }
         google()
-        mavenCentral()
+        mavenCentral {
+            content {
+                excludeGroup("com.spotify.ruler") // Don't rely on published versions in tests
+            }
+        }
     }
     dependencies {
         classpath("ANDROID_GRADLE_PLUGIN_MARKER") // Will be injected at runtime

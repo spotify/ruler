@@ -21,6 +21,10 @@ object Dependencies {
     const val KOTLIN_REACT_FUNCTION_GRADLE_PLUGIN = "gradle.plugin.com.bnorm.react:kotlin-react-function-gradle:${Versions.KOTLIN_REACT_FUNCTION}"
     const val DETEKT_GRADLE_PLUGIN = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${Versions.DETEKT_GRADLE_PLUGIN}"
 
+    const val BUNDLETOOL = "com.android.tools.build:bundletool:${Versions.BUNDLETOOL}"
+    const val ANDROID_TOOLS_COMMON = "com.android.tools:common:${Versions.ANDROID_TOOLS}"
+    const val ANDROID_TOOLS_SDKLIB = "com.android.tools:sdklib:${Versions.ANDROID_TOOLS}"
+
     const val APK_ANALYZER = "com.android.tools.apkparser:apkanalyzer:${Versions.APK_ANALYZER}"
     const val KOTLINX_SERIALIZATION_CORE = "org.jetbrains.kotlinx:kotlinx-serialization-core:${Versions.KOTLINX_SERIALIZATION}"
     const val KOTLINX_SERIALIZATION_JSON = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KOTLINX_SERIALIZATION}"
@@ -41,10 +45,13 @@ object Dependencies {
     const val BOOTSTRAP = "bootstrap"
 
     object Versions {
-        const val ANDROID_GRADLE_PLUGIN = "4.2.2" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
+        const val ANDROID_GRADLE_PLUGIN = "7.0.0" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
         const val KOTLIN = "1.5.21" // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
         const val KOTLIN_REACT_FUNCTION = "0.5.1" // https://mvnrepository.com/artifact/com.bnorm.react.kotlin-react-function/com.bnorm.react.kotlin-react-function.gradle.plugin
         const val DETEKT_GRADLE_PLUGIN = "1.17.1" // https://mvnrepository.com/artifact/io.gitlab.arturbosch.detekt/detekt-gradle-plugin
+
+        const val BUNDLETOOL = "1.7.0" // https://mvnrepository.com/artifact/com.android.tools.build/bundletool
+        const val ANDROID_TOOLS = "30.0.0" // https://mvnrepository.com/artifact/com.android.tools/common?repo=google
 
         const val APK_ANALYZER = "27.2.2" // https://mvnrepository.com/artifact/com.android.tools.apkparser/apkanalyzer
         const val KOTLINX_SERIALIZATION = "1.2.2" // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core

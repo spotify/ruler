@@ -20,19 +20,19 @@ import com.android.SdkConstants
 import com.android.build.gradle.internal.SdkLocator
 import com.android.builder.errors.DefaultIssueReporter
 import com.android.bundle.Devices
+import com.android.prefs.AndroidLocationsSingleton
 import com.android.repository.api.ProgressIndicatorAdapter
 import com.android.sdklib.repository.AndroidSdkHandler
+import com.android.tools.build.bundletool.androidtools.Aapt2Command
 import com.android.tools.build.bundletool.commands.BuildApksCommand
 import com.android.tools.build.bundletool.device.DeviceSpecParser
-import com.android.tools.build.bundletool.model.Aapt2Command
 import com.android.utils.StdLogger
 import com.spotify.ruler.plugin.models.DeviceSpec
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.StringReader
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
+import java.nio.file.Path
 
 /**
  * Responsible for creating APKs based on provided app bundle (AAB) files.
@@ -50,20 +50,18 @@ class ApkCreator(private val rootDir: File) {
      * @return Directory which contains all created APKs
      */
     fun createSplitApks(bundleFile: File, deviceSpec: DeviceSpec, targetDir: File): File {
-        val splitsDir = targetDir.resolve("splits")
         targetDir.listFiles()?.forEach(File::deleteRecursively) // Overwrite existing files
 
-        val apks = targetDir.resolve("output.apks")
         BuildApksCommand.builder()
             .setBundlePath(bundleFile.toPath())
-            .setOutputFile(apks.toPath())
+            .setOutputFile(targetDir.toPath())
             .setDeviceSpec(parseDeviceSpec(deviceSpec))
-            .setAapt2Command(Aapt2Command.createFromExecutablePath(getAapt2Location().toPath()))
+            .setAapt2Command(Aapt2Command.createFromExecutablePath(getAapt2Location()))
+            .setOutputFormat(BuildApksCommand.OutputFormat.DIRECTORY)
             .build()
             .execute()
-        unzip(apks, targetDir)
 
-        return splitsDir
+        return targetDir.resolve("splits")
     }
 
     /** Converts the given [deviceSpec] into a format which bundletool understands. */
@@ -73,30 +71,18 @@ class ApkCreator(private val rootDir: File) {
     }
 
     /** Finds and returns the location of the aapt2 executable. */
-    private fun getAapt2Location(): File {
-        val sdkHandler = AndroidSdkHandler.getInstance(getAndroidSdkLocation())
+    private fun getAapt2Location(): Path {
+        val sdkLocation = getAndroidSdkLocation()
+        val sdkHandler = AndroidSdkHandler.getInstance(AndroidLocationsSingleton, sdkLocation)
         val progressIndicator = object : ProgressIndicatorAdapter() { /* No progress reporting */ }
         val buildToolInfo = sdkHandler.getLatestBuildTool(progressIndicator, true)
         return buildToolInfo.location.resolve(SdkConstants.FN_AAPT2)
     }
 
     /** Finds and returns the location of the Android SDK. */
-    private fun getAndroidSdkLocation(): File {
+    private fun getAndroidSdkLocation(): Path {
         val logger = StdLogger(StdLogger.Level.WARNING)
         val issueReporter = DefaultIssueReporter(logger)
-        return SdkLocator.getSdkDirectory(rootDir, issueReporter)
-    }
-
-    /** Unzips a given ZIP [file] in the [targetDir]. */
-    private fun unzip(file: File, targetDir: File) {
-        ZipFile(file).use { zipFile ->
-            zipFile.entries().asSequence().filterNot(ZipEntry::isDirectory).forEach { zipEntry ->
-                val content = zipFile.getInputStream(zipEntry).readBytes()
-
-                val entry = targetDir.resolve(zipEntry.name)
-                entry.parentFile.mkdirs()
-                entry.writeBytes(content)
-            }
-        }
+        return SdkLocator.getSdkDirectory(rootDir, issueReporter).toPath()
     }
 }

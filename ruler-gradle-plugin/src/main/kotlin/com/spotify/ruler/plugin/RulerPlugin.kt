@@ -16,8 +16,8 @@
 
 package com.spotify.ruler.plugin
 
-import com.android.build.api.artifact.ArtifactType
-import com.android.build.api.extension.ApplicationAndroidComponentsExtension
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.ApplicationVariant
 import com.spotify.ruler.plugin.models.AppInfo
 import com.spotify.ruler.plugin.models.DeviceSpec
@@ -39,8 +39,8 @@ class RulerPlugin : Plugin<Project> {
                     task.appInfo.set(getAppInfo(project, variant))
                     task.deviceSpec.set(getDeviceSpec(project, rulerExtension))
 
-                    task.bundleFile.set(variant.artifacts.get(ArtifactType.BUNDLE))
-                    task.mappingFile.set(variant.artifacts.get(ArtifactType.OBFUSCATION_MAPPING_FILE))
+                    task.bundleFile.set(variant.artifacts.get(SingleArtifact.BUNDLE))
+                    task.mappingFile.set(variant.artifacts.get(SingleArtifact.OBFUSCATION_MAPPING_FILE))
 
                     task.workingDir.set(project.layout.buildDirectory.dir("intermediates/ruler/${variant.name}"))
                     task.reportDir.set(project.layout.buildDirectory.dir("reports/ruler/${variant.name}"))

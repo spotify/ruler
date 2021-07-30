@@ -3,12 +3,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion(31)
+    compileSdk = 31
     defaultConfig {
-        minSdkVersion(23)
-        targetSdkVersion(31)
+        minSdk = 23
+        targetSdk = 31
     }
-    lintOptions {
+    lint {
         isWarningsAsErrors = true
     }
 }

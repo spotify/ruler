@@ -12,6 +12,11 @@ extra[EXT_POM_DESCRIPTION] = "Gradle plugin for analyzing Android app size"
 dependencies {
     compileOnly(gradleApi())
     compileOnly(Dependencies.ANDROID_GRADLE_PLUGIN)
+    compileOnly(Dependencies.BUNDLETOOL)
+    compileOnly(Dependencies.PROTOBUF_CORE)
+    compileOnly(Dependencies.ANDROID_TOOLS_COMMON)
+    compileOnly(Dependencies.ANDROID_TOOLS_SDKLIB)
+    compileOnly(Dependencies.DEXLIB)
 
     implementation(project(":ruler-models"))
 

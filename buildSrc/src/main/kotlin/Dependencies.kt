@@ -15,6 +15,8 @@
  */
 
 object Dependencies {
+    const val RULER_GRADLE_PLUGIN = "com.spotify.ruler:ruler-gradle-plugin:$RULER_PLUGIN_VERSION"
+
     const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:${Versions.ANDROID_GRADLE_PLUGIN}"
     const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.KOTLIN}"
     const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-serialization:${Versions.KOTLIN}"

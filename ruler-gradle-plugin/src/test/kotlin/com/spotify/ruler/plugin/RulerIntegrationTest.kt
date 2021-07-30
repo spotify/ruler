@@ -17,6 +17,7 @@
 package com.spotify.ruler.plugin
 
 import com.google.common.truth.Truth.assertThat
+import com.spotify.ruler.plugin.testutil.ProjectFixture
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
@@ -26,17 +27,15 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 import java.io.File
-import java.nio.file.Paths
 
 class RulerIntegrationTest {
-    private val projectFixture = Paths.get("src", "test", "resources", "project-fixture").toFile()
 
     @TempDir
     lateinit var projectDir: File
 
     @BeforeEach
     fun setup() {
-        projectFixture.copyRecursively(projectDir)
+        ProjectFixture.load(projectDir)
     }
 
     @ParameterizedTest

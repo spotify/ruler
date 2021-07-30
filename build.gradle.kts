@@ -17,7 +17,7 @@ buildscript {
         classpath(Dependencies.DETEKT_GRADLE_PLUGIN)
 
         if (!properties.containsKey("withoutSample")) {
-            classpath("com.spotify.ruler:ruler-gradle-plugin:$RULER_PLUGIN_VERSION")
+            classpath(Dependencies.RULER_GRADLE_PLUGIN)
         }
     }
 }

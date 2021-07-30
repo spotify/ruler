@@ -9,8 +9,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.2.1")
-        classpath("com.spotify.ruler:ruler-gradle-plugin:+")
+        classpath("ANDROID_GRADLE_PLUGIN_MARKER") // Will be injected at runtime
+        classpath("RULER_GRADLE_PLUGIN_MARKER") // Will be injected at runtime
     }
 }
 

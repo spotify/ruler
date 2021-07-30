@@ -42,7 +42,7 @@ fun PublishingExtension.configurePublications(project: Project) {
     repositories {
         maven {
             name = "sonatype"
-            url = URI.create("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            url = URI.create("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
             credentials {
                 username = System.getenv(ENV_SONATYPE_USERNAME)
                 password = System.getenv(ENV_SONATYPE_PASSWORD)

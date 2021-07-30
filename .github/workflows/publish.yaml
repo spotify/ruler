@@ -23,4 +23,4 @@ jobs:
           java-version: 11
 
       - name: Publish plugin to Sonatype
-        run: ./gradlew publish -PwithoutSample --no-daemon --stacktrace
+        run: ./gradlew publish closeAndReleaseSonatypeStagingRepository -PwithoutSample --no-daemon --stacktrace

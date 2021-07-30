@@ -1,0 +1,34 @@
+name: Bug report
+description: Report a bug you've encountered
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: Current behavior
+      description: Explain the current behavior you're experiencing.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: Explain the behavior you're expecting instead.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: Describe how this bug can be reproduced.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Versions
+      description: Which version of components are you using (e.g. Android Gradle Plugin, Gradle, Ruler)?
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: Links? References? Sample projects? Anything that will give more context about the issue you are encountering.
+    validations:
+      required: false

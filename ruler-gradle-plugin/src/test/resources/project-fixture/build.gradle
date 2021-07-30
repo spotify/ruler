@@ -1,0 +1,22 @@
+buildscript {
+    repositories {
+        mavenLocal {
+            content {
+                includeGroup("com.spotify.ruler") // Only load Ruler plugin from local Maven
+            }
+        }
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:4.2.1")
+        classpath("com.spotify.ruler:ruler-gradle-plugin:+")
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}

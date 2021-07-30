@@ -1,0 +1,16 @@
+name: Feature request
+description: Request a feature you would like to see
+labels: [feature request]
+body:
+  - type: textarea
+    attributes:
+      label: Feature description
+      description: Describe the feature you would like to see added to Ruler.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Reasoning
+      description: Explain what benefits this feature brings and how it is applicable to other users of Ruler.
+    validations:
+      required: false

@@ -4,21 +4,21 @@ plugins {
 }
 
 android {
-    compileSdkVersion(31)
+    compileSdk = 31
     defaultConfig {
         applicationId = "com.spotify.ruler.sample"
-        minSdkVersion(23)
-        targetSdkVersion(31)
-        versionCode(1)
-        versionName("1.0")
+        minSdk = 23
+        targetSdk = 31
+        versionCode = 1
+        versionName = "1.0"
     }
     buildTypes {
-        named("release").configure {
-            minifyEnabled(true)
+        release {
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
     }
-    lintOptions {
+    lint {
         isWarningsAsErrors = true
     }
 }

@@ -1,0 +1,99 @@
+[![Build Status](https://img.shields.io/github/workflow/status/spotify/ruler/CI)](https://github.com/spotify/ruler/actions)
+[![Maven Release](https://img.shields.io/maven-central/v/com.spotify.ruler/ruler-gradle-plugin)](https://github.com/spotify/ruler/releases)
+[![License](https://img.shields.io/github/license/spotify/ruler)](https://github.com/spotify/ruler/blob/main/LICENSE)
+
+# Ruler
+
+Ruler is a Gradle plugin which helps you analyze the size of your Android apps.
+
+## Motivation
+
+App size is an important metric which [directly correlates with business metrics](https://medium.com/googleplaydev/shrinking-apks-growing-installs-5d3fcba23ce2) like install conversion rate. Measuring app size is straightforward, but knowing what contributes to it is not. Especially in bigger projects with hundreds or thousands of modules and third-party dependencies. Ruler provides a convenient way to find out how much each module and dependency contributes to the total size of your app by running a single Gradle task.
+
+![HTML report](docs/report.png)
+
+## Usage
+
+Follow the following steps to start using Ruler in your project.
+
+### Adding the plugin
+
+First you need to add the Ruler Gradle plugin to the buildscript classpath in your top-level `build.gradle` file:
+
+```kotlin
+buildscript {
+    repositories {
+        maven {
+            google()
+            mavenCentral()
+        }
+    }
+    dependencies {
+        classpath("com.spotify.ruler:ruler-gradle-plugin:0.1.0")
+    }
+}
+```
+
+You also have to apply the plugin in the `build.gradle` of your application module:
+
+```kotlin
+plugins {
+    id("com.android.application")
+    id("com.spotify.ruler")
+}
+```
+
+### Configuring the plugin
+
+When using [app bundles](https://developer.android.com/guide/app-bundle), Google Play will generate optimized APKs for each device. This means that the size of an APK depends on the specifications of the device that's downloading it. You can configure which device specifications should be used for the analysis in the `build.gradle` of your application module:
+
+```kotlin
+ruler {
+    abi.set("arm64-v8a")
+    locale.set("en")
+    screenDensity.set(480)
+    sdkVersion.set(27)
+}
+```
+
+### Running the task
+
+Once this is done, `analyze<VariantName>Bundle` tasks will be added for each of your app variants. Running this task will build the app and generate a HTML report, which you can use to analyze your app size. It will also generate a JSON report, in case you want to further process the data.
+
+## Project structure
+
+Ruler is built with Kotlin and contains multiple modules:
+
+- **ruler-gradle-plugin:** Core Gradle plugin where the APK parsing, dependency handling and attribution logic lives.
+- **ruler-frontend:** React template used for the HTML report, built with Kotlin JS.
+- **ruler-models:** Common models shared between the Gradle plugin and the frontend, built with Kotlin Multiplatform.
+
+### Working with this project
+
+The project is set up like a standard Gradle project. You can build it using `./gradlew assemble` and run the tests with `./gradlew test`.
+
+There is also a sample project, which shows the usage of the plugin. Because the way this sample project is set up, the initial build can fail if you bump the plugin version. To fix this, you have to publish the plugin to your local Maven repository by running `./gradlew publishToMavenLocal -PwithoutSample`.
+
+When working on the frontend, you can start a development server by running `./gradlew browserRun`, which will show a report filled with dummy data to make development easier.
+
+## Code of conduct
+
+This project adheres to the [Open Code of Conduct](https://github.com/spotify/code-of-conduct/blob/master/code-of-conduct.md). By participating, you are expected to honor this code.
+
+## License
+
+```
+Copyright 2021 Spotify AB
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```

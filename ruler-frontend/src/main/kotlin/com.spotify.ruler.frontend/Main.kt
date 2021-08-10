@@ -16,13 +16,9 @@
 
 package com.spotify.ruler.frontend
 
-import com.spotify.ruler.models.AppComponent
-import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.AppReport
-import com.spotify.ruler.models.FileType
 import kotlinext.js.require
 import kotlinx.browser.document
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import react.dom.render
@@ -31,32 +27,12 @@ fun main() {
     require("bootstrap/dist/css/bootstrap.css")
     require("bootstrap/dist/js/bootstrap.bundle.js")
 
-    val report = getReportData()
+    // Load and deserialize the report data
+    val rawReport = require("./report.json").toString()
+    val report = Json.decodeFromString<AppReport>(rawReport)
+
+    // Visualize and display the report data
     render(document.getElementById("root")) {
         reportCard(report)
     }
 }
-
-fun getReportData(): AppReport = try {
-    getRealReportData() // Try to read real data
-} catch (ignored: SerializationException) {
-    getFakeReportData() // If not real data is provided, fall back to fake data
-}
-
-// Provides the real report data, for the generated report
-fun getRealReportData(): AppReport {
-    val json = "REPLACE_ME" // Will be replaced with the report data in JSON format
-    return Json.decodeFromString(json)
-}
-
-// Provides fake report data, to be able to work on the frontend independently
-@Suppress("MagicNumber")
-fun getFakeReportData(): AppReport = AppReport("com.spotify.music", "1.2.3", "release", 750, 1050, listOf(
-    AppComponent(":lib", 500, 600, listOf(
-        AppFile("/assets/license.html", FileType.ASSET, 500, 600),
-    )),
-    AppComponent(":app", 250, 450, listOf(
-        AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250),
-        AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200),
-    )),
-))

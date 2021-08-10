@@ -1,0 +1,41 @@
+{
+  "name": "com.spotify.music",
+  "version": "1.2.3",
+  "variant": "release",
+  "downloadSize": 750,
+  "installSize": 1050,
+  "components": [
+    {
+      "name": ":lib",
+      "downloadSize": 500,
+      "installSize": 600,
+      "files": [
+        {
+          "name": "/assets/license.html",
+          "type": "ASSET",
+          "downloadSize": 500,
+          "installSize": 600
+        }
+      ]
+    },
+    {
+      "name": ":app",
+      "downloadSize": 250,
+      "installSize": 450,
+      "files": [
+        {
+          "name": "/res/layout/activity_main.xml",
+          "type": "RESOURCE",
+          "downloadSize": 150,
+          "installSize": 250
+        },
+        {
+          "name": "com.spotify.MainActivity",
+          "type": "CLASS",
+          "downloadSize": 100,
+          "installSize": 200
+        }
+      ]
+    }
+  ]
+}

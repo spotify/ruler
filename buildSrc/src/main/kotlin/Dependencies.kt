@@ -56,7 +56,7 @@ object Dependencies {
         const val DETEKT_GRADLE_PLUGIN = "1.17.1" // https://mvnrepository.com/artifact/io.gitlab.arturbosch.detekt/detekt-gradle-plugin
         const val NEXUS_PUBLISH_GRADLE_PLUGIN = "1.1.0" // https://mvnrepository.com/artifact/io.github.gradle-nexus.publish-plugin/io.github.gradle-nexus.publish-plugin.gradle.plugin
 
-        const val BUNDLETOOL = "1.7.0" // https://mvnrepository.com/artifact/com.android.tools.build/bundletool
+        const val BUNDLETOOL = "1.7.1" // https://mvnrepository.com/artifact/com.android.tools.build/bundletool
         const val PROTOBUF = "3.17.3" // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
         const val DEXLIB = "2.5.2" // https://mvnrepository.com/artifact/org.smali/dexlib2
 
@@ -67,10 +67,10 @@ object Dependencies {
         const val GOOGLE_TRUTH = "1.1.3" // https://mvnrepository.com/artifact/com.google.truth/truth
         const val GOOGLE_GUAVA = "30.1.1-jre" // https://mvnrepository.com/artifact/com.google.guava/guava
 
-        const val KOTLIN_REACT = "17.0.2-pre.222-kotlin-1.5.21" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react
-        const val KOTLIN_JS_EXTENSIONS = "1.0.1-pre.222-kotlin-1.5.21" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-extensions
+        const val KOTLIN_REACT = "17.0.2-pre.227-kotlin-1.5.21" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react
+        const val KOTLIN_JS_EXTENSIONS = "1.0.1-pre.227-kotlin-1.5.21" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-extensions
 
         const val REACT = "17.0.2" // https://www.npmjs.com/package/react
-        const val BOOTSTRAP = "5.0.2" // https://www.npmjs.com/package/bootstrap
+        const val BOOTSTRAP = "5.1.0" // https://www.npmjs.com/package/bootstrap
     }
 }

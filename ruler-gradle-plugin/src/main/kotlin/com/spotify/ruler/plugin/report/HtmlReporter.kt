@@ -29,10 +29,10 @@ class HtmlReporter {
      * @return Generated HTML report file
      */
     fun generateReport(json: String, targetDir: File): File {
-        var html = javaClass.getResource("/index.html").readText()
+        var html = readResourceFile("index.html")
 
         // Inline Javascript
-        val javascript = javaClass.getResource("/ruler-frontend.js").readText()
+        val javascript = readResourceFile("ruler-frontend.js")
         html = html.replaceFirst("<script src=\"ruler-frontend.js\"></script>", "<script>$javascript</script>")
 
         // Inline JSON data
@@ -41,5 +41,10 @@ class HtmlReporter {
         val reportFile = targetDir.resolve("report.html")
         reportFile.writeText(html)
         return reportFile
+    }
+
+    private fun readResourceFile(fileName: String): String {
+        val url = requireNotNull(javaClass.getResource("/$fileName"))
+        return url.readText()
     }
 }

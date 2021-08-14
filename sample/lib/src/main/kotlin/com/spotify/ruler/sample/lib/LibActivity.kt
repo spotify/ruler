@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.spotify.ruler.sample.lib;
+package com.spotify.ruler.sample.lib
 
-import android.app.Activity;
-import android.os.Bundle;
+import android.app.Activity
+import android.os.Bundle
 
-public class LibActivity extends Activity {
+class LibActivity : Activity() {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lib);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_lib)
     }
 }

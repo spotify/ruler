@@ -14,20 +14,8 @@
  * limitations under the License.
  */
 
-package com.spotify.ruler.sample.app;
+package com.spotify.ruler.sample.lib
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.util.Log;
-
-import com.spotify.ruler.sample.lib.ClassToObfuscate;
-
-public class MainActivity extends Activity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Log.d("MainActivity", ClassToObfuscate.string());
-    }
+object ClassToObfuscate {
+    fun string() = "Some logic to avoid inlining (${javaClass.name})"
 }

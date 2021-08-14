@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    id("kotlin-android")
     id("com.spotify.ruler")
 }
 
@@ -20,6 +21,9 @@ android {
     }
     lint {
         isWarningsAsErrors = true
+    }
+    packagingOptions {
+        resources.excludes.add("**/*.kotlin_builtins")
     }
 }
 

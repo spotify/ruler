@@ -42,7 +42,7 @@ import react.useState
 @RFunction
 fun RBuilder.reportCard(report: AppReport) {
     div(classes = "container mt-4 mb-4") {
-        div(classes = "shadow-sm p-4 mb-5 bg-body rounded-1") {
+        div(classes = "shadow-sm p-4 mb-5 bg-white rounded-1") {
             reportHeader(report)
             hr {}
             componentBreakdown(report.components)

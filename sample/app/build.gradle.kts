@@ -33,3 +33,9 @@ ruler {
     screenDensity.set(480)
     sdkVersion.set(27)
 }
+
+// Include Ruler tasks in checks
+tasks.named("check").configure {
+    dependsOn("analyzeDebugBundle")
+    dependsOn("analyzeReleaseBundle")
+}

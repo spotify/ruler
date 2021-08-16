@@ -76,6 +76,16 @@ There is also a sample project, which shows the usage of the plugin. Because the
 
 When working on the frontend, you can start a development server by running `./gradlew browserRun`, which will show a report filled with dummy data to make development easier.
 
+## Compatibility
+
+The latest version of this plugin is compatible with
+
+- Java 11 or above,
+- Gradle 7.0 or above and
+- Android Gradle Plugin 7.0.0 or above.
+
+Earlier versions might also work, but compatibility can't be guaranteed.
+
 ## Code of conduct
 
 This project adheres to the [Open Code of Conduct](https://github.com/spotify/code-of-conduct/blob/master/code-of-conduct.md). By participating, you are expected to honor this code.

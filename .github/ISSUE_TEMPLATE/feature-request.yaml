@@ -1,6 +1,6 @@
 name: Feature request
 description: Request a feature you would like to see
-labels: [feature request]
+labels: [enhancement]
 body:
   - type: textarea
     attributes:

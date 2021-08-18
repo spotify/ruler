@@ -50,17 +50,17 @@ object Dependencies {
     const val BOOTSTRAP = "bootstrap"
 
     object Versions {
-        const val ANDROID_GRADLE_PLUGIN = "7.0.0" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
+        const val ANDROID_GRADLE_PLUGIN = "7.0.1" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
         const val KOTLIN = "1.5.21" // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
         const val KOTLIN_REACT_FUNCTION = "0.5.1" // https://mvnrepository.com/artifact/com.bnorm.react.kotlin-react-function/com.bnorm.react.kotlin-react-function.gradle.plugin
-        const val DETEKT_GRADLE_PLUGIN = "1.17.1" // https://mvnrepository.com/artifact/io.gitlab.arturbosch.detekt/detekt-gradle-plugin
+        const val DETEKT_GRADLE_PLUGIN = "1.18.0" // https://mvnrepository.com/artifact/io.gitlab.arturbosch.detekt/detekt-gradle-plugin
         const val NEXUS_PUBLISH_GRADLE_PLUGIN = "1.1.0" // https://mvnrepository.com/artifact/io.github.gradle-nexus.publish-plugin/io.github.gradle-nexus.publish-plugin.gradle.plugin
 
-        const val BUNDLETOOL = "1.7.1" // https://mvnrepository.com/artifact/com.android.tools.build/bundletool
+        const val BUNDLETOOL = "1.8.0" // https://mvnrepository.com/artifact/com.android.tools.build/bundletool
         const val PROTOBUF = "3.17.3" // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
         const val DEXLIB = "2.5.2" // https://mvnrepository.com/artifact/org.smali/dexlib2
 
-        const val ANDROID_TOOLS = "30.0.0" // https://mvnrepository.com/artifact/com.android.tools/common?repo=google
+        const val ANDROID_TOOLS = "30.0.1" // https://mvnrepository.com/artifact/com.android.tools/common?repo=google
         const val KOTLINX_SERIALIZATION = "1.2.2" // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core
 
         const val JUNIT = "5.7.2" // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine

@@ -16,6 +16,7 @@
 
 package com.spotify.ruler.frontend
 
+import com.spotify.ruler.frontend.components.report
 import com.spotify.ruler.models.AppReport
 import kotlinext.js.require
 import kotlinx.browser.document
@@ -41,6 +42,6 @@ fun main() {
 
     // Visualize and display the report data
     render(document.getElementById("root")) {
-        reportCard(report)
+        report(report)
     }
 }

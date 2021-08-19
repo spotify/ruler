@@ -39,6 +39,7 @@ dependencies {
 
     implementation(Dependencies.KOTLIN_REACT)
     implementation(Dependencies.KOTLIN_REACT_DOM)
+    implementation(Dependencies.KOTLIN_REACT_ROUTER)
     implementation(Dependencies.KOTLIN_JS_EXTENSIONS)
     implementation(Dependencies.KOTLIN_REACT_FUNCTION)
     implementation(Dependencies.KOTLINX_SERIALIZATION_JSON)

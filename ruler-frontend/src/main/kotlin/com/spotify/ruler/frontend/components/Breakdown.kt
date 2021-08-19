@@ -14,92 +14,27 @@
  * limitations under the License.
  */
 
-@file:Suppress("TooManyFunctions")
-
-package com.spotify.ruler.frontend
+package com.spotify.ruler.frontend.components
 
 import com.bnorm.react.RFunction
 import com.bnorm.react.RKey
+import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
-import com.spotify.ruler.models.AppReport
 import com.spotify.ruler.models.Measurable
 import kotlinx.html.id
-import kotlinx.html.js.onChangeFunction
-import org.w3c.dom.HTMLSelectElement
 import react.RBuilder
 import react.dom.button
 import react.dom.div
 import react.dom.h2
-import react.dom.h3
 import react.dom.h4
-import react.dom.hr
-import react.dom.option
-import react.dom.select
 import react.dom.span
-import react.useState
 
 @RFunction
-fun RBuilder.reportCard(report: AppReport) {
-    div(classes = "container mt-4 mb-4") {
-        div(classes = "shadow-sm p-4 mb-5 bg-white rounded-1") {
-            reportHeader(report)
-            hr {}
-            componentBreakdown(report.components)
-        }
-    }
-}
-
-@RFunction
-fun RBuilder.reportHeader(report: AppReport) {
-    div(classes = "row mt-2") {
-        div(classes = "col") {
-            h3 { +report.name }
-            span(classes = "text-muted") { +"Version ${report.version} (${report.variant})" }
-        }
-        reportHeaderSizeItem(report.downloadSize, "Download size")
-        reportHeaderSizeItem(report.installSize, "Install size")
-    }
-}
-
-@RFunction
-fun RBuilder.reportHeaderSizeItem(size: Number, label: String) {
-    div(classes = "col-auto text-center ms-5 me-5") {
-        h3 { +formatSize(size) }
-        span(classes = "text-muted m-0") { +label }
-    }
-}
-
-@RFunction
-fun RBuilder.componentBreakdown(components: List<AppComponent>) {
-    val (sizeType, setSizeType) = useState(Measurable.SizeType.DOWNLOAD)
-
-    div(classes = "row mt-4 mb-4 align-items-center") {
-        h4(classes = "col") { +"Breakdown (${components.size} components)" }
-        div(classes = "col-auto") {
-            sizeTypeDropdown(onSizeTypeSelected = { setSizeType(it) })
-        }
-    }
+fun RBuilder.breakdown(components: List<AppComponent>, sizeType: Measurable.SizeType) {
+    h4(classes = "mb-3") { +"Breakdown (${components.size} components)" }
     div(classes = "row") {
         componentList(components, sizeType)
-    }
-}
-
-@RFunction
-fun RBuilder.sizeTypeDropdown(onSizeTypeSelected: (Measurable.SizeType) -> Unit) {
-    select(classes = "form-select") {
-        attrs.onChangeFunction = { event ->
-            val selectedValue = (event.target as HTMLSelectElement).value
-            onSizeTypeSelected(Measurable.SizeType.valueOf(selectedValue))
-        }
-        option {
-            attrs.value = Measurable.SizeType.DOWNLOAD.name
-            +"Download size"
-        }
-        option {
-            attrs.value = Measurable.SizeType.INSTALL.name
-            +"Install size"
-        }
     }
 }
 

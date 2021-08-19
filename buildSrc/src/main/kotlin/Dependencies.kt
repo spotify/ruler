@@ -42,6 +42,7 @@ object Dependencies {
 
     const val KOTLIN_REACT = "org.jetbrains.kotlin-wrappers:kotlin-react:${Versions.KOTLIN_REACT}"
     const val KOTLIN_REACT_DOM = "org.jetbrains.kotlin-wrappers:kotlin-react-dom:${Versions.KOTLIN_REACT}"
+    const val KOTLIN_REACT_ROUTER = "org.jetbrains.kotlin-wrappers:kotlin-react-router-dom:${Versions.KOTLIN_REACT_ROUTER}"
     const val KOTLIN_JS_EXTENSIONS = "org.jetbrains.kotlin-wrappers:kotlin-extensions:${Versions.KOTLIN_JS_EXTENSIONS}"
     const val KOTLIN_REACT_FUNCTION = "com.bnorm.react:kotlin-react-function:${Versions.KOTLIN_REACT_FUNCTION}"
 
@@ -68,6 +69,7 @@ object Dependencies {
         const val GOOGLE_GUAVA = "30.1.1-jre" // https://mvnrepository.com/artifact/com.google.guava/guava
 
         const val KOTLIN_REACT = "17.0.2-pre.227-kotlin-1.5.21" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react
+        const val KOTLIN_REACT_ROUTER = "5.2.0-pre.227-kotlin-1.5.21" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react-router-dom
         const val KOTLIN_JS_EXTENSIONS = "1.0.1-pre.227-kotlin-1.5.21" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-extensions
 
         const val REACT = "17.0.2" // https://www.npmjs.com/package/react

@@ -47,6 +47,8 @@ dependencies {
     implementation(npm(Dependencies.REACT, Dependencies.Versions.REACT))
     implementation(npm(Dependencies.REACT_DOM, Dependencies.Versions.REACT))
     implementation(npm(Dependencies.BOOTSTRAP, Dependencies.Versions.BOOTSTRAP))
+    implementation(npm(Dependencies.UUID, Dependencies.Versions.UUID))
+    implementation(npm(Dependencies.APEX_CHARTS, Dependencies.Versions.APEX_CHARTS))
 
     testImplementation(kotlin("test-js"))
 }

@@ -10,7 +10,12 @@ Ruler is a Gradle plugin which helps you analyze the size of your Android apps.
 
 App size is an important metric which [directly correlates with business metrics](https://medium.com/googleplaydev/shrinking-apks-growing-installs-5d3fcba23ce2) like install conversion rate. Measuring app size is straightforward, but knowing what contributes to it is not. Especially in bigger projects with hundreds or thousands of modules and third-party dependencies. Ruler provides a convenient way to find out how much each module and dependency contributes to the total size of your app by running a single Gradle task.
 
-![HTML report](docs/report.png)
+<table>
+  <tr>
+    <td><img src="docs/breakdown.png"></td>
+    <td><img src="docs/insights.png"></td>
+  </tr>
+</table>
 
 ## Usage
 

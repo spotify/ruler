@@ -2,8 +2,8 @@
   "name": "com.spotify.music",
   "version": "1.2.3",
   "variant": "release",
-  "downloadSize": 750,
-  "installSize": 1050,
+  "downloadSize": 850,
+  "installSize": 1250,
   "components": [
     {
       "name": ":lib",
@@ -34,6 +34,20 @@
         {
           "name": "com.spotify.MainActivity",
           "type": "CLASS",
+          "downloadSize": 100,
+          "installSize": 200
+        }
+      ]
+    },
+    {
+      "name": "com.spotify:sample:1.0.0",
+      "type": "EXTERNAL",
+      "downloadSize": 100,
+      "installSize": 200,
+      "files": [
+        {
+          "name": "/lib/arm64-v8a/libnative.so",
+          "type": "NATIVE_LIB",
           "downloadSize": 100,
           "installSize": 200
         }

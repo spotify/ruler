@@ -49,6 +49,8 @@ object Dependencies {
     const val REACT = "react"
     const val REACT_DOM = "react-dom"
     const val BOOTSTRAP = "bootstrap"
+    const val UUID = "uuid"
+    const val APEX_CHARTS = "apexcharts"
 
     object Versions {
         const val ANDROID_GRADLE_PLUGIN = "7.0.1" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
@@ -74,5 +76,7 @@ object Dependencies {
 
         const val REACT = "17.0.2" // https://www.npmjs.com/package/react
         const val BOOTSTRAP = "5.1.0" // https://www.npmjs.com/package/bootstrap
+        const val UUID = "8.3.2" // https://www.npmjs.com/package/uuid
+        const val APEX_CHARTS = "3.27.3" // https://www.npmjs.com/package/apexcharts
     }
 }

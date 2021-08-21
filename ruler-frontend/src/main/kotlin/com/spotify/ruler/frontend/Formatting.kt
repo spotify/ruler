@@ -19,6 +19,7 @@ package com.spotify.ruler.frontend
 import com.spotify.ruler.models.Measurable
 
 const val BYTE_FACTOR = 1024
+const val PERCENT_FACTOR = 100
 
 fun formatSize(measurable: Measurable, sizeType: Measurable.SizeType): String {
     val bytes = measurable.getSize(sizeType)
@@ -33,4 +34,9 @@ fun formatSize(bytes: Number): String {
         units.removeFirst()
     }
     return "${remainder.asDynamic().toFixed(1)} ${units.first()}"
+}
+
+fun formatPercentage(fraction: Number, total: Number): String {
+    val percentage = PERCENT_FACTOR * fraction.toDouble() / total.toDouble()
+    return "${percentage.asDynamic().toFixed(2)} %"
 }

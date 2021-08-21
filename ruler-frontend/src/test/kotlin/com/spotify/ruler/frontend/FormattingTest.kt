@@ -27,4 +27,12 @@ class FormattingTest {
         assertEquals("4.3 KB", formatSize(4.3 * 1024))
         assertEquals("26.0 MB", formatSize(26.0 * 1024 * 1024))
     }
+
+    @Test
+    fun formatPercentage() {
+        assertEquals("100.00 %", formatPercentage(100, 100))
+        assertEquals("6.73 %", formatPercentage(55, 817))
+        assertEquals("37.50 %", formatPercentage(75, 200))
+        assertEquals("166.67 %", formatPercentage(150, 90))
+    }
 }

@@ -43,6 +43,7 @@ fun RBuilder.report(report: AppReport) {
 
     val tabs = listOf(
         Tab("/", "Breakdown") { breakdown(report.components, sizeType) },
+        Tab("/insights", "Insights") { insights(report.components) }
     )
 
     div(classes = "container mt-4 mb-5") {

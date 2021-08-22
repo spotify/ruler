@@ -19,6 +19,8 @@ package com.spotify.ruler.frontend
 import com.spotify.ruler.models.AppReport
 import kotlinext.js.require
 import kotlinx.browser.document
+import kotlinx.html.dom.append
+import kotlinx.html.js.link
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import react.dom.render
@@ -26,6 +28,10 @@ import react.dom.render
 fun main() {
     require("bootstrap/dist/css/bootstrap.css")
     require("bootstrap/dist/js/bootstrap.bundle.js")
+
+    // Load and show the favicon
+    val favicon = require("./favicon.svg").toString()
+    document.head?.append?.link(href = favicon, rel = "icon")
 
     // Load and deserialize the report data
     val rawReport = require("./report.json").toString()

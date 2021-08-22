@@ -19,3 +19,9 @@ config.module.rules.push({
     test: /\.json$/,
     type: 'asset/source',
 });
+
+// Load SVG files by inlining them as data URLs
+config.module.rules.push({
+    test: /\.svg$/,
+    type: 'asset/inline',
+});

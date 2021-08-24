@@ -18,13 +18,16 @@ package com.spotify.ruler.plugin.attribution
 
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
+import com.spotify.ruler.plugin.dependency.DependencyComponent
+
+private typealias Dependencies = Map<String, List<DependencyComponent>>
 
 /**
  * Responsible for attributing files to the components they are coming from.
  *
  * @param defaultComponent Component to which files will be assigned, if they can't be attributed to any other component
  */
-class Attributor(private val defaultComponent: String) {
+class Attributor(private val defaultComponent: DependencyComponent) {
 
     /**
      * Attributes files contained in the final app to the component that they are coming from.
@@ -33,8 +36,8 @@ class Attributor(private val defaultComponent: String) {
      * @param dependencies Map of file names to a list of all components which include this file
      * @return Map of component names to the list of app files attributed to this component
      */
-    fun attribute(files: List<AppFile>, dependencies: Map<String, List<String>>): Map<String, List<AppFile>> {
-        val components = mutableMapOf<String, MutableList<AppFile>>()
+    fun attribute(files: List<AppFile>, dependencies: Dependencies): Map<DependencyComponent, List<AppFile>> {
+        val components = mutableMapOf<DependencyComponent, MutableList<AppFile>>()
         files.forEach { file ->
             val component = when(file.type) {
                 FileType.CLASS -> getComponentForClass(file.name, dependencies)
@@ -51,7 +54,7 @@ class Attributor(private val defaultComponent: String) {
 
     /** Tries to determine the component for a certain class. */
     @Suppress("ReturnCount")
-    private fun getComponentForClass(name: String, dependencies: Map<String, List<String>>): String? {
+    private fun getComponentForClass(name: String, dependencies: Dependencies): DependencyComponent? {
         if (dependencies[name]?.size == 1) {
             return dependencies.getValue(name).single()
         }
@@ -83,19 +86,19 @@ class Attributor(private val defaultComponent: String) {
     }
 
     /** Tries to determine the component for a certain resource file. */
-    private fun getComponentForResource(name: String, dependencies: Map<String, List<String>>): String? {
+    private fun getComponentForResource(name: String, dependencies: Dependencies): DependencyComponent? {
         val resourceName = name.removePrefix("/res")
         return dependencies[resourceName]?.singleOrNull()
     }
 
     /** Tries to determine the component for a certain asset file. */
-    private fun getComponentForAsset(name: String, dependencies: Map<String, List<String>>): String? {
+    private fun getComponentForAsset(name: String, dependencies: Dependencies): DependencyComponent? {
         val assetName = name.removePrefix("/assets")
         return dependencies[assetName]?.singleOrNull()
     }
 
     /** Tries to determine the component for a certain native library. */
-    private fun getComponentForNativeLib(name: String, dependencies: Map<String, List<String>>): String? {
+    private fun getComponentForNativeLib(name: String, dependencies: Dependencies): DependencyComponent? {
         val nativeLibName = name.removePrefix("/lib")
         if (dependencies[nativeLibName]?.size == 1) {
             return dependencies.getValue(nativeLibName).single()
@@ -107,12 +110,12 @@ class Attributor(private val defaultComponent: String) {
     }
 
     /** Tries to determine the component for a certain file. */
-    private fun getComponentForFile(name: String, dependencies: Map<String, List<String>>): String? {
+    private fun getComponentForFile(name: String, dependencies: Dependencies): DependencyComponent? {
         return dependencies[name]?.singleOrNull()
     }
 
     /** Tries to determine the component for a certain package. */
-    private fun getComponentForPackage(name: String, dependencies: Map<String, List<String>>): String? {
+    private fun getComponentForPackage(name: String, dependencies: Dependencies): DependencyComponent? {
         val candidates = dependencies.filter { it.key.substringBeforeLast('.') == name }.values.flatten()
         return candidates.distinct().singleOrNull()
     }

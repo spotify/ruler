@@ -16,6 +16,7 @@
 
 package com.spotify.ruler.plugin.dependency
 
+import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.plugin.common.ClassNameSanitizer
 
 /**
@@ -32,11 +33,12 @@ class DependencySanitizer(private val classNameSanitizer: ClassNameSanitizer) {
      * @param entries List of raw entries parsed from dependencies
      * @return Map of file names to a list of all components which include this file
      */
-    fun sanitize(entries: List<DependencyEntry>): Map<String, List<String>> {
-        val map = mutableMapOf<String, MutableList<String>>()
+    fun sanitize(entries: List<DependencyEntry>): Map<String, List<DependencyComponent>> {
+        val map = mutableMapOf<String, MutableList<DependencyComponent>>()
         entries.map(::sanitizeEntry).forEach { entry ->
             val components = map.getOrPut(entry.name) { ArrayList() }
-            components += entry.component
+            val type = getComponentType(entry)
+            components += DependencyComponent(entry.component, type)
         }
         return map
     }
@@ -51,5 +53,11 @@ class DependencySanitizer(private val classNameSanitizer: ClassNameSanitizer) {
             }
             is DependencyEntry.Default -> entry.copy(component = component)
         }
+    }
+
+    /** Determines the correct component type for a given [entry]. */
+    private fun getComponentType(entry: DependencyEntry): ComponentType = when {
+        entry.component.startsWith(':') -> ComponentType.INTERNAL
+        else -> ComponentType.EXTERNAL
     }
 }

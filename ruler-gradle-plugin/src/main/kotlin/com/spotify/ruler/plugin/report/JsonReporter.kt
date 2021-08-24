@@ -20,6 +20,7 @@ import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.AppReport
 import com.spotify.ruler.models.Measurable
+import com.spotify.ruler.plugin.dependency.DependencyComponent
 import com.spotify.ruler.plugin.models.AppInfo
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -37,16 +38,17 @@ class JsonReporter {
      * @param targetDir Directory where the generated report will be located
      * @return Generated JSON report file
      */
-    fun generateReport(appInfo: AppInfo, components: Map<String, List<AppFile>>, targetDir: File): File {
+    fun generateReport(appInfo: AppInfo, components: Map<DependencyComponent, List<AppFile>>, targetDir: File): File {
         val report = AppReport(
             name = appInfo.applicationId,
             version = appInfo.versionName,
             variant = appInfo.variantName,
             downloadSize = components.values.flatten().sumOf(AppFile::downloadSize),
             installSize = components.values.flatten().sumOf(AppFile::installSize),
-            components = components.map { (componentName, files) ->
+            components = components.map { (component, files) ->
                 AppComponent(
-                    name = componentName,
+                    name = component.name,
+                    type = component.type,
                     downloadSize = files.sumOf(AppFile::downloadSize),
                     installSize = files.sumOf(AppFile::installSize),
                     files = files.sortedWith(comparator.reversed())

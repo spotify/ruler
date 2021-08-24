@@ -14,16 +14,12 @@
 * limitations under the License.
 */
 
-package com.spotify.ruler.models
+package com.spotify.ruler.plugin.dependency
 
-import kotlinx.serialization.Serializable
+import com.spotify.ruler.models.ComponentType
 
-/** Single component of an app. Can either be a Gradle module or a dependency. */
-@Serializable
-data class AppComponent(
+/** Component representing a single dependency. */
+data class DependencyComponent(
     val name: String,
     val type: ComponentType,
-    override val downloadSize: Long,
-    override val installSize: Long,
-    val files: List<AppFile>,
-) : Measurable
+)

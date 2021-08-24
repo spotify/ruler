@@ -20,7 +20,9 @@ import com.google.common.truth.Truth.assertThat
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.AppReport
+import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.FileType
+import com.spotify.ruler.plugin.dependency.DependencyComponent
 import com.spotify.ruler.plugin.models.AppInfo
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -33,11 +35,11 @@ class JsonReporterTest {
 
     private val appInfo = AppInfo("release", "com.spotify.music", "1.2.3")
     private val components = mapOf(
-        ":app" to listOf(
+        DependencyComponent(":app", ComponentType.INTERNAL) to listOf(
             AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200),
             AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250),
         ),
-        ":lib" to listOf(
+        DependencyComponent(":lib", ComponentType.INTERNAL) to listOf(
             AppFile("/assets/license.html", FileType.ASSET, 500, 600),
         ),
     )
@@ -48,10 +50,10 @@ class JsonReporterTest {
         val report = Json.decodeFromString<AppReport>(reportFile.readText())
 
         val expected = AppReport("com.spotify.music", "1.2.3", "release", 750, 1050, listOf(
-            AppComponent(":lib", 500, 600, listOf(
+            AppComponent(":lib", ComponentType.INTERNAL, 500, 600, listOf(
                 AppFile("/assets/license.html", FileType.ASSET, 500, 600),
             )),
-            AppComponent(":app", 250, 450, listOf(
+            AppComponent(":app", ComponentType.INTERNAL, 250, 450, listOf(
                 AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250),
                 AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200),
             )),

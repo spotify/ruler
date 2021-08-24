@@ -17,11 +17,13 @@
 package com.spotify.ruler.plugin
 
 import com.spotify.ruler.models.AppFile
+import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.plugin.apk.ApkCreator
 import com.spotify.ruler.plugin.apk.ApkParser
 import com.spotify.ruler.plugin.apk.ApkSanitizer
 import com.spotify.ruler.plugin.attribution.Attributor
 import com.spotify.ruler.plugin.common.ClassNameSanitizer
+import com.spotify.ruler.plugin.dependency.DependencyComponent
 import com.spotify.ruler.plugin.dependency.DependencyParser
 import com.spotify.ruler.plugin.dependency.DependencySanitizer
 import com.spotify.ruler.plugin.models.AppInfo
@@ -65,7 +67,7 @@ abstract class RulerTask : DefaultTask() {
         val dependencies = getDependencies() // Get all entries from all dependencies
 
         // Attribute bundle entries and group into components
-        val attributor = Attributor(project.path)
+        val attributor = Attributor(DependencyComponent(project.path, ComponentType.INTERNAL))
         val components = attributor.attribute(files, dependencies)
 
         generateReports(components)
@@ -84,7 +86,7 @@ abstract class RulerTask : DefaultTask() {
         return apkSanitizer.sanitize(entries)
     }
 
-    private fun getDependencies(): Map<String, List<String>> {
+    private fun getDependencies(): Map<String, List<DependencyComponent>> {
         val dependencyParser = DependencyParser()
         val entries = dependencyParser.parse(project, appInfo.get())
 
@@ -93,7 +95,7 @@ abstract class RulerTask : DefaultTask() {
         return dependencySanitizer.sanitize(entries)
     }
 
-    private fun generateReports(components: Map<String, List<AppFile>>) {
+    private fun generateReports(components: Map<DependencyComponent, List<AppFile>>) {
         val jsonReporter = JsonReporter()
         val jsonReport = jsonReporter.generateReport(appInfo.get(), components, reportDir.asFile.get())
         project.logger.lifecycle("Wrote JSON report to file://${jsonReport.absolutePath}")

@@ -16,14 +16,8 @@
 
 package com.spotify.ruler.models
 
-import kotlinx.serialization.Serializable
-
-/** Single component of an app. Can either be a Gradle module or a dependency. */
-@Serializable
-data class AppComponent(
-    val name: String,
-    val type: ComponentType,
-    override val downloadSize: Long,
-    override val installSize: Long,
-    val files: List<AppFile>,
-) : Measurable
+/** Type of an [AppComponent]. */
+enum class ComponentType {
+    INTERNAL,
+    EXTERNAL,
+}

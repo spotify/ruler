@@ -17,6 +17,7 @@
 package com.spotify.ruler.plugin.dependency
 
 import com.google.common.truth.Truth.assertThat
+import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.plugin.common.ClassNameSanitizer
 import org.junit.jupiter.api.Test
 
@@ -28,7 +29,7 @@ class DependencySanitizerTest {
         val dirty = DependencyEntry.Default("licenses.html", "project :lib")
         val clean = sanitizer.sanitize(listOf(dirty))
 
-        assertThat(clean).containsEntry("licenses.html", listOf(":lib"))
+        assertThat(clean).containsEntry("licenses.html", listOf(DependencyComponent(":lib", ComponentType.INTERNAL)))
     }
 
     @Test
@@ -36,7 +37,23 @@ class DependencySanitizerTest {
         val dirty = DependencyEntry.Class("com/spotify/MainActivity.class", "com.spotify:main:1.0.0")
         val clean = sanitizer.sanitize(listOf(dirty))
 
-        assertThat(clean).containsEntry("com.spotify.MainActivity", listOf("com.spotify:main:1.0.0"))
+        assertThat(clean).containsEntry("com.spotify.MainActivity", listOf(
+            DependencyComponent("com.spotify:main:1.0.0", ComponentType.EXTERNAL),
+        ))
+    }
+
+    @Test
+    fun `Component types are recognized`() {
+        val dirty = listOf(
+            DependencyEntry.Default("foo.txt", ":foo"),
+            DependencyEntry.Default("bar.txt", "org.bar:bar:1.0.0"),
+        )
+        val clean = sanitizer.sanitize(dirty)
+
+        assertThat(clean).containsEntry("foo.txt", listOf(DependencyComponent(":foo", ComponentType.INTERNAL)))
+        assertThat(clean).containsEntry("bar.txt", listOf(
+            DependencyComponent("org.bar:bar:1.0.0", ComponentType.EXTERNAL),
+        ))
     }
 
     @Test
@@ -48,9 +65,9 @@ class DependencySanitizerTest {
         )
         val clean = sanitizer.sanitize(dirty)
 
-        assertThat(clean).containsEntry("foo.txt", listOf(":foo"))
-        assertThat(clean).containsEntry("bar.txt", listOf(":bar"))
-        assertThat(clean).containsEntry("baz.txt", listOf(":baz"))
+        assertThat(clean).containsEntry("foo.txt", listOf(DependencyComponent(":foo", ComponentType.INTERNAL)))
+        assertThat(clean).containsEntry("bar.txt", listOf(DependencyComponent(":bar", ComponentType.INTERNAL)))
+        assertThat(clean).containsEntry("baz.txt", listOf(DependencyComponent(":baz", ComponentType.INTERNAL)))
     }
 
     @Test
@@ -62,6 +79,10 @@ class DependencySanitizerTest {
         )
         val clean = sanitizer.sanitize(dirty)
 
-        assertThat(clean).containsEntry("test.txt", listOf(":foo", ":bar", ":baz"))
+        assertThat(clean).containsEntry("test.txt", listOf(
+            DependencyComponent(":foo", ComponentType.INTERNAL),
+            DependencyComponent(":bar", ComponentType.INTERNAL),
+            DependencyComponent(":baz", ComponentType.INTERNAL),
+        ))
     }
 }

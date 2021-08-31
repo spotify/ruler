@@ -26,6 +26,8 @@ import kotlinx.serialization.json.Json
 import react.dom.render
 
 fun main() {
+    require("./style.css")
+
     require("bootstrap/dist/css/bootstrap.css")
     require("bootstrap/dist/js/bootstrap.bundle.js")
 

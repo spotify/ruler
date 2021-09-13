@@ -24,6 +24,8 @@ import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.FileType
 import com.spotify.ruler.plugin.dependency.DependencyComponent
 import com.spotify.ruler.plugin.models.AppInfo
+import com.spotify.ruler.plugin.ownership.OwnershipEntry
+import com.spotify.ruler.plugin.ownership.OwnershipInfo
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
@@ -44,27 +46,37 @@ class JsonReporterTest {
         ),
     )
 
+    private val ownershipEntries = listOf(OwnershipEntry(":app", "app-team"))
+    private val ownershipInfo = OwnershipInfo(ownershipEntries, "default-team")
+
     @Test
     fun `JSON report is generated`(@TempDir targetDir: File) {
-        val reportFile = reporter.generateReport(appInfo, components, targetDir)
+        val reportFile = reporter.generateReport(appInfo, components, ownershipInfo, targetDir)
         val report = Json.decodeFromString<AppReport>(reportFile.readText())
 
         val expected = AppReport("com.spotify.music", "1.2.3", "release", 750, 1050, listOf(
             AppComponent(":lib", ComponentType.INTERNAL, 500, 600, listOf(
-                AppFile("/assets/license.html", FileType.ASSET, 500, 600),
-            )),
+                AppFile("/assets/license.html", FileType.ASSET, 500, 600, "default-team"),
+            ), "default-team"),
             AppComponent(":app", ComponentType.INTERNAL, 250, 450, listOf(
-                AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250),
-                AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200),
-            )),
+                AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250, "app-team"),
+                AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200, "app-team"),
+            ), "app-team"),
         ))
         assertThat(report).isEqualTo(expected)
     }
 
     @Test
+    fun `Ownership info is omitted from report if it is null`(@TempDir targetDir: File) {
+        val reportFile = reporter.generateReport(appInfo, components, null, targetDir)
+        val reportContent = reportFile.readText()
+        assertThat(reportContent).doesNotContain("owner")
+    }
+
+    @Test
     fun `Existing reports are overwritten`(@TempDir targetDir: File) {
         repeat(2) {
-            reporter.generateReport(appInfo, components, targetDir)
+            reporter.generateReport(appInfo, components, ownershipInfo, targetDir)
         }
     }
 }

@@ -25,4 +25,5 @@ data class AppFile(
     val type: FileType,
     override val downloadSize: Long,
     override val installSize: Long,
+    val owner: String? = null,
 ) : Measurable

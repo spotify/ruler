@@ -53,6 +53,9 @@ ruler {
     locale.set("en")
     screenDensity.set(480)
     sdkVersion.set(27)
+
+    ownershipFile.set(project.layout.projectDirectory.file("ownership.yaml"))
+    defaultOwner.set("default-team")
 }
 
 // Include Ruler tasks in checks

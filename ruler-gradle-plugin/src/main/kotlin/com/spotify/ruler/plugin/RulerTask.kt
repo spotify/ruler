@@ -28,6 +28,8 @@ import com.spotify.ruler.plugin.dependency.DependencyParser
 import com.spotify.ruler.plugin.dependency.DependencySanitizer
 import com.spotify.ruler.plugin.models.AppInfo
 import com.spotify.ruler.plugin.models.DeviceSpec
+import com.spotify.ruler.plugin.ownership.OwnershipFileParser
+import com.spotify.ruler.plugin.ownership.OwnershipInfo
 import com.spotify.ruler.plugin.report.HtmlReporter
 import com.spotify.ruler.plugin.report.JsonReporter
 import org.gradle.api.DefaultTask
@@ -55,6 +57,13 @@ abstract class RulerTask : DefaultTask() {
     @get:InputFile
     abstract val mappingFile: RegularFileProperty
 
+    @get:Optional
+    @get:InputFile
+    abstract val ownershipFile: RegularFileProperty
+
+    @get:Input
+    abstract val defaultOwner: Property<String>
+
     @get:OutputDirectory
     abstract val workingDir: DirectoryProperty
 
@@ -70,7 +79,8 @@ abstract class RulerTask : DefaultTask() {
         val attributor = Attributor(DependencyComponent(project.path, ComponentType.INTERNAL))
         val components = attributor.attribute(files, dependencies)
 
-        generateReports(components)
+        val ownershipInfo = getOwnershipInfo() // Get ownership information for all components
+        generateReports(components, ownershipInfo)
     }
 
     private fun getFilesFromBundle(): List<AppFile> {
@@ -95,9 +105,17 @@ abstract class RulerTask : DefaultTask() {
         return dependencySanitizer.sanitize(entries)
     }
 
-    private fun generateReports(components: Map<DependencyComponent, List<AppFile>>) {
+    private fun getOwnershipInfo(): OwnershipInfo? {
+        val ownershipFile = ownershipFile.asFile.orNull ?: return null
+        val ownershipFileParser = OwnershipFileParser()
+        val ownershipEntries = ownershipFileParser.parse(ownershipFile)
+
+        return OwnershipInfo(ownershipEntries, defaultOwner.get())
+    }
+
+    private fun generateReports(components: Map<DependencyComponent, List<AppFile>>, ownershipInfo: OwnershipInfo?) {
         val jsonReporter = JsonReporter()
-        val jsonReport = jsonReporter.generateReport(appInfo.get(), components, reportDir.asFile.get())
+        val jsonReport = jsonReporter.generateReport(appInfo.get(), components, ownershipInfo, reportDir.asFile.get())
         project.logger.lifecycle("Wrote JSON report to file://${jsonReport.absolutePath}")
 
         val htmlReporter = HtmlReporter()

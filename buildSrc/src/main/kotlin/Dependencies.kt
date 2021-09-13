@@ -33,6 +33,7 @@ object Dependencies {
     const val APK_ANALYZER = "com.android.tools.apkparser:apkanalyzer:${Versions.ANDROID_TOOLS}"
     const val KOTLINX_SERIALIZATION_CORE = "org.jetbrains.kotlinx:kotlinx-serialization-core:${Versions.KOTLINX_SERIALIZATION}"
     const val KOTLINX_SERIALIZATION_JSON = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KOTLINX_SERIALIZATION}"
+    const val SNAKE_YAML = "org.yaml:snakeyaml:${Versions.SNAKE_YAML}"
 
     const val JUNIT_ENGINE = "org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}"
     const val JUNIT_API = "org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}"
@@ -65,6 +66,7 @@ object Dependencies {
 
         const val ANDROID_TOOLS = "30.0.1" // https://mvnrepository.com/artifact/com.android.tools/common?repo=google
         const val KOTLINX_SERIALIZATION = "1.2.2" // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core
+        const val SNAKE_YAML = "1.29" // https://mvnrepository.com/artifact/org.yaml/snakeyaml
 
         const val JUNIT = "5.7.2" // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
         const val GOOGLE_TRUTH = "1.1.3" // https://mvnrepository.com/artifact/com.google.truth/truth

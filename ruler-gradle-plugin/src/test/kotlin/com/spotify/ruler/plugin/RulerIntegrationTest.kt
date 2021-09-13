@@ -67,6 +67,27 @@ class RulerIntegrationTest {
         gradlew(task, expectFailure = true)
     }
 
+    @ParameterizedTest
+    @CsvSource(":app:analyzeDebugBundle,debug", ":app:analyzeReleaseBundle,release")
+    fun `Bundle analysis succeeds if no ownership file is configured`(task: String, variant: String) {
+        val buildGradle = projectDir.resolve("app/build.gradle")
+        buildGradle.writeText(buildGradle.readText().substringBefore("ownershipFile") + "}")
+
+        gradlew(task)
+
+        val reportDir = projectDir.resolve("app/build/reports/ruler/$variant")
+        assertThat(reportDir.resolve("report.json").readText()).doesNotContain("owner")
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [":app:analyzeDebugBundle", ":app:analyzeReleaseBundle"])
+    fun `Bundle analysis fails if the ownership file is invalid`(task: String) {
+        val ownershipYaml = projectDir.resolve("app/ownership.yaml")
+        ownershipYaml.writeText("This is not a valid YAML file")
+
+        gradlew(task, expectFailure = true)
+    }
+
     private fun gradlew(vararg arguments: String, expectFailure: Boolean = false): BuildResult {
          val runner = GradleRunner.create()
             .withProjectDir(projectDir)

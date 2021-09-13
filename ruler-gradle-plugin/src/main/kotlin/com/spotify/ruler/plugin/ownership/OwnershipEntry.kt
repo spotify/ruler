@@ -14,17 +14,10 @@
 * limitations under the License.
 */
 
-package com.spotify.ruler.models
+package com.spotify.ruler.plugin.ownership
 
-import kotlinx.serialization.Serializable
-
-/** Single component of an app. Can either be a Gradle module or a dependency. */
-@Serializable
-data class AppComponent(
-    val name: String,
-    val type: ComponentType,
-    override val downloadSize: Long,
-    override val installSize: Long,
-    val files: List<AppFile>,
-    val owner: String? = null,
-) : Measurable
+/** A single entry in the ownership file. */
+data class OwnershipEntry(
+    val identifier: String,
+    val owner: String,
+)

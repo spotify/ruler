@@ -16,6 +16,7 @@
 
 package com.spotify.ruler.plugin
 
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 
@@ -24,4 +25,12 @@ open class RulerExtension(objects: ObjectFactory) {
     val locale: Property<String> = objects.property(String::class.java)
     val screenDensity: Property<Int> = objects.property(Int::class.java)
     val sdkVersion: Property<Int> = objects.property(Int::class.java)
+
+    val ownershipFile: RegularFileProperty = objects.fileProperty()
+    val defaultOwner: Property<String> = objects.property(String::class.java)
+
+    // Set up default values
+    init {
+        defaultOwner.convention("unknown")
+    }
 }

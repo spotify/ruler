@@ -22,6 +22,7 @@ import com.spotify.ruler.models.AppReport
 import com.spotify.ruler.models.Measurable
 import com.spotify.ruler.plugin.dependency.DependencyComponent
 import com.spotify.ruler.plugin.models.AppInfo
+import com.spotify.ruler.plugin.ownership.OwnershipInfo
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -35,10 +36,16 @@ class JsonReporter {
      *
      * @param appInfo General info about the analyzed app.
      * @param components Map of app component names to their respective files
+     * @param ownershipInfo Optional info about the owners of components.
      * @param targetDir Directory where the generated report will be located
      * @return Generated JSON report file
      */
-    fun generateReport(appInfo: AppInfo, components: Map<DependencyComponent, List<AppFile>>, targetDir: File): File {
+    fun generateReport(
+        appInfo: AppInfo,
+        components: Map<DependencyComponent, List<AppFile>>,
+        ownershipInfo: OwnershipInfo?,
+        targetDir: File
+    ): File {
         val report = AppReport(
             name = appInfo.applicationId,
             version = appInfo.versionName,
@@ -51,7 +58,16 @@ class JsonReporter {
                     type = component.type,
                     downloadSize = files.sumOf(AppFile::downloadSize),
                     installSize = files.sumOf(AppFile::installSize),
-                    files = files.sortedWith(comparator.reversed())
+                    owner = ownershipInfo?.getOwner(component.name, component.type),
+                    files = files.map { file ->
+                        AppFile(
+                            name = file.name,
+                            type = file.type,
+                            downloadSize = file.downloadSize,
+                            installSize = file.installSize,
+                            owner = ownershipInfo?.getOwner(component.name, component.type),
+                        )
+                    }.sortedWith(comparator.reversed())
                 )
             }.sortedWith(comparator.reversed())
         )

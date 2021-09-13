@@ -40,6 +40,7 @@ dependencies {
         exclude(group = "com.android.tools.lint") // Avoid leaking incompatible Lint versions to consumers
     }
     implementation(Dependencies.KOTLINX_SERIALIZATION_JSON)
+    implementation(Dependencies.SNAKE_YAML)
 
     testRuntimeOnly(Dependencies.JUNIT_ENGINE)
     testImplementation(gradleTestKit())

@@ -41,6 +41,8 @@ class RulerPlugin : Plugin<Project> {
 
                     task.bundleFile.set(variant.artifacts.get(SingleArtifact.BUNDLE))
                     task.mappingFile.set(variant.artifacts.get(SingleArtifact.OBFUSCATION_MAPPING_FILE))
+                    task.ownershipFile.set(rulerExtension.ownershipFile)
+                    task.defaultOwner.set(rulerExtension.defaultOwner)
 
                     task.workingDir.set(project.layout.buildDirectory.dir("intermediates/ruler/${variant.name}"))
                     task.reportDir.set(project.layout.buildDirectory.dir("reports/ruler/${variant.name}"))

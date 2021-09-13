@@ -11,6 +11,9 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        android-gradle-plugin: [7.0.1]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -26,6 +29,8 @@ jobs:
         run: ./gradlew publishToMavenLocal -PwithoutSample --no-daemon --stacktrace
 
       - name: Run checks
+        env:
+          ANDROID_GRADLE_PLUGIN_VERSION: ${{ matrix.android-gradle-plugin }}
         run: ./gradlew check --no-daemon --stacktrace
 
       - name: Archive sample HTML report

@@ -47,7 +47,16 @@ dependencies {
     testImplementation(Dependencies.JUNIT_PARAMS)
     testImplementation(Dependencies.GOOGLE_TRUTH)
     testImplementation(Dependencies.GOOGLE_GUAVA)
-    testImplementation(Dependencies.ANDROID_GRADLE_PLUGIN)
+
+    // Allow testing against different Android Gradle plugin versions
+    testImplementation(Dependencies.ANDROID_GRADLE_PLUGIN) {
+        val version = System.getenv("ANDROID_GRADLE_PLUGIN_VERSION")
+        if (version != null) {
+            version {
+                strictly(version)
+            }
+        }
+    }
 }
 
 // Include the output of the frontend JS compilation in the plugin resources

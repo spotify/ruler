@@ -41,9 +41,12 @@ import react.useState
 fun RBuilder.report(report: AppReport) {
     val (sizeType, setSizeType) = useState(Measurable.SizeType.DOWNLOAD)
 
+    val hasOwnershipInfo = report.components.any { component -> component.owner != null }
+
     val tabs = listOf(
         Tab("/", "Breakdown") { breakdown(report.components, sizeType) },
-        Tab("/insights", "Insights") { insights(report.components) }
+        Tab("/insights", "Insights") { insights(report.components) },
+        Tab("/ownership", "Ownership", hasOwnershipInfo) { ownership(report.components, sizeType) },
     )
 
     div(classes = "container mt-4 mb-5") {
@@ -86,7 +89,11 @@ fun RBuilder.navigation(tabs: List<Tab>, onSizeTypeSelected: (Measurable.SizeTyp
             tabs(tabs)
         }
         div(classes = "col-auto") {
-            sizeTypeDropdown(onSizeTypeSelected = onSizeTypeSelected)
+            val options = mapOf(
+                "Download size" to Measurable.SizeType.DOWNLOAD,
+                "Install size" to Measurable.SizeType.INSTALL,
+            )
+            dropdown(options, onSizeTypeSelected)
         }
     }
 }
@@ -94,7 +101,7 @@ fun RBuilder.navigation(tabs: List<Tab>, onSizeTypeSelected: (Measurable.SizeTyp
 @RFunction
 fun RBuilder.tabs(tabs: List<Tab>) {
     ul(classes = "nav nav-pills") {
-        tabs.forEach { (path, label, _) ->
+        tabs.filter(Tab::enabled).forEach { (path, label) ->
             li(classes = "nav-item") {
                 navLink<RProps>(to = path, className = "nav-link", exact = true) { +label }
             }
@@ -103,28 +110,32 @@ fun RBuilder.tabs(tabs: List<Tab>) {
 }
 
 @RFunction
-fun RBuilder.sizeTypeDropdown(onSizeTypeSelected: (Measurable.SizeType) -> Unit) {
-    select(classes = "form-select") {
-        attrs.onChangeFunction = { event ->
-            val selectedValue = (event.target as HTMLSelectElement).value
-            onSizeTypeSelected(Measurable.SizeType.valueOf(selectedValue))
-        }
-        option {
-            attrs.value = Measurable.SizeType.DOWNLOAD.name
-            +"Download size"
-        }
-        option {
-            attrs.value = Measurable.SizeType.INSTALL.name
-            +"Install size"
+fun RBuilder.content(tabs: List<Tab>) {
+    switch {
+        tabs.forEach { (path, _, _, content) ->
+            route(path, exact = true, render = content)
         }
     }
 }
 
 @RFunction
-fun RBuilder.content(tabs: List<Tab>) {
-    switch {
-        tabs.forEach { (path, _, content) ->
-            route(path, exact = true, render = content)
+fun <T : Enum<T>> RBuilder.dropdown(options: Map<String, T>, onOptionSelected: (T) -> Unit) {
+    dropdown(options.keys) { selectedOption ->
+        onOptionSelected(options.getValue(selectedOption))
+    }
+}
+
+@RFunction
+fun RBuilder.dropdown(options: Iterable<String>, onOptionSelected: (String) -> Unit) {
+    select(classes = "form-select") {
+        attrs.onChangeFunction = { event ->
+            onOptionSelected((event.target as HTMLSelectElement).value)
+        }
+        options.forEach { option ->
+            option {
+                attrs.value = option
+                +option
+            }
         }
     }
 }
@@ -132,5 +143,6 @@ fun RBuilder.content(tabs: List<Tab>) {
 data class Tab(
     val path: String,
     val label: String,
+    val enabled: Boolean = true,
     val content: RBuilder.() -> Unit
 )

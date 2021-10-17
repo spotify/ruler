@@ -2,20 +2,22 @@
   "name": "com.spotify.music",
   "version": "1.2.3",
   "variant": "release",
-  "downloadSize": 850,
-  "installSize": 1250,
+  "downloadSize": 2900,
+  "installSize": 4800,
   "components": [
     {
       "name": ":lib",
       "type": "INTERNAL",
       "downloadSize": 500,
       "installSize": 600,
+      "owner": "lib-team",
       "files": [
         {
           "name": "/assets/license.html",
           "type": "ASSET",
           "downloadSize": 500,
-          "installSize": 600
+          "installSize": 600,
+          "owner": "lib-team"
         }
       ]
     },
@@ -24,18 +26,21 @@
       "type": "INTERNAL",
       "downloadSize": 250,
       "installSize": 450,
+      "owner": "app-team",
       "files": [
         {
           "name": "/res/layout/activity_main.xml",
           "type": "RESOURCE",
           "downloadSize": 150,
-          "installSize": 250
+          "installSize": 250,
+          "owner": "app-team"
         },
         {
           "name": "com.spotify.MainActivity",
           "type": "CLASS",
           "downloadSize": 100,
-          "installSize": 200
+          "installSize": 200,
+          "owner": "app-team"
         }
       ]
     },
@@ -44,12 +49,173 @@
       "type": "EXTERNAL",
       "downloadSize": 100,
       "installSize": 200,
+      "owner": "so-team",
       "files": [
         {
           "name": "/lib/arm64-v8a/libnative.so",
           "type": "NATIVE_LIB",
           "downloadSize": 100,
-          "installSize": 200
+          "installSize": 200,
+          "owner": "so-team"
+        }
+      ]
+    },
+    {
+      "name": ":sample:navigation",
+      "type": "INTERNAL",
+      "downloadSize": 100,
+      "installSize": 150,
+      "owner": "navigation-team",
+      "files": [
+        {
+          "name": "/res/navigation/nav_graph.xml",
+          "type": "RESOURCE",
+          "downloadSize": 100,
+          "installSize": 150,
+          "owner": "navigation-team"
+        }
+      ]
+    },
+    {
+      "name": ":sample:search",
+      "type": "INTERNAL",
+      "downloadSize": 200,
+      "installSize": 400,
+      "owner": "search-team",
+      "files": [
+        {
+          "name": "com.spotify.SearchFragment",
+          "type": "CLASS",
+          "downloadSize": 200,
+          "installSize": 400,
+          "owner": "search-team"
+        }
+      ]
+    },
+    {
+      "name": ":sample:database",
+      "type": "INTERNAL",
+      "downloadSize": 150,
+      "installSize": 150,
+      "owner": "database-team",
+      "files": [
+        {
+          "name": "/assets/sample.db",
+          "type": "ASSET",
+          "downloadSize": 150,
+          "installSize": 150,
+          "owner": "database-team"
+        }
+      ]
+    },{
+      "name": "com.google.dagger:dagger:2.39",
+      "type": "EXTERNAL",
+      "downloadSize": 300,
+      "installSize": 500,
+      "owner": "di-team",
+      "files": [
+        {
+          "name": "dagger.internal.InstanceFactory",
+          "type": "CLASS",
+          "downloadSize": 300,
+          "installSize": 500,
+          "owner": "di-team"
+        }
+      ]
+    },
+    {
+      "name": "androidx.room:room-runtime:2.3.0",
+      "type": "EXTERNAL",
+      "downloadSize": 300,
+      "installSize": 350,
+      "owner": "database-team",
+      "files": [
+        {
+          "name": "androidx.room.RoomDatabase",
+          "type": "CLASS",
+          "downloadSize": 300,
+          "installSize": 350,
+          "owner": "database-team"
+        }
+      ]
+    },
+    {
+      "name": ":sample:logging",
+      "type": "INTERNAL",
+      "downloadSize": 200,
+      "installSize": 700,
+      "owner": "logging-team",
+      "files": [
+        {
+          "name": "com.spotify.Logger",
+          "type": "CLASS",
+          "downloadSize": 200,
+          "installSize": 700,
+          "owner": "logging-team"
+        }
+      ]
+    },
+    {
+      "name": "androidx.core:core:1.6.0",
+      "type": "EXTERNAL",
+      "downloadSize": 300,
+      "installSize": 400,
+      "owner": "core-team",
+      "files": [
+        {
+          "name": "/res/layout/custom_dialog.xml",
+          "type": "RESOURCE",
+          "downloadSize": 300,
+          "installSize": 400,
+          "owner": "core-team"
+        }
+      ]
+    },
+    {
+      "name": ":sample:core",
+      "type": "INTERNAL",
+      "downloadSize": 200,
+      "installSize": 350,
+      "owner": "core-team",
+      "files": [
+        {
+          "name": "com.spotify.Core",
+          "type": "CLASS",
+          "downloadSize": 200,
+          "installSize": 350,
+          "owner": "core-team"
+        }
+      ]
+    },
+    {
+      "name": ":sample:performance",
+      "type": "INTERNAL",
+      "downloadSize": 100,
+      "installSize": 200,
+      "owner": "performance-team",
+      "files": [
+        {
+          "name": "com.spotify.Benchmark",
+          "type": "CLASS",
+          "downloadSize": 100,
+          "installSize": 200,
+          "owner": "performance-team"
+        }
+      ]
+    },
+    {
+      "name": ":sample:playback",
+      "type": "INTERNAL",
+      "downloadSize": 200,
+      "installSize": 350,
+      "owner": "playback-team",
+      "files": [
+        {
+          "name": "com.spotify.Playback",
+          "type": "CLASS",
+          "downloadSize": 200,
+          "installSize": 350,
+          "owner": "playback-team"
         }
       ]
     }

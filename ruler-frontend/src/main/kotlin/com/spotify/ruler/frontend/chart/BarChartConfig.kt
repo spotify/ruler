@@ -22,6 +22,7 @@ import com.spotify.ruler.frontend.binding.TooltipAxisFormatterOptions
 import com.spotify.ruler.frontend.formatPercentage
 
 /** Chart config for bar charts. */
+@Suppress("LongParameterList")
 class BarChartConfig(
     private val chartLabels: Array<String>,
     private val chartSeries: Array<Series>,
@@ -29,6 +30,7 @@ class BarChartConfig(
     private val horizontal: Boolean = false,
     private val xAxisFormatter: NumberFormatter = Number::toString,
     private val yAxisFormatter: NumberFormatter = Number::toString,
+    private val chartSeriesTotals: LongArray? = null,
 ) : ChartConfig() {
 
     override fun getOptions() = buildOptions {
@@ -48,7 +50,11 @@ class BarChartConfig(
 
     private fun formatTooltip(number: Number, options: TooltipAxisFormatterOptions): String {
         val axisFormatter = if (horizontal) xAxisFormatter else yAxisFormatter
-        val total = options.series[options.seriesIndex].sumOf { it.toLong() }
+        val total = if (chartSeriesTotals != null) {
+            chartSeriesTotals[options.seriesIndex]
+        } else {
+            options.series[options.seriesIndex].sumOf(Number::toLong)
+        }
         return "${axisFormatter.invoke(number)} (${formatPercentage(number, total)})"
     }
 }

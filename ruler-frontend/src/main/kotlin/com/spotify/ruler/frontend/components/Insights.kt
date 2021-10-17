@@ -104,11 +104,11 @@ fun RBuilder.componentTypeGraphs(components: List<AppComponent>) {
         ),
     )
     chart(
-        title = "Component type distribution (file count)",
+        title = "Component type distribution (component count)",
         description = "Shows how many components of a certain type are contained in the app.",
         config = BarChartConfig(
             chartLabels = labels,
-            chartSeries = arrayOf(seriesOf("Files", fileCounts)),
+            chartSeries = arrayOf(seriesOf("Components", fileCounts)),
             chartHeight = 250,
             horizontal = true,
         ),

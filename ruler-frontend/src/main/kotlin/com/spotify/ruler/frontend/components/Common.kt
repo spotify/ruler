@@ -23,7 +23,6 @@ import com.spotify.ruler.models.Measurable
 import kotlinx.html.js.onChangeFunction
 import org.w3c.dom.HTMLSelectElement
 import react.RBuilder
-import react.RProps
 import react.dom.div
 import react.dom.h3
 import react.dom.li
@@ -31,10 +30,10 @@ import react.dom.option
 import react.dom.select
 import react.dom.span
 import react.dom.ul
-import react.router.dom.hashRouter
-import react.router.dom.navLink
-import react.router.dom.route
-import react.router.dom.switch
+import react.router.dom.HashRouter
+import react.router.dom.NavLink
+import react.router.dom.Route
+import react.router.dom.Switch
 import react.useState
 
 @RFunction
@@ -54,7 +53,7 @@ fun RBuilder.report(report: AppReport) {
             header(report)
         }
         div(classes = "shadow-sm p-4 bg-white rounded-1") {
-            hashRouter {
+            HashRouter {
                 navigation(tabs, onSizeTypeSelected = { setSizeType(it) })
                 content(tabs)
             }
@@ -103,7 +102,12 @@ fun RBuilder.tabs(tabs: List<Tab>) {
     ul(classes = "nav nav-pills") {
         tabs.filter(Tab::enabled).forEach { (path, label) ->
             li(classes = "nav-item") {
-                navLink<RProps>(to = path, className = "nav-link", exact = true) { +label }
+                NavLink {
+                    attrs.to = path
+                    attrs.className = "nav-link"
+                    attrs.exact = true
+                    +label
+                }
             }
         }
     }
@@ -111,9 +115,13 @@ fun RBuilder.tabs(tabs: List<Tab>) {
 
 @RFunction
 fun RBuilder.content(tabs: List<Tab>) {
-    switch {
+    Switch {
         tabs.forEach { (path, _, _, content) ->
-            route(path, exact = true, render = content)
+            Route {
+                attrs.path = arrayOf(path)
+                attrs.exact = true
+                content.invoke(this)
+            }
         }
     }
 }

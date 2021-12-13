@@ -71,6 +71,29 @@ class AttributorTest {
     }
 
     @Test
+    fun `External synthetic classes are attributed correctly`() {
+        val files = listOf(AppFile("a.TestClass\$\$ExternalSyntheticLambda1", FileType.CLASS, 100, 200))
+        val dependencies = mapOf("com.spotify.TestClass" to listOf(
+            DependencyComponent(":lib", ComponentType.INTERNAL),
+        ))
+        val map = attributor.attribute(files, dependencies)
+
+        assertThat(map).containsEntry(DependencyComponent(":lib", ComponentType.INTERNAL), files)
+    }
+
+    @Test
+    fun `External synthetic classes are not attributed if there is no unambiguous component`() {
+        val files = listOf(AppFile("a.TestClass\$\$ExternalSyntheticLambda1", FileType.CLASS, 100, 200))
+        val dependencies = mapOf(
+            "com.spotify.TestClass" to listOf(DependencyComponent(":lib", ComponentType.INTERNAL)),
+            "com.spotify.other.TestClass" to listOf(DependencyComponent(":other", ComponentType.INTERNAL)),
+        )
+        val map = attributor.attribute(files, dependencies)
+
+        assertThat(map).containsEntry(DependencyComponent(":default", ComponentType.INTERNAL), files)
+    }
+
+    @Test
     fun `Classes are attributed based on their package name`() {
         val files = listOf(AppFile("com.spotify.UnknownClass", FileType.CLASS, 100, 200))
         val dependencies = mapOf("com.spotify.MainActivity" to listOf(

@@ -80,6 +80,16 @@ class Attributor(private val defaultComponent: DependencyComponent) {
             }
         }
 
+        // Attribute external synthetic classes based on their simple class name
+        if (name.contains("\$\$ExternalSynthetic")) {
+            val simpleClassName = name.substringBefore("\$\$ExternalSynthetic").substringAfterLast('.')
+            val candidates = dependencies.filter { it.key.substringAfterLast('.') == simpleClassName }.values.flatten()
+            val component = candidates.distinct().singleOrNull()
+            if (component != null) {
+                return component
+            }
+        }
+
         // If everything else fails, try matching based on package name
         val packageName = name.substringBeforeLast('.')
         return getComponentForPackage(packageName, dependencies)

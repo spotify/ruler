@@ -10,7 +10,12 @@ Ruler is a Gradle plugin which helps you analyze the size of your Android apps.
 
 App size is an important metric which [directly correlates with business metrics](https://medium.com/googleplaydev/shrinking-apks-growing-installs-5d3fcba23ce2) like install conversion rate. Measuring app size is straightforward, but knowing what contributes to it is not. Especially in bigger projects with hundreds or thousands of modules and third-party dependencies. Ruler provides a convenient way to find out how much each module and dependency contributes to the total size of your app by running a single Gradle task.
 
-![HTML report](docs/report.png)
+<table>
+  <tr>
+    <td><img src="docs/breakdown.png"></td>
+    <td><img src="docs/insights.png"></td>
+  </tr>
+</table>
 
 ## Usage
 
@@ -59,6 +64,33 @@ ruler {
 ### Running the task
 
 Once this is done, `analyze<VariantName>Bundle` tasks will be added for each of your app variants. Running this task will build the app and generate a HTML report, which you can use to analyze your app size. It will also generate a JSON report, in case you want to further process the data.
+
+## Ownership
+
+In larger organizations, Gradle modules and dependencies are is often owned by specific teams. If that's the case for your app, Ruler can help you analyze app size contributions by different teams. All you need to do is provide a YAML file listing all components and their owners:
+
+```yaml
+# Identifier for Gradle modules -> path of the module
+- identifier: :sample:app
+  owner: app-team
+
+# Identifier for dependencies -> dependency shorthand without the version
+- identifier: androidx.core:core
+  owner: core-team
+```
+
+This ownership file can be maintained manually, but in most cases it will be more practical to generate it during the build. You can point Ruler to your YAML file in the `build.gradle`, you can also configure default owners for components missing from the ownership file:
+
+```kotlin
+ruler {
+    ownershipFile.set("/path/to/ownership.yaml")
+    defaultOwner.set("default-team") // unknown by default
+}
+```
+
+When you pass an ownership file to Ruler, you'll see a new tab in the HTML report with app size insights broken down by team:
+
+![HTML report - ownership](docs/ownership.png)
 
 ## Project structure
 

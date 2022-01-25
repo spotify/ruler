@@ -27,6 +27,6 @@ android {
         targetSdk = 31
     }
     lint {
-        isWarningsAsErrors = true
+        warningsAsErrors = true
     }
 }

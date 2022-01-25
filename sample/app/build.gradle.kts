@@ -37,7 +37,7 @@ android {
         }
     }
     lint {
-        isWarningsAsErrors = true
+        warningsAsErrors = true
     }
     packagingOptions {
         resources.excludes.add("**/*.kotlin_builtins")

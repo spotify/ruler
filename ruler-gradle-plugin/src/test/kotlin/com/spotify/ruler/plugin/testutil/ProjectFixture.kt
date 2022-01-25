@@ -50,9 +50,19 @@ object ProjectFixture {
         buildGradle.writeText(buildGradleContent)
     }
 
-    /** Replaces a given [marker] in the source build.gradle file with the [field] from the common [dependencies]. */
+    /**
+     * Replaces a given [marker] in the source build.gradle file with the [field] from the common [dependencies]. If
+     * there is an environment variable for the given [field], the version from that will be used instead.
+     */
     private fun String.injectVersion(marker: String, field: String): String {
-        val version = dependencies.getField(field).get(dependencies).toString()
-        return replace(marker, version)
+        var dependency = dependencies.getField(field).get(dependencies).toString()
+
+        // Override the version of the dependency if an environment variable exists
+        val versionOverride = System.getenv("${field}_VERSION")
+        if (versionOverride != null) {
+            dependency = dependency.replaceAfterLast(':', versionOverride)
+        }
+
+        return replace(marker, dependency)
     }
 }

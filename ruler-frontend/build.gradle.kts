@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
-
 plugins {
     id("org.jetbrains.kotlin.js")
     id("com.bnorm.react.kotlin-react-function")
@@ -56,13 +53,3 @@ dependencies {
 // Make report data directories available to webpack
 registerWebpackDirectory("src/development", "development")
 registerWebpackDirectory("src/production", "production")
-
-rootProject.plugins.withType(NodeJsRootPlugin::class) {
-    rootProject.extensions.configure(NodeJsRootExtension::class) {
-        // Workaround until https://youtrack.jetbrains.com/issue/KT-48273 is fixed
-        versions.webpackDevServer.version = "4.0.0"
-
-        // Workaround until https://youtrack.jetbrains.com/issue/KT-49124 is fixed
-        versions.webpackCli.version = "4.9.0"
-    }
-}

@@ -23,6 +23,7 @@ import com.spotify.ruler.models.Measurable
 import kotlinx.html.js.onChangeFunction
 import org.w3c.dom.HTMLSelectElement
 import react.RBuilder
+import react.createElement
 import react.dom.div
 import react.dom.h3
 import react.dom.li
@@ -30,10 +31,10 @@ import react.dom.option
 import react.dom.select
 import react.dom.span
 import react.dom.ul
+import react.router.Route
+import react.router.Routes
 import react.router.dom.HashRouter
 import react.router.dom.NavLink
-import react.router.dom.Route
-import react.router.dom.Switch
 import react.useState
 
 @RFunction
@@ -92,7 +93,9 @@ fun RBuilder.navigation(tabs: List<Tab>, onSizeTypeSelected: (Measurable.SizeTyp
                 "Download size" to Measurable.SizeType.DOWNLOAD,
                 "Install size" to Measurable.SizeType.INSTALL,
             )
-            dropdown(options, onSizeTypeSelected)
+            dropdown(options.keys) { selectedOption ->
+                onSizeTypeSelected(options.getValue(selectedOption))
+            }
         }
     }
 }
@@ -105,7 +108,6 @@ fun RBuilder.tabs(tabs: List<Tab>) {
                 NavLink {
                     attrs.to = path
                     attrs.className = "nav-link"
-                    attrs.exact = true
                     +label
                 }
             }
@@ -115,21 +117,13 @@ fun RBuilder.tabs(tabs: List<Tab>) {
 
 @RFunction
 fun RBuilder.content(tabs: List<Tab>) {
-    Switch {
+    Routes {
         tabs.forEach { (path, _, _, content) ->
             Route {
-                attrs.path = arrayOf(path)
-                attrs.exact = true
-                content.invoke(this)
+                attrs.path = path
+                attrs.element = createElement(content)
             }
         }
-    }
-}
-
-@RFunction
-fun <T : Enum<T>> RBuilder.dropdown(options: Map<String, T>, onOptionSelected: (T) -> Unit) {
-    dropdown(options.keys) { selectedOption ->
-        onOptionSelected(options.getValue(selectedOption))
     }
 }
 

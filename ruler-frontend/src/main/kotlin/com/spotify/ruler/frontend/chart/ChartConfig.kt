@@ -17,7 +17,7 @@
 package com.spotify.ruler.frontend.chart
 
 import com.spotify.ruler.frontend.binding.ApexChartOptions
-import kotlinext.js.jsObject
+import kotlinext.js.jso
 
 /** Base config for displaying charts. Check https://apexcharts.com/docs/options/ for all chart types and options. */
 abstract class ChartConfig {
@@ -26,56 +26,56 @@ abstract class ChartConfig {
     abstract fun getOptions(): ApexChartOptions
 
     /** Utility function which allows concrete configs to start with a common sets of defaults. */
-    protected fun buildOptions(builder: ApexChartOptions.() -> Unit) = jsObject<ApexChartOptions> {
-        chart = jsObject {
+    protected fun buildOptions(builder: ApexChartOptions.() -> Unit) = jso<ApexChartOptions> {
+        chart = jso {
             fontFamily = FONT_FAMILY
-            toolbar = jsObject {
+            toolbar = jso {
                 show = false
             }
         }
-        dataLabels = jsObject {
+        dataLabels = jso {
             enabled = false
         }
-        fill = jsObject {
+        fill = jso {
             opacity = 1.0
         }
-        grid = jsObject {
-            xaxis = jsObject {
-                lines = jsObject()
+        grid = jso {
+            xaxis = jso {
+                lines = jso()
             }
-            yaxis = jsObject {
-                lines = jsObject()
+            yaxis = jso {
+                lines = jso()
             }
         }
-        legend = jsObject {
+        legend = jso {
             fontSize = FONT_SIZE
-            markers = jsObject {
+            markers = jso {
                 width = FONT_SIZE
                 height = FONT_SIZE
             }
         }
-        plotOptions = jsObject {
-            bar = jsObject()
+        plotOptions = jso {
+            bar = jso()
         }
-        stroke = jsObject {
+        stroke = jso {
             show = true
             colors = arrayOf("transparent")
             width = STROKE_WIDTH
         }
-        tooltip = jsObject {
-            x = jsObject()
-            y = jsObject()
+        tooltip = jso {
+            x = jso()
+            y = jso()
         }
-        xaxis = jsObject {
-            labels = jsObject {
-                style = jsObject {
+        xaxis = jso {
+            labels = jso {
+                style = jso {
                     fontSize = FONT_SIZE
                 }
             }
         }
-        yaxis = jsObject {
-            labels = jsObject {
-                style = jsObject {
+        yaxis = jso {
+            labels = jso {
+                style = jso {
                     fontSize = FONT_SIZE
                 }
             }

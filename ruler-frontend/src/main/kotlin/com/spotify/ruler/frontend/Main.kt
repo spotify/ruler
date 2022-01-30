@@ -41,7 +41,7 @@ fun main() {
     val report = Json.decodeFromString<AppReport>(rawReport)
 
     // Visualize and display the report data
-    render(document.getElementById("root")) {
+    render(requireNotNull(document.getElementById("root"))) {
         report(report)
     }
 }

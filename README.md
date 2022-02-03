@@ -1,10 +1,11 @@
+<p></p>
+<img src="docs/logo.png" width="50%" />
+
+_Ruler is a Gradle plugin which helps you analyze the size of your Android apps._
+
 [![Build Status](https://img.shields.io/github/workflow/status/spotify/ruler/CI)](https://github.com/spotify/ruler/actions)
 [![Maven Release](https://img.shields.io/maven-central/v/com.spotify.ruler/ruler-gradle-plugin)](https://github.com/spotify/ruler/releases)
 [![License](https://img.shields.io/github/license/spotify/ruler)](https://github.com/spotify/ruler/blob/main/LICENSE)
-
-# Ruler 📏
-
-Ruler is a Gradle plugin which helps you analyze the size of your Android apps.
 
 ## Motivation
 

@@ -68,7 +68,7 @@ Once this is done, `analyze<VariantName>Bundle` tasks will be added for each of 
 
 ## Ownership
 
-In larger organizations, Gradle modules and dependencies are is often owned by specific teams. If that's the case for your app, Ruler can help you analyze app size contributions by different teams. All you need to do is provide a YAML file listing all components and their owners:
+In larger organizations, Gradle modules and dependencies are often owned by specific teams. If that's the case for your app, Ruler can help you analyze app size contributions by different teams. All you need to do is provide a YAML file listing all components and their owners:
 
 ```yaml
 # Identifier for Gradle modules -> path of the module

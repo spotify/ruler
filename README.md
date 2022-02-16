@@ -84,7 +84,7 @@ This ownership file can be maintained manually, but in most cases it will be mor
 
 ```kotlin
 ruler {
-    ownershipFile.set("/path/to/ownership.yaml")
+    ownershipFile.set(project.file("/path/to/ownership.yaml"))
     defaultOwner.set("default-team") // unknown by default
 }
 ```

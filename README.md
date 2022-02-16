@@ -78,6 +78,10 @@ In larger organizations, Gradle modules and dependencies are often owned by spec
 # Identifier for dependencies -> dependency shorthand without the version
 - identifier: androidx.core:core
   owner: core-team
+
+# Wildcard identifier -> matches multiple components (can be both modules or dependencies)
+- identifier: :sample:wildcard:*
+  owner: wildcard-team
 ```
 
 This ownership file can be maintained manually, but in most cases it will be more practical to generate it during the build. You can point Ruler to your YAML file in the `build.gradle`, you can also configure default owners for components missing from the ownership file:

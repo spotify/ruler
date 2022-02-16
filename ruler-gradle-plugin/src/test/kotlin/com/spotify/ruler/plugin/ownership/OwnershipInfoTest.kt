@@ -23,7 +23,13 @@ import org.junit.jupiter.api.Test
 class OwnershipInfoTest {
     private val entries = listOf(
         OwnershipEntry(":foo:bar", "internal-component-owner"),
+        OwnershipEntry(":wildcard:foo:*", "internal-wildcard-foo-owner"),
+        OwnershipEntry(":wildcard:*", "internal-wildcard-owner"),
+        OwnershipEntry(":wildcard:foo:bar", "internal-wildcard-foo-bar-owner"),
         OwnershipEntry("com.spotify:main", "external-component-owner"),
+        OwnershipEntry("com.wildcard.spotify:*", "external-wildcard-spotify-owner"),
+        OwnershipEntry("com.wildcard.*", "external-wildcard-owner"),
+        OwnershipEntry("com.wildcard.spotify:foo", "external-wildcard-spotify-foo-owner"),
     )
     private val ownershipInfo = OwnershipInfo(entries, "default-owner")
 
@@ -46,6 +52,24 @@ class OwnershipInfoTest {
     }
 
     @Test
+    fun `Internal component owner is found for wildcard entries`() {
+        val owner = ownershipInfo.getOwner(":wildcard:test", ComponentType.INTERNAL)
+        assertThat(owner).isEqualTo("internal-wildcard-owner")
+    }
+
+    @Test
+    fun `Internal component owner is found for more specific wildcard entries`() {
+        val owner = ownershipInfo.getOwner(":wildcard:foo:test", ComponentType.INTERNAL)
+        assertThat(owner).isEqualTo("internal-wildcard-foo-owner")
+    }
+
+    @Test
+    fun `Internal component owner is found for explicit entry when wildcard is present`() {
+        val owner = ownershipInfo.getOwner(":wildcard:foo:bar", ComponentType.INTERNAL)
+        assertThat(owner).isEqualTo("internal-wildcard-foo-bar-owner")
+    }
+
+    @Test
     fun `External component owner is found`() {
         val owner = ownershipInfo.getOwner("com.spotify:main:1.0.0", ComponentType.EXTERNAL)
         assertThat(owner).isEqualTo("external-component-owner")
@@ -61,5 +85,23 @@ class OwnershipInfoTest {
     fun `External component owner is not found when queried for internal components`() {
         val owner = ownershipInfo.getOwner("com.spotify:main:1.0.0", ComponentType.INTERNAL)
         assertThat(owner).isEqualTo("default-owner")
+    }
+
+    @Test
+    fun `External component owner is found for wildcard entries`() {
+        val owner = ownershipInfo.getOwner("com.wildcard.test:test:1.0.0", ComponentType.EXTERNAL)
+        assertThat(owner).isEqualTo("external-wildcard-owner")
+    }
+
+    @Test
+    fun `External component owner is found for more specific wildcard entries`() {
+        val owner = ownershipInfo.getOwner("com.wildcard.spotify:test:1.0.0", ComponentType.EXTERNAL)
+        assertThat(owner).isEqualTo("external-wildcard-spotify-owner")
+    }
+
+    @Test
+    fun `External component owner is found for explicit entry when wildcard is present`() {
+        val owner = ownershipInfo.getOwner("com.wildcard.spotify:foo:1.0.0", ComponentType.EXTERNAL)
+        assertThat(owner).isEqualTo("external-wildcard-spotify-foo-owner")
     }
 }

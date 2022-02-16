@@ -29,10 +29,8 @@ First you need to add the Ruler Gradle plugin to the buildscript classpath in yo
 ```kotlin
 buildscript {
     repositories {
-        maven {
-            google()
-            mavenCentral()
-        }
+        google()
+        mavenCentral()
     }
     dependencies {
         classpath("com.spotify.ruler:ruler-gradle-plugin:1.1.0")

@@ -37,7 +37,7 @@ class RulerPlugin : Plugin<Project> {
                 val variantName = StringGroovyMethods.capitalize(variant.name)
                 project.tasks.register("analyze${variantName}Bundle", RulerTask::class.java) { task ->
                     task.appInfo.set(getAppInfo(project, variant))
-                    task.deviceSpec.set(getDeviceSpec(project, rulerExtension))
+                    task.deviceSpec.set(getDeviceSpec(rulerExtension))
 
                     task.bundleFile.set(variant.artifacts.get(SingleArtifact.BUNDLE))
                     task.mappingFile.set(variant.artifacts.get(SingleArtifact.OBFUSCATION_MAPPING_FILE))
@@ -56,16 +56,14 @@ class RulerPlugin : Plugin<Project> {
         AppInfo(
             applicationId = variant.applicationId.get(),
             versionName = variant.outputs.first().versionName.get() ?: "-",
-            variantName = variant.name
+            variantName = variant.name,
         )
     }
 
-    private fun getDeviceSpec(project: Project, extension: RulerExtension) = project.provider {
-        DeviceSpec(
-            abi = extension.abi.get(),
-            locale = extension.locale.get(),
-            screenDensity = extension.screenDensity.get(),
-            sdkVersion = extension.sdkVersion.get()
-        )
-    }
+    private fun getDeviceSpec(extension: RulerExtension) = DeviceSpec(
+        abi = extension.abi.orNull ?: error("ABI not specified."),
+        locale = extension.locale.orNull ?: error("Locale not specified."),
+        screenDensity = extension.screenDensity.orNull ?: error("Screen density not specified."),
+        sdkVersion = extension.sdkVersion.orNull ?: error("SDK version not specified."),
+    )
 }

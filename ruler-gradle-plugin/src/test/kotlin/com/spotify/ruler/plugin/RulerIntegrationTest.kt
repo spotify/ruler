@@ -64,7 +64,8 @@ class RulerIntegrationTest {
         val buildGradle = projectDir.resolve("app/build.gradle")
         buildGradle.writeText(buildGradle.readText().substringBefore("ruler {"))
 
-        gradlew(task, expectFailure = true)
+        val tasks = gradlew(task, expectFailure = true).tasks
+        assertThat(tasks).isEmpty() // We want to fail early
     }
 
     @ParameterizedTest

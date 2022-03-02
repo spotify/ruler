@@ -51,7 +51,10 @@ class DependencySanitizer(private val classNameSanitizer: ClassNameSanitizer) {
                 val name = classNameSanitizer.sanitize(entry.name)
                 DependencyEntry.Class(name, component)
             }
-            is DependencyEntry.Default -> entry.copy(component = component)
+            is DependencyEntry.Default -> {
+                val name = entry.name.replace('\\', '/') // Convert Windows-style paths to UNIX-style paths
+                DependencyEntry.Default(name, component)
+            }
         }
     }
 

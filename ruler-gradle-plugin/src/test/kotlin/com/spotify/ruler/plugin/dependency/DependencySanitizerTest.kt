@@ -85,4 +85,14 @@ class DependencySanitizerTest {
             DependencyComponent(":baz", ComponentType.INTERNAL),
         ))
     }
+
+    @Test
+    fun `Windows-style paths are converted to UNIX-style paths`() {
+        val dirty = DependencyEntry.Default("\\windows\\path\\test.txt", ":test")
+        val clean = sanitizer.sanitize(listOf(dirty))
+
+        assertThat(clean).containsEntry("/windows/path/test.txt", listOf(
+            DependencyComponent(":test", ComponentType.INTERNAL),
+        ))
+    }
 }

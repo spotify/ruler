@@ -41,6 +41,7 @@ android {
     }
     packagingOptions {
         resources.excludes.add("**/*.kotlin_builtins")
+        resources.excludes.add("kotlin-tooling-metadata.json")
     }
 }
 

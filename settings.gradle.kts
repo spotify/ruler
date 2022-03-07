@@ -21,6 +21,8 @@ include(":ruler-gradle-plugin")
 include(":ruler-models")
 
 if (!startParameter.projectProperties.containsKey("withoutSample")) {
+    include(":ruler-e2e-tests")
+
     include(":sample:app")
     include(":sample:lib")
 }

@@ -116,10 +116,10 @@ abstract class RulerTask : DefaultTask() {
     private fun generateReports(components: Map<DependencyComponent, List<AppFile>>, ownershipInfo: OwnershipInfo?) {
         val jsonReporter = JsonReporter()
         val jsonReport = jsonReporter.generateReport(appInfo.get(), components, ownershipInfo, reportDir.asFile.get())
-        project.logger.lifecycle("Wrote JSON report to file://${jsonReport.absolutePath}")
+        project.logger.lifecycle("Wrote JSON report to ${jsonReport.toPath().toUri()}")
 
         val htmlReporter = HtmlReporter()
         val htmlReport = htmlReporter.generateReport(jsonReport.readText(), reportDir.asFile.get())
-        project.logger.lifecycle("Wrote HTML report to file://${htmlReport.absolutePath}")
+        project.logger.lifecycle("Wrote HTML report to ${htmlReport.toPath().toUri()}")
     }
 }

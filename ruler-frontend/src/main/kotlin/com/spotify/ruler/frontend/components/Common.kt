@@ -22,6 +22,7 @@ import com.spotify.ruler.models.AppReport
 import com.spotify.ruler.models.Measurable
 import kotlinx.html.js.onChangeFunction
 import org.w3c.dom.HTMLSelectElement
+import react.Props
 import react.RBuilder
 import react.createElement
 import react.dom.div
@@ -121,7 +122,7 @@ fun RBuilder.content(tabs: List<Tab>) {
         tabs.forEach { (path, _, _, content) ->
             Route {
                 attrs.path = path
-                attrs.element = createElement(content)
+                attrs.element = createElement<Props>(content)
             }
         }
     }

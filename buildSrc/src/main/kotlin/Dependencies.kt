@@ -54,7 +54,7 @@ object Dependencies {
     const val APEX_CHARTS = "apexcharts"
 
     object Versions {
-        const val ANDROID_GRADLE_PLUGIN = "7.1.0" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
+        const val ANDROID_GRADLE_PLUGIN = "7.1.2" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
         const val KOTLIN = "1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
         const val KOTLIN_REACT_FUNCTION = "0.7.0" // https://mvnrepository.com/artifact/com.bnorm.react.kotlin-react-function/com.bnorm.react.kotlin-react-function.gradle.plugin
         const val DETEKT_GRADLE_PLUGIN = "1.19.0" // https://mvnrepository.com/artifact/io.gitlab.arturbosch.detekt/detekt-gradle-plugin
@@ -70,15 +70,15 @@ object Dependencies {
 
         const val JUNIT = "5.8.2" // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
         const val GOOGLE_TRUTH = "1.1.3" // https://mvnrepository.com/artifact/com.google.truth/truth
-        const val GOOGLE_GUAVA = "31.0.1-jre" // https://mvnrepository.com/artifact/com.google.guava/guava
+        const val GOOGLE_GUAVA = "31.1-jre" // https://mvnrepository.com/artifact/com.google.guava/guava
 
-        const val KOTLIN_REACT = "17.0.2-pre.292-kotlin-1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react
-        const val KOTLIN_REACT_ROUTER = "6.2.1-pre.292-kotlin-1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react-router-dom
-        const val KOTLIN_JS_EXTENSIONS = "1.0.1-pre.292-kotlin-1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-extensions
+        const val KOTLIN_REACT = "17.0.2-pre.313-kotlin-1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react
+        const val KOTLIN_REACT_ROUTER = "6.2.1-pre.313-kotlin-1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react-router-dom
+        const val KOTLIN_JS_EXTENSIONS = "1.0.1-pre.313-kotlin-1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-extensions
 
         const val REACT = "17.0.2" // https://www.npmjs.com/package/react
         const val BOOTSTRAP = "5.1.3" // https://www.npmjs.com/package/bootstrap
         const val UUID = "8.3.2" // https://www.npmjs.com/package/uuid
-        const val APEX_CHARTS = "3.33.0" // https://www.npmjs.com/package/apexcharts
+        const val APEX_CHARTS = "3.33.2" // https://www.npmjs.com/package/apexcharts
     }
 }

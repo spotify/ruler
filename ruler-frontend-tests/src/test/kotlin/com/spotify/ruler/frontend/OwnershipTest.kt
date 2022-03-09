@@ -40,14 +40,32 @@ class OwnershipTest {
     fun `Switching the selected owner changes the displayed values`(driver: WebDriver) {
         start(driver)
             .navigateToOwnershipTab()
-            .assertVisible(":app")
-            .assertVisible("250.0 B")
-            .assertVisible("450.0 B")
+            .selectOwner("navigation-team")
+            .assertVisible(":sample:navigation")
+            .assertVisible("100.0 B")
+            .assertVisible("150.0 B")
             .assertNotVisible(":lib")
             .selectOwner("lib-team")
             .assertVisible(":lib")
             .assertVisible("500.0 B")
             .assertVisible("600.0 B")
-            .assertNotVisible(":app")
+            .assertNotVisible(":sample:navigation")
+    }
+
+    @Test
+    fun `Files owned by different teams are filtered and attributed to the right team`(driver: WebDriver) {
+        start(driver)
+            .navigateToOwnershipTab()
+            .selectOwner("app-team")
+            .click(":app")
+            .assertVisible("com.spotify.MainActivity")
+            .assertVisible("100.0 B")
+            .assertNotVisible("/res/layout/activity_main.xml")
+            .assertNotVisible("Other owned files")
+            .selectOwner("app-resource-team")
+            .click("Other owned files")
+            .assertVisible("/res/layout/activity_main.xml")
+            .assertVisible("150.0 B")
+            .assertNotVisible("com.spotify.MainActivity")
     }
 }

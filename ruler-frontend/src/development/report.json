@@ -33,7 +33,7 @@
           "type": "RESOURCE",
           "downloadSize": 150,
           "installSize": 250,
-          "owner": "app-team"
+          "owner": "app-resource-team"
         },
         {
           "name": "com.spotify.MainActivity",

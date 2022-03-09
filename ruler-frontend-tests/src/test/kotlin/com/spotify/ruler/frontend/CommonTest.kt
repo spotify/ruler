@@ -45,6 +45,6 @@ class CommonTest {
             .assertVisible("Component type distribution (component count)")
             .navigateToOwnershipTab()
             .assertVisible("Ownership overview")
-            .assertVisible("Components grouped by owner")
+            .assertVisible("Components and files grouped by owner")
     }
 }

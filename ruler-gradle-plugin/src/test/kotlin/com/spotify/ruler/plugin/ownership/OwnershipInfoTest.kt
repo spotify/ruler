@@ -30,6 +30,8 @@ class OwnershipInfoTest {
         OwnershipEntry("com.wildcard.spotify:*", "external-wildcard-spotify-owner"),
         OwnershipEntry("com.wildcard.*", "external-wildcard-owner"),
         OwnershipEntry("com.wildcard.spotify:foo", "external-wildcard-spotify-foo-owner"),
+        OwnershipEntry("com.spotify.MainActivity", "main-activity-owner"),
+        OwnershipEntry("com.spotify.ui.*", "ui-owner"),
     )
     private val ownershipInfo = OwnershipInfo(entries, "default-owner")
 
@@ -103,5 +105,23 @@ class OwnershipInfoTest {
     fun `External component owner is found for explicit entry when wildcard is present`() {
         val owner = ownershipInfo.getOwner("com.wildcard.spotify:foo:1.0.0", ComponentType.EXTERNAL)
         assertThat(owner).isEqualTo("external-wildcard-spotify-foo-owner")
+    }
+
+    @Test
+    fun `File owner is found`() {
+        val owner = ownershipInfo.getOwner("com.spotify.MainActivity", ":foo:bar", ComponentType.INTERNAL)
+        assertThat(owner).isEqualTo("main-activity-owner")
+    }
+
+    @Test
+    fun `Component owner is used when file owner is not found`() {
+        val owner = ownershipInfo.getOwner("com.spotify.Unknown", ":foo:bar", ComponentType.INTERNAL)
+        assertThat(owner).isEqualTo("internal-component-owner")
+    }
+
+    @Test
+    fun `File owner is found for wildcard entries`() {
+        val owner = ownershipInfo.getOwner("com.spotify.ui.UiClass", ":foo:bar", ComponentType.INTERNAL)
+        assertThat(owner).isEqualTo("ui-owner")
     }
 }

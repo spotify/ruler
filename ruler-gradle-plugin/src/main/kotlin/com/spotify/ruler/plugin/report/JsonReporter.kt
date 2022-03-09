@@ -65,7 +65,7 @@ class JsonReporter {
                             type = file.type,
                             downloadSize = file.downloadSize,
                             installSize = file.installSize,
-                            owner = ownershipInfo?.getOwner(component.name, component.type),
+                            owner = ownershipInfo?.getOwner(file.name, component.name, component.type),
                         )
                     }.sortedWith(comparator.reversed())
                 )

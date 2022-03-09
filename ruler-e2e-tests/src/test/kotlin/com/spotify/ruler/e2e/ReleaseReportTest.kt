@@ -43,8 +43,8 @@ class ReleaseReportTest {
         assertThat(app.owner).isEqualTo("default-team")
 
         assertThat(app.files).comparingElementsUsing(Correspondence.file()).containsExactly(
-            FileMatcher("com.spotify.ruler.sample.app.MainActivity", FileType.CLASS, "default-team"),
-            FileMatcher("/res/layout/activity_main.xml", FileType.RESOURCE, "default-team"),
+            FileMatcher("com.spotify.ruler.sample.app.MainActivity", FileType.CLASS, "main-team"),
+            FileMatcher("/res/layout/activity_main.xml", FileType.RESOURCE, "main-team"),
             FileMatcher("/AndroidManifest.xml", FileType.OTHER, "default-team"),
             FileMatcher("/resources.arsc", FileType.OTHER, "default-team"),
         )

@@ -51,12 +51,20 @@ class OwnershipInfo(entries: List<OwnershipEntry>, private val defaultOwner: Str
         return owner ?: getWildcardOwner(component) ?: defaultOwner
     }
 
-    /** Tries to find the owner for a component with the given [component] identifier based on all wildcard entries. */
-    private fun getWildcardOwner(component: String): String? {
-        val identifier = wildcardOwnershipEntries.keys
-            .filter(component::startsWith) // Find all identifiers that match the wildcard
+    /**
+     * Returns the owner of a given [file]. If the file has no explicit owner, the owner of the [component] will be
+     * returned instead.
+     */
+    fun getOwner(file: String, component: String, componentType: ComponentType): String {
+        return explicitOwnershipEntries[file] ?: getWildcardOwner(file) ?: getOwner(component, componentType)
+    }
+
+    /** Tries to find the owner for a component or file with the given [identifier] based on all wildcard entries. */
+    private fun getWildcardOwner(identifier: String): String? {
+        val matchingIdentifier = wildcardOwnershipEntries.keys
+            .filter(identifier::startsWith) // Find all identifiers that match the wildcard
             .maxByOrNull(String::length) // Take the longest one because that one is the most specific
 
-        return wildcardOwnershipEntries[identifier]
+        return wildcardOwnershipEntries[matchingIdentifier]
     }
 }

@@ -22,6 +22,8 @@ import com.spotify.ruler.frontend.chart.BarChartConfig
 import com.spotify.ruler.frontend.chart.seriesOf
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppComponent
+import com.spotify.ruler.models.AppFile
+import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.Measurable
 import react.RBuilder
 import react.dom.div
@@ -40,11 +42,11 @@ fun RBuilder.ownership(components: List<AppComponent>, sizeType: Measurable.Size
 @RFunction
 fun RBuilder.componentOwnershipOverview(components: List<AppComponent>) {
     val sizes = mutableMapOf<String, Measurable.Mutable>()
-    components.forEach { component ->
-        val owner = component.owner ?: return@forEach
+    components.flatMap(AppComponent::files).forEach { file ->
+        val owner = file.owner ?: return@forEach
         val current = sizes.getOrPut(owner) { Measurable.Mutable(0, 0) }
-        current.downloadSize += component.downloadSize
-        current.installSize += component.installSize
+        current.downloadSize += file.downloadSize
+        current.installSize += file.installSize
     }
 
     val sorted = sizes.entries.sortedByDescending { (_, measurable) -> measurable.downloadSize }
@@ -73,19 +75,45 @@ fun RBuilder.componentOwnershipOverview(components: List<AppComponent>) {
 
 @RFunction
 fun RBuilder.componentOwnershipPerTeam(components: List<AppComponent>, sizeType: Measurable.SizeType) {
-    val owners = components.mapNotNull(AppComponent::owner).distinct().sorted()
+    val files = components.flatMap(AppComponent::files)
+    val owners = files.mapNotNull(AppFile::owner).distinct().sorted()
     var selectedOwner by useState(owners.first())
 
     val ownedComponents = components.filter { component -> component.owner == selectedOwner }
+    val ownedFiles = files.filter { file -> file.owner == selectedOwner }
 
-    h4(classes = "mb-3 mt-4") { +"Components grouped by owner" }
+    val remainingOwnedFiles = ownedFiles.toMutableSet()
+    val processedComponents = ownedComponents.map { component ->
+        val ownedFilesFromComponent = component.files.filter { file -> file.owner == selectedOwner }
+        remainingOwnedFiles.removeAll(ownedFilesFromComponent)
+        component.copy(
+            downloadSize = ownedFilesFromComponent.sumOf(AppFile::downloadSize),
+            installSize = ownedFilesFromComponent.sumOf(AppFile::installSize),
+            files = ownedFilesFromComponent,
+        )
+    }.toMutableList()
+
+    // Group together all owned files which belong to components not owned by the currently selected owner
+    if (remainingOwnedFiles.isNotEmpty()) {
+        processedComponents += AppComponent(
+            name = "Other owned files",
+            type = ComponentType.INTERNAL,
+            downloadSize = remainingOwnedFiles.sumOf(AppFile::downloadSize),
+            installSize = remainingOwnedFiles.sumOf(AppFile::installSize),
+            files = remainingOwnedFiles.toList(),
+            owner = selectedOwner,
+        )
+    }
+
+    h4(classes = "mb-3 mt-4") { +"Components and files grouped by owner" }
     dropdown(owners, "owner-dropdown") { owner -> selectedOwner = owner }
     div(classes = "row mt-4 mb-4") {
         highlightedValue(ownedComponents.size, "Component(s)")
-        highlightedValue(ownedComponents.sumOf(AppComponent::downloadSize), "Download size", ::formatSize)
-        highlightedValue(ownedComponents.sumOf(AppComponent::installSize), "Install size", ::formatSize)
+        highlightedValue(ownedFiles.size, "File(s)")
+        highlightedValue(ownedFiles.sumOf(AppFile::downloadSize), "Download size", ::formatSize)
+        highlightedValue(ownedFiles.sumOf(AppFile::installSize), "Install size", ::formatSize)
     }
-    componentList(ownedComponents, sizeType)
+    componentList(processedComponents, sizeType)
 }
 
 @RFunction

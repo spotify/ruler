@@ -50,6 +50,12 @@ abstract class BaseRobot<T : BaseRobot<T>>(protected val driver: WebDriver) {
         return OwnershipRobot(driver)
     }
 
+    /** Clicks on the element with the given [text]. */
+    fun click(text: String): T {
+        driver.findElement(text(text)).click()
+        return self()
+    }
+
     /** Selects download size in the global size type selection dropdown. */
     fun selectDownloadSize(): T {
         val dropdown = Select(driver.findElement(id("size-type-dropdown")))

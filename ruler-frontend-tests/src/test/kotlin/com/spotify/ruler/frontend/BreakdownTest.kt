@@ -39,9 +39,9 @@ class BreakdownTest {
     fun `Toggling list items reveals and hides details`(driver: WebDriver) {
         start(driver)
             .assertNotVisible("com.spotify.MainActivity")
-            .toggleComponent(":app")
+            .click(":app")
             .assertVisible("com.spotify.MainActivity")
-            .toggleComponent(":app")
+            .click(":app")
             .assertNotVisible("com.spotify.MainActivity")
     }
 }

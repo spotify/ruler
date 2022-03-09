@@ -102,6 +102,7 @@ Ruler is built with Kotlin and contains multiple modules:
 - **ruler-gradle-plugin:** Core Gradle plugin where the APK parsing, dependency handling and attribution logic lives.
 - **ruler-frontend:** React template used for the HTML report, built with Kotlin JS.
 - **ruler-models:** Common models shared between the Gradle plugin and the frontend, built with Kotlin Multiplatform.
+- **ruler-e2e-tests:** End-to-end tests verifying the plugin using the sample project.
 
 ### Working with this project
 

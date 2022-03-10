@@ -20,6 +20,7 @@ import com.bnorm.react.RFunction
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppReport
 import com.spotify.ruler.models.Measurable
+import kotlinx.html.id
 import kotlinx.html.js.onChangeFunction
 import org.w3c.dom.HTMLSelectElement
 import react.Props
@@ -94,7 +95,7 @@ fun RBuilder.navigation(tabs: List<Tab>, onSizeTypeSelected: (Measurable.SizeTyp
                 "Download size" to Measurable.SizeType.DOWNLOAD,
                 "Install size" to Measurable.SizeType.INSTALL,
             )
-            dropdown(options.keys) { selectedOption ->
+            dropdown(options.keys, "size-type-dropdown") { selectedOption ->
                 onSizeTypeSelected(options.getValue(selectedOption))
             }
         }
@@ -129,8 +130,9 @@ fun RBuilder.content(tabs: List<Tab>) {
 }
 
 @RFunction
-fun RBuilder.dropdown(options: Iterable<String>, onOptionSelected: (String) -> Unit) {
+fun RBuilder.dropdown(options: Iterable<String>, id: String, onOptionSelected: (String) -> Unit) {
     select(classes = "form-select") {
+        attrs.id = id
         attrs.onChangeFunction = { event ->
             onOptionSelected((event.target as HTMLSelectElement).value)
         }

@@ -54,6 +54,7 @@ fun RBuilder.componentOwnershipOverview(components: List<AppComponent>) {
 
     pagedContent(owners.size, PAGE_SIZE) { pageStartIndex, pageEndIndex ->
         chart(
+            id = "owner-chart",
             title = "Ownership overview",
             description = "Shows how much of the overall app size is owned by each owner.",
             config = BarChartConfig(
@@ -78,7 +79,7 @@ fun RBuilder.componentOwnershipPerTeam(components: List<AppComponent>, sizeType:
     val ownedComponents = components.filter { component -> component.owner == selectedOwner }
 
     h4(classes = "mb-3 mt-4") { +"Components grouped by owner" }
-    dropdown(owners) { owner -> selectedOwner = owner }
+    dropdown(owners, "owner-dropdown") { owner -> selectedOwner = owner }
     div(classes = "row mt-4 mb-4") {
         highlightedValue(ownedComponents.size, "Component(s)")
         highlightedValue(ownedComponents.sumOf(AppComponent::downloadSize), "Download size", ::formatSize)

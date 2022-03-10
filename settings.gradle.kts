@@ -17,6 +17,7 @@
 rootProject.name = "ruler"
 
 include(":ruler-frontend")
+include(":ruler-frontend-tests")
 include(":ruler-gradle-plugin")
 include(":ruler-models")
 

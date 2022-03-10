@@ -58,6 +58,7 @@ fun RBuilder.fileTypeGraphs(components: List<AppComponent>) {
     }
 
     chart(
+        id = "file-type-distribution-size-chart",
         title = "File type distribution (size)",
         description = "Shows the accumulated app size for each file type.",
         config = BarChartConfig(
@@ -68,6 +69,7 @@ fun RBuilder.fileTypeGraphs(components: List<AppComponent>) {
         ),
     )
     chart(
+        id = "file-type-distribution-count-chart",
         title = "File type distribution (file count)",
         description = "Shows how many files of a certain type are contained in the app.",
         config = BarChartConfig(
@@ -93,6 +95,7 @@ fun RBuilder.componentTypeGraphs(components: List<AppComponent>) {
     }
 
     chart(
+        id = "component-type-distribution-size-chart",
         title = "Component type distribution (size)",
         description = "Shows the accumulated app size for each component type.",
         config = BarChartConfig(
@@ -104,6 +107,7 @@ fun RBuilder.componentTypeGraphs(components: List<AppComponent>) {
         ),
     )
     chart(
+        id = "component-type-distribution-count-chart",
         title = "Component type distribution (component count)",
         description = "Shows how many components of a certain type are contained in the app.",
         config = BarChartConfig(
@@ -116,14 +120,14 @@ fun RBuilder.componentTypeGraphs(components: List<AppComponent>) {
 }
 
 @RFunction
-fun RBuilder.chart(title: String, description: String, config: ChartConfig) {
+fun RBuilder.chart(id: String, title: String, description: String, config: ChartConfig) {
     div(classes = "col") {
         h4 { +title }
         p(classes = "text-muted") { +description }
         div {
-            attrs.id = Uuid.v4()
+            attrs.id = id
             useEffect {
-                val chart = ApexCharts(document.getElementById(attrs.id), config.getOptions())
+                val chart = ApexCharts(document.getElementById(id), config.getOptions())
                 chart.render()
                 cleanup {
                     chart.destroy()

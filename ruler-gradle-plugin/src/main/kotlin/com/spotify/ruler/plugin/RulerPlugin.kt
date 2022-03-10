@@ -27,15 +27,18 @@ import org.gradle.api.Project
 
 class RulerPlugin : Plugin<Project> {
 
+    private val name: String = "ruler"
+
     @Suppress("UnstableApiUsage")
     override fun apply(project: Project) {
-        val rulerExtension = project.extensions.create("ruler", RulerExtension::class.java)
+        val rulerExtension = project.extensions.create(name, RulerExtension::class.java)
 
         project.plugins.withId("com.android.application") {
             val androidComponents = project.extensions.getByType(ApplicationAndroidComponentsExtension::class.java)
             androidComponents.onVariants { variant ->
                 val variantName = StringGroovyMethods.capitalize(variant.name)
                 project.tasks.register("analyze${variantName}Bundle", RulerTask::class.java) { task ->
+                    task.group = name
                     task.appInfo.set(getAppInfo(project, variant))
                     task.deviceSpec.set(getDeviceSpec(rulerExtension))
 

@@ -47,10 +47,12 @@ object Dependencies {
     const val KOTLIN_JS_EXTENSIONS = "org.jetbrains.kotlin-wrappers:kotlin-extensions:${Versions.KOTLIN_JS_EXTENSIONS}"
     const val KOTLIN_REACT_FUNCTION = "com.bnorm.react:kotlin-react-function:${Versions.KOTLIN_REACT_FUNCTION}"
 
+    const val SELENIUM_WEBDRIVER = "org.seleniumhq.selenium:selenium-java:${Versions.SELENIUM_WEBDRIVER}"
+    const val SELENIUM_WEBDRIVER_MANAGER = "io.github.bonigarcia:webdrivermanager:${Versions.SELENIUM_WEBDRIVER_MANAGER}"
+
     const val REACT = "react"
     const val REACT_DOM = "react-dom"
     const val BOOTSTRAP = "bootstrap"
-    const val UUID = "uuid"
     const val APEX_CHARTS = "apexcharts"
 
     object Versions {
@@ -76,9 +78,11 @@ object Dependencies {
         const val KOTLIN_REACT_ROUTER = "6.2.1-pre.313-kotlin-1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react-router-dom
         const val KOTLIN_JS_EXTENSIONS = "1.0.1-pre.313-kotlin-1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-extensions
 
+        const val SELENIUM_WEBDRIVER = "4.1.2" // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+        const val SELENIUM_WEBDRIVER_MANAGER = "5.1.0" // https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager
+
         const val REACT = "17.0.2" // https://www.npmjs.com/package/react
         const val BOOTSTRAP = "5.1.3" // https://www.npmjs.com/package/bootstrap
-        const val UUID = "8.3.2" // https://www.npmjs.com/package/uuid
         const val APEX_CHARTS = "3.33.2" // https://www.npmjs.com/package/apexcharts
     }
 }

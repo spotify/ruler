@@ -56,14 +56,14 @@ object Dependencies {
     const val APEX_CHARTS = "apexcharts"
 
     object Versions {
-        const val ANDROID_GRADLE_PLUGIN = "7.1.2" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
-        const val KOTLIN = "1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
+        const val ANDROID_GRADLE_PLUGIN = "7.1.3" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
+        const val KOTLIN = "1.6.20" // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
         const val KOTLIN_REACT_FUNCTION = "0.7.0" // https://mvnrepository.com/artifact/com.bnorm.react.kotlin-react-function/com.bnorm.react.kotlin-react-function.gradle.plugin
-        const val DETEKT_GRADLE_PLUGIN = "1.19.0" // https://mvnrepository.com/artifact/io.gitlab.arturbosch.detekt/detekt-gradle-plugin
+        const val DETEKT_GRADLE_PLUGIN = "1.20.0" // https://mvnrepository.com/artifact/io.gitlab.arturbosch.detekt/detekt-gradle-plugin
         const val NEXUS_PUBLISH_GRADLE_PLUGIN = "1.1.0" // https://mvnrepository.com/artifact/io.github.gradle-nexus.publish-plugin/io.github.gradle-nexus.publish-plugin.gradle.plugin
 
-        const val BUNDLETOOL = "1.8.2" // https://mvnrepository.com/artifact/com.android.tools.build/bundletool
-        const val PROTOBUF = "3.19.4" // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
+        const val BUNDLETOOL = "1.9.1" // https://mvnrepository.com/artifact/com.android.tools.build/bundletool
+        const val PROTOBUF = "3.20.0" // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
         const val DEXLIB = "2.5.2" // https://mvnrepository.com/artifact/org.smali/dexlib2
 
         const val ANDROID_TOOLS = "30.0.4" // https://mvnrepository.com/artifact/com.android.tools/common?repo=google
@@ -74,15 +74,15 @@ object Dependencies {
         const val GOOGLE_TRUTH = "1.1.3" // https://mvnrepository.com/artifact/com.google.truth/truth
         const val GOOGLE_GUAVA = "31.1-jre" // https://mvnrepository.com/artifact/com.google.guava/guava
 
-        const val KOTLIN_REACT = "17.0.2-pre.313-kotlin-1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react
-        const val KOTLIN_REACT_ROUTER = "6.2.1-pre.313-kotlin-1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react-router-dom
-        const val KOTLIN_JS_EXTENSIONS = "1.0.1-pre.313-kotlin-1.6.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-extensions
+        const val KOTLIN_REACT = "18.0.0-pre.330-kotlin-1.6.20" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react
+        const val KOTLIN_REACT_ROUTER = "6.3.0-pre.330-kotlin-1.6.20" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react-router-dom
+        const val KOTLIN_JS_EXTENSIONS = "1.0.1-pre.330-kotlin-1.6.20" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-extensions
 
-        const val SELENIUM_WEBDRIVER = "4.1.2" // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
-        const val SELENIUM_WEBDRIVER_MANAGER = "5.1.0" // https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager
+        const val SELENIUM_WEBDRIVER = "4.1.3" // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+        const val SELENIUM_WEBDRIVER_MANAGER = "5.1.1" // https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager
 
-        const val REACT = "17.0.2" // https://www.npmjs.com/package/react
+        const val REACT = "18.0.0" // https://www.npmjs.com/package/react
         const val BOOTSTRAP = "5.1.3" // https://www.npmjs.com/package/bootstrap
-        const val APEX_CHARTS = "3.33.2" // https://www.npmjs.com/package/apexcharts
+        const val APEX_CHARTS = "3.35.0" // https://www.npmjs.com/package/apexcharts
     }
 }

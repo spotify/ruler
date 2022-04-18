@@ -39,7 +39,7 @@ fun main() {
     document.head?.append?.link(href = favicon, rel = "icon")
 
     // Load and deserialize the report data
-    val rawReport = require("./report.json").toString()
+    val rawReport = require("report.json").toString()
     val report = Json.decodeFromString<AppReport>(rawReport)
 
     // Visualize and display the report data

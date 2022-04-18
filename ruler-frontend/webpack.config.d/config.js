@@ -25,3 +25,6 @@ config.module.rules.push({
     test: /\.svg$/,
     type: 'asset/inline',
 });
+
+// Make report data directories available to webpack
+config.resolve.modules.push('../../ruler-frontend/src/' + config.mode);

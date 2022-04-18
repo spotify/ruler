@@ -48,7 +48,3 @@ dependencies {
 
     testImplementation(kotlin("test-js"))
 }
-
-// Make report data directories available to webpack
-registerWebpackDirectory("src/development", "development")
-registerWebpackDirectory("src/production", "production")

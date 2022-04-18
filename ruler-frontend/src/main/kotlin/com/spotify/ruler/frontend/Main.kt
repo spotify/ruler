@@ -24,7 +24,9 @@ import kotlinx.html.dom.append
 import kotlinx.html.js.link
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import react.dom.render
+import react.Props
+import react.createElement
+import react.dom.client.createRoot
 
 fun main() {
     require("./style.css")
@@ -41,7 +43,8 @@ fun main() {
     val report = Json.decodeFromString<AppReport>(rawReport)
 
     // Visualize and display the report data
-    render(requireNotNull(document.getElementById("root"))) {
+    val root = createRoot(requireNotNull(document.getElementById("root")))
+    root.render(createElement<Props> {
         report(report)
-    }
+    })
 }

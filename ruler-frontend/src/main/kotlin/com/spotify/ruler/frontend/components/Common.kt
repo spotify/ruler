@@ -20,6 +20,7 @@ import com.bnorm.react.RFunction
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppReport
 import com.spotify.ruler.models.Measurable
+import csstype.ClassName
 import kotlinx.html.id
 import kotlinx.html.js.onChangeFunction
 import org.w3c.dom.HTMLSelectElement
@@ -109,7 +110,7 @@ fun RBuilder.tabs(tabs: List<Tab>) {
             li(classes = "nav-item") {
                 NavLink {
                     attrs.to = path
-                    attrs.className = "nav-link"
+                    attrs.className = ClassName("nav-link")
                     +label
                 }
             }

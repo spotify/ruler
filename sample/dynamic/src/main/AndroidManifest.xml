@@ -15,8 +15,7 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.spotify.ruler.sample.dynamic">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <dist:module dist:title="@string/dynamic_feature_title">
         <dist:delivery>

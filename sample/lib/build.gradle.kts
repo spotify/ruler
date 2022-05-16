@@ -21,10 +21,11 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    namespace = "com.spotify.ruler.sample.lib"
+    compileSdk = 33
     defaultConfig {
         minSdk = 23
-        targetSdk = 31
+        targetSdk = 33
     }
     lint {
         warningsAsErrors = true

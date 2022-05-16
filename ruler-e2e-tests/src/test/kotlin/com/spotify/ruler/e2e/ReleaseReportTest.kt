@@ -47,6 +47,7 @@ class ReleaseReportTest {
             FileMatcher("/res/layout/activity_main.xml", FileType.RESOURCE, "main-team"),
             FileMatcher("/AndroidManifest.xml", FileType.OTHER, "default-team"),
             FileMatcher("/resources.arsc", FileType.OTHER, "default-team"),
+            FileMatcher("/META-INF/com/android/build/gradle/app-metadata.properties", FileType.OTHER, "default-team"),
         )
     }
 

@@ -25,11 +25,12 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    namespace = "com.spotify.ruler.sample.proguard"
+    compileSdk = 33
     defaultConfig {
         applicationId = "com.spotify.ruler.sample"
         minSdk = 23
-        targetSdk = 31
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
     }

@@ -124,10 +124,10 @@ fun RBuilder.tabs(tabs: List<Tab>) {
 @RFunction
 fun RBuilder.content(tabs: List<Tab>) {
     Routes {
-        tabs.forEach { (path, _, _, content) ->
+        tabs.forEach { tab ->
             Route {
-                attrs.path = path
-                attrs.element = createElement<Props>(content)
+                attrs.path = tab.path
+                attrs.element = createElement<Props>(tab.content)
             }
         }
     }

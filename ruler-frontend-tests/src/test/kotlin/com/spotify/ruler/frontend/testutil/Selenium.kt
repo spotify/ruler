@@ -28,7 +28,7 @@ fun text(text: String): By {
     return xpath("//*[text()='$text']")
 }
 
-/** Matches web elements based on the text of a sibling element. */
-fun sibling(text: String): By {
-    return xpath("//*[text()='$text']/following-sibling::*")
+/** Matches web elements based on the text of a child element. */
+fun ancestor(text: String): By {
+    return xpath("//*[text()='$text']/ancestor::*")
 }

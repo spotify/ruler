@@ -23,12 +23,16 @@ import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.Measurable
 import kotlinx.html.id
+import org.w3c.dom.HTMLElement
 import react.RBuilder
 import react.dom.button
 import react.dom.div
 import react.dom.h2
 import react.dom.h4
 import react.dom.span
+import react.useRef
+import react.virtual.VirtualOptions
+import react.virtual.useVirtual
 
 @RFunction
 fun RBuilder.breakdown(components: List<AppComponent>, sizeType: Measurable.SizeType) {
@@ -40,9 +44,23 @@ fun RBuilder.breakdown(components: List<AppComponent>, sizeType: Measurable.Size
 
 @RFunction
 fun RBuilder.componentList(components: List<AppComponent>, sizeType: Measurable.SizeType) {
+    val useRef = useRef<HTMLElement>()
+    val virtualOptions: VirtualOptions<HTMLElement> = js("{}")
+    val virtual = useVirtual(
+        options = virtualOptions.apply {
+            size = components.size
+            parentRef = useRef
+        }
+    )
     div(classes = "accordion") {
-        components.forEachIndexed { index, component ->
-            componentListItem(index, component, sizeType, component.name)
+        ref = useRef
+        virtual.virtualItems.forEachIndexed { index, virtualItem ->
+            componentListItem(
+                virtualItem.index,
+                components[index],
+                sizeType,
+                components[index].name
+            )
         }
     }
 }

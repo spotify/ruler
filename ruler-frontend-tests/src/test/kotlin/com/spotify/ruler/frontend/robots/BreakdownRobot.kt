@@ -16,9 +16,12 @@
 
 package com.spotify.ruler.frontend.robots
 
-import com.google.common.truth.Truth.assertThat
-import com.spotify.ruler.frontend.testutil.sibling
+import com.spotify.ruler.frontend.testutil.WAIT_DURATION
+import com.spotify.ruler.frontend.testutil.ancestor
+import com.spotify.ruler.frontend.testutil.text
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfNestedElementsLocatedBy
+import org.openqa.selenium.support.ui.WebDriverWait
 
 /** Testing robot specifically for the breakdown page. */
 class BreakdownRobot(driver: WebDriver) : BaseRobot<BreakdownRobot>(driver) {
@@ -26,7 +29,7 @@ class BreakdownRobot(driver: WebDriver) : BaseRobot<BreakdownRobot>(driver) {
 
     /** Assets that the size displayed for a given [component] matches the expected [size]. */
     fun assertComponentSize(component: String, size: String) = apply {
-        val element = driver.findElement(sibling(component))
-        assertThat(element.text).isEqualTo(size)
+        val ancestor = driver.findElement(ancestor(component))
+        WebDriverWait(driver, WAIT_DURATION).until(visibilityOfNestedElementsLocatedBy(ancestor, text(size)))
     }
 }

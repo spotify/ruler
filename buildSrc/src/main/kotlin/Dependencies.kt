@@ -44,6 +44,7 @@ object Dependencies {
     const val KOTLIN_REACT = "org.jetbrains.kotlin-wrappers:kotlin-react:${Versions.KOTLIN_REACT}"
     const val KOTLIN_REACT_DOM = "org.jetbrains.kotlin-wrappers:kotlin-react-dom-legacy:${Versions.KOTLIN_REACT}"
     const val KOTLIN_REACT_ROUTER = "org.jetbrains.kotlin-wrappers:kotlin-react-router-dom:${Versions.KOTLIN_REACT_ROUTER}"
+    const val KOTLIN_REACT_VIRTUAL = "org.jetbrains.kotlin-wrappers:kotlin-react-virtual:${Versions.KOTLIN_REACT_VIRTUAL}"
     const val KOTLIN_JS_EXTENSIONS = "org.jetbrains.kotlin-wrappers:kotlin-extensions:${Versions.KOTLIN_JS_EXTENSIONS}"
     const val KOTLIN_REACT_FUNCTION = "com.bnorm.react:kotlin-react-function:${Versions.KOTLIN_REACT_FUNCTION}"
 
@@ -76,6 +77,7 @@ object Dependencies {
 
         const val KOTLIN_REACT = "18.0.0-pre.330-kotlin-1.6.20" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react
         const val KOTLIN_REACT_ROUTER = "6.3.0-pre.330-kotlin-1.6.20" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react-router-dom
+        const val KOTLIN_REACT_VIRTUAL = "2.10.4-pre.330-kotlin-1.6.20" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react-virtual
         const val KOTLIN_JS_EXTENSIONS = "1.0.1-pre.330-kotlin-1.6.20" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-extensions
 
         const val SELENIUM_WEBDRIVER = "4.1.3" // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java

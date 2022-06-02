@@ -18,7 +18,6 @@ package com.spotify.ruler.frontend.components
 
 import com.bnorm.react.RFunction
 import com.spotify.ruler.frontend.binding.ApexCharts
-import com.spotify.ruler.frontend.binding.Uuid
 import com.spotify.ruler.frontend.chart.ChartConfig
 import com.spotify.ruler.frontend.chart.BarChartConfig
 import com.spotify.ruler.frontend.formatSize

@@ -82,7 +82,7 @@ fun RBuilder.componentListItemHeader(id: Int, component: AppComponent, sizeType:
             attrs["data-bs-target"] = "#module-$id-body"
             span(classes = "font-monospace text-truncate me-3") { +component.name }
             component.owner?.let { owner -> span(classes = "badge bg-secondary me-auto") { +owner } }
-            span(classes = "ms-3 me-3 text-nowrap") {
+            span(classes = "ms-auto me-3 text-nowrap") {
                 +formatSize(component, sizeType)
             }
         }

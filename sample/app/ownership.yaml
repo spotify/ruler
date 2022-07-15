@@ -6,3 +6,6 @@
 
 - identifier: :sample:lib
   owner: lib-team
+
+- identifier: dynamic
+  owner: dynamic-team

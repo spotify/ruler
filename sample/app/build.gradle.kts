@@ -43,6 +43,7 @@ android {
         resources.excludes.add("**/*.kotlin_builtins")
         resources.excludes.add("kotlin-tooling-metadata.json")
     }
+    dynamicFeatures += setOf(":sample:dynamic")
 }
 
 dependencies {

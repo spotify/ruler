@@ -21,6 +21,7 @@ import com.bnorm.react.RKey
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
+import com.spotify.ruler.models.FileContainer
 import com.spotify.ruler.models.Measurable
 import kotlinx.html.id
 import react.RBuilder
@@ -34,49 +35,49 @@ import react.dom.span
 fun RBuilder.breakdown(components: List<AppComponent>, sizeType: Measurable.SizeType) {
     h4(classes = "mb-3") { +"Breakdown (${components.size} components)" }
     div(classes = "row") {
-        componentList(components, sizeType)
+        containerList(components, sizeType)
     }
 }
 
 @RFunction
-fun RBuilder.componentList(components: List<AppComponent>, sizeType: Measurable.SizeType) {
+fun RBuilder.containerList(containers: List<FileContainer>, sizeType: Measurable.SizeType) {
     div(classes = "accordion") {
-        components.forEachIndexed { index, component ->
-            componentListItem(index, component, sizeType, component.name)
+        containers.forEachIndexed { index, container ->
+            containerListItem(index, container, sizeType, container.name)
         }
     }
 }
 
 @RFunction
 @Suppress("UNUSED_PARAMETER")
-fun RBuilder.componentListItem(id: Int, component: AppComponent, sizeType: Measurable.SizeType, @RKey key: String) {
+fun RBuilder.containerListItem(id: Int, container: FileContainer, sizeType: Measurable.SizeType, @RKey key: String) {
     div(classes = "accordion-item") {
-        componentListItemHeader(id, component, sizeType)
-        componentListItemBody(id, component, sizeType)
+        containerListItemHeader(id, container, sizeType)
+        containerListItemBody(id, container, sizeType)
     }
 }
 
 @RFunction
-fun RBuilder.componentListItemHeader(id: Int, component: AppComponent, sizeType: Measurable.SizeType) {
+fun RBuilder.containerListItemHeader(id: Int, container: FileContainer, sizeType: Measurable.SizeType) {
     h2(classes = "accordion-header") {
         button(classes = "accordion-button collapsed") {
             attrs["data-bs-toggle"] = "collapse"
             attrs["data-bs-target"] = "#module-$id-body"
-            span(classes = "font-monospace text-truncate me-3") { +component.name }
-            component.owner?.let { owner -> span(classes = "badge bg-secondary me-3") { +owner } }
+            span(classes = "font-monospace text-truncate me-3") { +container.name }
+            container.owner?.let { owner -> span(classes = "badge bg-secondary me-3") { +owner } }
             span(classes = "ms-auto me-3 text-nowrap") {
-                +formatSize(component, sizeType)
+                +formatSize(container, sizeType)
             }
         }
     }
 }
 
 @RFunction
-fun RBuilder.componentListItemBody(id: Int, component: AppComponent, sizeType: Measurable.SizeType) {
+fun RBuilder.containerListItemBody(id: Int, container: FileContainer, sizeType: Measurable.SizeType) {
     div(classes = "accordion-collapse collapse") {
         attrs.id = "module-$id-body"
         div(classes = "accordion-body p-0") {
-            fileList(component.files, sizeType)
+            fileList(container.files, sizeType)
         }
     }
 }

@@ -40,8 +40,8 @@ class OwnershipInfo(entries: List<OwnershipEntry>, private val defaultOwner: Str
     }
 
     /**
-     * Returns the owner of a given [component]. If the owner has no explicit owner, the [defaultOwner] will be returned
-     * instead.
+     * Returns the owner of a given [component]. If the component has no explicit owner, the [defaultOwner] will be
+     * returned instead.
      */
     fun getOwner(component: String, componentType: ComponentType): String {
         val owner = when (componentType) {
@@ -52,11 +52,27 @@ class OwnershipInfo(entries: List<OwnershipEntry>, private val defaultOwner: Str
     }
 
     /**
+     * Returns the owner of a given [feature]. If the feature has no explicit owner, the [defaultOwner] will be returned
+     * instead.
+     */
+    fun getOwner(feature: String): String {
+        return explicitOwnershipEntries[feature] ?: getWildcardOwner(feature) ?: defaultOwner
+    }
+
+    /**
      * Returns the owner of a given [file]. If the file has no explicit owner, the owner of the [component] will be
      * returned instead.
      */
     fun getOwner(file: String, component: String, componentType: ComponentType): String {
         return explicitOwnershipEntries[file] ?: getWildcardOwner(file) ?: getOwner(component, componentType)
+    }
+
+    /**
+     * Returns the owner of a given [file]. If the file has no explicit owner, the owner of the [feature] will be
+     * returned instead.
+     */
+    fun getOwner(file: String, feature: String): String {
+        return explicitOwnershipEntries[file] ?: getWildcardOwner(file) ?: getOwner(feature)
     }
 
     /** Tries to find the owner for a component or file with the given [identifier] based on all wildcard entries. */

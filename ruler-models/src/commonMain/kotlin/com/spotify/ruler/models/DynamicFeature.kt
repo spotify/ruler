@@ -18,14 +18,12 @@ package com.spotify.ruler.models
 
 import kotlinx.serialization.Serializable
 
-/** Analysis report of an app. */
+/** Dynamic feature contained in an app. */
 @Serializable
-data class AppReport(
+data class DynamicFeature(
     val name: String,
-    val version: String,
-    val variant: String,
     override val downloadSize: Long,
     override val installSize: Long,
-    val components: List<AppComponent>,
-    val dynamicFeatures: List<DynamicFeature>,
+    val files: List<AppFile>,
+    val owner: String? = null,
 ) : Measurable

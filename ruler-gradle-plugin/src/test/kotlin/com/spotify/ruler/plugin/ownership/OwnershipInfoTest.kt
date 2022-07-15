@@ -32,6 +32,10 @@ class OwnershipInfoTest {
         OwnershipEntry("com.wildcard.spotify:foo", "external-wildcard-spotify-foo-owner"),
         OwnershipEntry("com.spotify.MainActivity", "main-activity-owner"),
         OwnershipEntry("com.spotify.ui.*", "ui-owner"),
+        OwnershipEntry("dynamic", "dynamic-owner"),
+        OwnershipEntry("dynamic-*", "dynamic-wildcard-owner"),
+        OwnershipEntry("dynamic-feature-*", "dynamic-feature-wildcard-owner"),
+        OwnershipEntry("dynamic-bar", "dynamic-bar-owner"),
     )
     private val ownershipInfo = OwnershipInfo(entries, "default-owner")
 
@@ -108,6 +112,36 @@ class OwnershipInfoTest {
     }
 
     @Test
+    fun `Feature owner is found`() {
+        val owner = ownershipInfo.getOwner("dynamic")
+        assertThat(owner).isEqualTo("dynamic-owner")
+    }
+
+    @Test
+    fun `Feature owner is not found if there is no entry`() {
+        val owner = ownershipInfo.getOwner("feature")
+        assertThat(owner).isEqualTo("default-owner")
+    }
+
+    @Test
+    fun `Feature owner is found for wildcard entries`() {
+        val owner = ownershipInfo.getOwner("dynamic-foo")
+        assertThat(owner).isEqualTo("dynamic-wildcard-owner")
+    }
+
+    @Test
+    fun `Feature owner is found for more specific wildcard entries`() {
+        val owner = ownershipInfo.getOwner("dynamic-feature-foo")
+        assertThat(owner).isEqualTo("dynamic-feature-wildcard-owner")
+    }
+
+    @Test
+    fun `Feature owner is found for explicit entry when wildcard is present`() {
+        val owner = ownershipInfo.getOwner("dynamic-bar")
+        assertThat(owner).isEqualTo("dynamic-bar-owner")
+    }
+
+    @Test
     fun `File owner is found`() {
         val owner = ownershipInfo.getOwner("com.spotify.MainActivity", ":foo:bar", ComponentType.INTERNAL)
         assertThat(owner).isEqualTo("main-activity-owner")
@@ -117,6 +151,12 @@ class OwnershipInfoTest {
     fun `Component owner is used when file owner is not found`() {
         val owner = ownershipInfo.getOwner("com.spotify.Unknown", ":foo:bar", ComponentType.INTERNAL)
         assertThat(owner).isEqualTo("internal-component-owner")
+    }
+
+    @Test
+    fun `Feature owner is used when file owner is not found`() {
+        val owner = ownershipInfo.getOwner("com.spotify.Unknown", "dynamic")
+        assertThat(owner).isEqualTo("dynamic-owner")
     }
 
     @Test

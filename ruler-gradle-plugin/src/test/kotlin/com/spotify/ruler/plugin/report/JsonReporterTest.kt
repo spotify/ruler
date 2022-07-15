@@ -21,6 +21,7 @@ import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.AppReport
 import com.spotify.ruler.models.ComponentType
+import com.spotify.ruler.models.DynamicFeature
 import com.spotify.ruler.models.FileType
 import com.spotify.ruler.plugin.dependency.DependencyComponent
 import com.spotify.ruler.plugin.models.AppInfo
@@ -45,13 +46,19 @@ class JsonReporterTest {
             AppFile("/assets/license.html", FileType.ASSET, 500, 600),
         ),
     )
+    private val features = mapOf(
+        "dynamic" to listOf(
+            AppFile("com.spotify.DynamicActivity", FileType.CLASS, 200, 300),
+            AppFile("/res/layout/activity_dynamic.xml", FileType.RESOURCE, 100, 250),
+        ),
+    )
 
-    private val ownershipEntries = listOf(OwnershipEntry(":app", "app-team"))
+    private val ownershipEntries = listOf(OwnershipEntry(":app", "app-team"), OwnershipEntry("dynamic", "dynamic-team"))
     private val ownershipInfo = OwnershipInfo(ownershipEntries, "default-team")
 
     @Test
     fun `JSON report is generated`(@TempDir targetDir: File) {
-        val reportFile = reporter.generateReport(appInfo, components, ownershipInfo, targetDir)
+        val reportFile = reporter.generateReport(appInfo, components, features, ownershipInfo, targetDir)
         val report = Json.decodeFromString<AppReport>(reportFile.readText())
 
         val expected = AppReport("com.spotify.music", "1.2.3", "release", 750, 1050, listOf(
@@ -62,13 +69,18 @@ class JsonReporterTest {
                 AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250, "app-team"),
                 AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200, "app-team"),
             ), "app-team"),
+        ), listOf(
+            DynamicFeature("dynamic", 300, 550, listOf(
+                AppFile("com.spotify.DynamicActivity", FileType.CLASS, 200, 300, "dynamic-team"),
+                AppFile("/res/layout/activity_dynamic.xml", FileType.RESOURCE, 100, 250, "dynamic-team"),
+            ), "dynamic-team"),
         ))
         assertThat(report).isEqualTo(expected)
     }
 
     @Test
     fun `Ownership info is omitted from report if it is null`(@TempDir targetDir: File) {
-        val reportFile = reporter.generateReport(appInfo, components, null, targetDir)
+        val reportFile = reporter.generateReport(appInfo, components, features, null, targetDir)
         val reportContent = reportFile.readText()
         assertThat(reportContent).doesNotContain("owner")
     }
@@ -76,7 +88,7 @@ class JsonReporterTest {
     @Test
     fun `Existing reports are overwritten`(@TempDir targetDir: File) {
         repeat(2) {
-            reporter.generateReport(appInfo, components, ownershipInfo, targetDir)
+            reporter.generateReport(appInfo, components, features, ownershipInfo, targetDir)
         }
     }
 }

@@ -75,25 +75,30 @@ abstract class RulerTask : DefaultTask() {
         val files = getFilesFromBundle() // Get all relevant files from the provided bundle
         val dependencies = getDependencies() // Get all entries from all dependencies
 
-        // Attribute bundle entries and group into components
+        // Split main APK bundle entries and dynamic feature module entries
+        val mainFiles = files.getValue(ApkCreator.BASE_FEATURE_NAME)
+        val featureFiles = files.filter { (feature, _) -> feature != ApkCreator.BASE_FEATURE_NAME }
+
+        // Attribute main APK bundle entries and group into components
         val attributor = Attributor(DependencyComponent(project.path, ComponentType.INTERNAL))
-        val components = attributor.attribute(files, dependencies)
+        val components = attributor.attribute(mainFiles, dependencies)
 
         val ownershipInfo = getOwnershipInfo() // Get ownership information for all components
-        generateReports(components, ownershipInfo)
+        generateReports(components, featureFiles, ownershipInfo)
     }
 
-    private fun getFilesFromBundle(): List<AppFile> {
+    private fun getFilesFromBundle(): Map<String, List<AppFile>> {
         val apkCreator = ApkCreator(project.rootDir)
         val splits = apkCreator.createSplitApks(bundleFile.asFile.get(), deviceSpec.get(), workingDir.asFile.get())
-        val apks = splits.listFiles() ?: emptyArray()
 
         val apkParser = ApkParser()
-        val entries = apks.flatMap(apkParser::parse)
-
         val classNameSanitizer = ClassNameSanitizer(mappingFile.asFile.orNull)
         val apkSanitizer = ApkSanitizer(classNameSanitizer)
-        return apkSanitizer.sanitize(entries)
+
+        return splits.mapValues { (_, apks) ->
+            val entries = apks.flatMap(apkParser::parse)
+            apkSanitizer.sanitize(entries)
+        }
     }
 
     private fun getDependencies(): Map<String, List<DependencyComponent>> {
@@ -113,13 +118,19 @@ abstract class RulerTask : DefaultTask() {
         return OwnershipInfo(ownershipEntries, defaultOwner.get())
     }
 
-    private fun generateReports(components: Map<DependencyComponent, List<AppFile>>, ownershipInfo: OwnershipInfo?) {
+    private fun generateReports(
+        components: Map<DependencyComponent, List<AppFile>>,
+        features: Map<String, List<AppFile>>,
+        ownershipInfo: OwnershipInfo?,
+    ) {
+        val reportDir = reportDir.asFile.get()
+
         val jsonReporter = JsonReporter()
-        val jsonReport = jsonReporter.generateReport(appInfo.get(), components, ownershipInfo, reportDir.asFile.get())
+        val jsonReport = jsonReporter.generateReport(appInfo.get(), components, features, ownershipInfo, reportDir)
         project.logger.lifecycle("Wrote JSON report to ${jsonReport.toPath().toUri()}")
 
         val htmlReporter = HtmlReporter()
-        val htmlReport = htmlReporter.generateReport(jsonReport.readText(), reportDir.asFile.get())
+        val htmlReport = htmlReporter.generateReport(jsonReport.readText(), reportDir)
         project.logger.lifecycle("Wrote HTML report to ${htmlReport.toPath().toUri()}")
     }
 }

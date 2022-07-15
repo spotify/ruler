@@ -66,6 +66,19 @@ class ReleaseReportTest {
     }
 
     @Test
+    fun `Dynamic component is reported correctly`() {
+        val dynamic = report.dynamicFeatures.single { feature -> feature.name == "dynamic" }
+        assertThat(dynamic.owner).isEqualTo("dynamic-team")
+
+        assertThat(dynamic.files).comparingElementsUsing(Correspondence.file()).containsExactly(
+            FileMatcher("/AndroidManifest.xml", FileType.OTHER, "dynamic-team"),
+            FileMatcher("/resources.arsc", FileType.OTHER, "dynamic-team"),
+            FileMatcher("com.spotify.ruler.sample.dynamic.DynamicActivity", FileType.CLASS, "dynamic-team"),
+            FileMatcher("/res/layout/activity_dynamic.xml", FileType.RESOURCE, "dynamic-team"),
+        )
+    }
+
+    @Test
     fun `Component sizes add up correctly`() {
         var downloadSize = 0L
         var installSize = 0L
@@ -88,6 +101,20 @@ class ReleaseReportTest {
             }
             assertThat(downloadSize).isEqualTo(component.downloadSize)
             assertThat(installSize).isEqualTo(component.installSize)
+        }
+    }
+
+    @Test
+    fun `Dynamic feature sizes add up correctly`() {
+        report.dynamicFeatures.forEach { feature ->
+            var downloadSize = 0L
+            var installSize = 0L
+            feature.files.forEach { file ->
+                downloadSize += file.downloadSize
+                installSize += file.installSize
+            }
+            assertThat(downloadSize).isEqualTo(feature.downloadSize)
+            assertThat(installSize).isEqualTo(feature.installSize)
         }
     }
 }

@@ -15,6 +15,5 @@
  limitations under the License.
 -->
 <resources>
-    <string name="app_name">App</string>
-    <string name="dynamic_feature_title">Dynamic feature</string>
+    <string name="dynamic_name">Dynamic</string>
 </resources>

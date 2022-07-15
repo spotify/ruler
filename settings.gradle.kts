@@ -25,6 +25,7 @@ if (!startParameter.projectProperties.containsKey("withoutSample")) {
     include(":ruler-e2e-tests")
 
     include(":sample:app")
+    include(":sample:dynamic")
     include(":sample:lib")
 }
 

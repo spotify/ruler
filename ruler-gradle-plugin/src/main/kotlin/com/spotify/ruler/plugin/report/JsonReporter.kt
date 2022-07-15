@@ -19,6 +19,7 @@ package com.spotify.ruler.plugin.report
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.AppReport
+import com.spotify.ruler.models.DynamicFeature
 import com.spotify.ruler.models.Measurable
 import com.spotify.ruler.plugin.dependency.DependencyComponent
 import com.spotify.ruler.plugin.models.AppInfo
@@ -43,6 +44,7 @@ class JsonReporter {
     fun generateReport(
         appInfo: AppInfo,
         components: Map<DependencyComponent, List<AppFile>>,
+        features: Map<String, List<AppFile>>,
         ownershipInfo: OwnershipInfo?,
         targetDir: File
     ): File {
@@ -69,7 +71,24 @@ class JsonReporter {
                         )
                     }.sortedWith(comparator.reversed())
                 )
-            }.sortedWith(comparator.reversed())
+            }.sortedWith(comparator.reversed()),
+            dynamicFeatures = features.map { (feature, files) ->
+                DynamicFeature(
+                    name = feature,
+                    downloadSize = files.sumOf(AppFile::downloadSize),
+                    installSize = files.sumOf(AppFile::installSize),
+                    owner = ownershipInfo?.getOwner(feature),
+                    files = files.map { file ->
+                        AppFile(
+                            name = file.name,
+                            type = file.type,
+                            downloadSize = file.downloadSize,
+                            installSize = file.installSize,
+                            owner = ownershipInfo?.getOwner(file.name, feature),
+                        )
+                    }.sortedWith(comparator.reversed())
+                )
+            }.sortedWith(comparator.reversed()),
         )
 
         val format = Json { prettyPrint = true }

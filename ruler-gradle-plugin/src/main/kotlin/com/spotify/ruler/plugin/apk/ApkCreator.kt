@@ -19,6 +19,7 @@ package com.spotify.ruler.plugin.apk
 import com.android.SdkConstants
 import com.android.build.gradle.internal.SdkLocator
 import com.android.builder.errors.DefaultIssueReporter
+import com.android.bundle.Commands.BuildApksResult
 import com.android.bundle.Devices
 import com.android.prefs.AndroidLocationsSingleton
 import com.android.repository.api.ProgressIndicatorAdapter
@@ -47,9 +48,9 @@ class ApkCreator(private val rootDir: File) {
      * @param bundleFile Source AAB file
      * @param deviceSpec Device specification for which the APKs should be created
      * @param targetDir Directory where the APKs should be located. Contents of this directory will be deleted
-     * @return Directory which contains all created APKs
+     * @return Map of modules from the AAB file with all the APKs belonging to each module
      */
-    fun createSplitApks(bundleFile: File, deviceSpec: DeviceSpec, targetDir: File): File {
+    fun createSplitApks(bundleFile: File, deviceSpec: DeviceSpec, targetDir: File): Map<String, List<File>> {
         targetDir.listFiles()?.forEach(File::deleteRecursively) // Overwrite existing files
 
         BuildApksCommand.builder()
@@ -61,7 +62,14 @@ class ApkCreator(private val rootDir: File) {
             .build()
             .execute()
 
-        return targetDir.resolve("splits")
+        val result = BuildApksResult.parseFrom(targetDir.resolve("toc.pb").readBytes())
+        val variant = result.variantList.single() // We're targeting one device -> we only expect a single variant
+
+        return variant.apkSetList.associate { apkSet ->
+            val moduleName = apkSet.moduleMetadata.name
+            val moduleSplits = apkSet.apkDescriptionList.map { targetDir.resolve(it.path) }
+            moduleName to moduleSplits
+        }
     }
 
     /** Converts the given [deviceSpec] into a format which bundletool understands. */
@@ -84,5 +92,11 @@ class ApkCreator(private val rootDir: File) {
         val logger = StdLogger(StdLogger.Level.WARNING)
         val issueReporter = DefaultIssueReporter(logger)
         return SdkLocator.getSdkDirectory(rootDir, issueReporter).toPath()
+    }
+
+    companion object {
+
+        /** Name of the feature that contains the main app (without any dynamic feature modules). */
+        const val BASE_FEATURE_NAME = "base"
     }
 }

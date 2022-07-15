@@ -32,8 +32,11 @@ class ApkCreatorTest {
     fun `Split APKs are created`(@TempDir targetDir: File) {
         val splits = creator.createSplitApks(bundleFile, deviceSpec, targetDir)
 
-        assertThat(splits.resolve("base-master.apk").exists()).isTrue()
-        assertThat(splits.resolve("base-xxhdpi.apk").exists()).isTrue()
+        assertThat(splits).hasSize(1)
+        assertThat(splits).containsKey("base")
+        splits.values.flatten().forEach { apk ->
+            assertThat(apk.exists()).isTrue()
+        }
     }
 
     @Test

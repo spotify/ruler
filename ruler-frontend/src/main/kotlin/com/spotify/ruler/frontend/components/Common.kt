@@ -45,11 +45,13 @@ fun RBuilder.report(report: AppReport) {
     val (sizeType, setSizeType) = useState(Measurable.SizeType.DOWNLOAD)
 
     val hasOwnershipInfo = report.components.any { component -> component.owner != null }
+    val hasDynamicFeatures = report.dynamicFeatures.isNotEmpty()
 
     val tabs = listOf(
         Tab("/", "Breakdown") { breakdown(report.components, sizeType) },
         Tab("/insights", "Insights") { insights(report.components) },
         Tab("/ownership", "Ownership", hasOwnershipInfo) { ownership(report.components, sizeType) },
+        Tab("/dynamic", "Dynamic features", hasDynamicFeatures) { dynamicFeatures(report.dynamicFeatures, sizeType) },
     )
 
     div(classes = "container mt-4 mb-5") {

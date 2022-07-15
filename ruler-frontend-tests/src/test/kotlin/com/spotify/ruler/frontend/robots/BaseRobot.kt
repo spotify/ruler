@@ -50,6 +50,12 @@ abstract class BaseRobot<T : BaseRobot<T>>(protected val driver: WebDriver) {
         return OwnershipRobot(driver)
     }
 
+    /** Selected the dynamic features tab in the tab menu. */
+    fun navigateToDynamicFeaturesTab(): DynamicFeaturesRobot {
+        driver.findElement(linkText("Dynamic features")).click()
+        return DynamicFeaturesRobot(driver)
+    }
+
     /** Clicks on the element with the given [text]. */
     fun click(text: String): T {
         driver.findElement(text(text)).click()

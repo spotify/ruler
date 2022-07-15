@@ -21,10 +21,10 @@ import kotlinx.serialization.Serializable
 /** Single component of an app. Can either be a Gradle module or a dependency. */
 @Serializable
 data class AppComponent(
-    val name: String,
+    override val name: String,
     val type: ComponentType,
     override val downloadSize: Long,
     override val installSize: Long,
-    val files: List<AppFile>,
-    val owner: String? = null,
-) : Measurable
+    override val files: List<AppFile>,
+    override val owner: String? = null,
+) : FileContainer

@@ -113,7 +113,7 @@ fun RBuilder.componentOwnershipPerTeam(components: List<AppComponent>, sizeType:
         highlightedValue(ownedFiles.sumOf(AppFile::downloadSize), "Download size", ::formatSize)
         highlightedValue(ownedFiles.sumOf(AppFile::installSize), "Install size", ::formatSize)
     }
-    componentList(processedComponents, sizeType)
+    containerList(processedComponents, sizeType)
 }
 
 @RFunction

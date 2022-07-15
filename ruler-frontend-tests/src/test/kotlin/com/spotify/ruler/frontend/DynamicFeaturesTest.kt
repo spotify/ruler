@@ -23,30 +23,27 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.openqa.selenium.WebDriver
 
 @ExtendWith(WebDriverExtension::class)
-class CommonTest {
+class DynamicFeaturesTest {
 
     @Test
-    fun `Overall report details and sizes are displayed`(driver: WebDriver) {
+    fun `Switching between download and install size changes the displayed size`(driver: WebDriver) {
         start(driver)
-            .assertVisible("com.spotify.music")
-            .assertVisible("Version 1.2.3 (release)")
-            .assertVisible("2.8 KB")
-            .assertVisible("4.7 KB")
+            .navigateToDynamicFeaturesTab()
+            .assertFeatureSize("dynamic", "500.0 B")
+            .selectInstallSize()
+            .assertFeatureSize("dynamic", "800.0 B")
+            .selectDownloadSize()
+            .assertFeatureSize("dynamic", "500.0 B")
     }
 
     @Test
-    fun `Navigation between tabs changes the displayed content`(driver: WebDriver) {
+    fun `Toggling list items reveals and hides details`(driver: WebDriver) {
         start(driver)
-            .assertVisible("Breakdown (13 components)")
-            .navigateToInsightsTab()
-            .assertVisible("File type distribution (size)")
-            .assertVisible("File type distribution (file count)")
-            .assertVisible("Component type distribution (size)")
-            .assertVisible("Component type distribution (component count)")
-            .navigateToOwnershipTab()
-            .assertVisible("Ownership overview")
-            .assertVisible("Components and files grouped by owner")
             .navigateToDynamicFeaturesTab()
-            .assertVisible("Dynamic features")
+            .assertNotVisible("com.spotify.DynamicActivity")
+            .click("dynamic")
+            .assertVisible("com.spotify.DynamicActivity")
+            .click("dynamic")
+            .assertNotVisible("com.spotify.DynamicActivity")
     }
 }

@@ -219,5 +219,29 @@
         }
       ]
     }
+  ],
+  "dynamicFeatures": [
+    {
+      "name": "dynamic",
+      "downloadSize": 500,
+      "installSize": 800,
+      "owner": "dynamic-team",
+      "files": [
+        {
+          "name": "com.spotify.DynamicActivity",
+          "type": "CLASS",
+          "downloadSize": 300,
+          "installSize": 500,
+          "owner": "dynamic-team"
+        },
+        {
+          "name": "/res/layout/activity_dynamic.xml",
+          "type": "RESOURCE",
+          "downloadSize": 200,
+          "installSize": 300,
+          "owner": "dynamic-team"
+        }
+      ]
+    }
   ]
 }

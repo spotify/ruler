@@ -32,7 +32,9 @@ import com.spotify.ruler.plugin.ownership.OwnershipFileParser
 import com.spotify.ruler.plugin.ownership.OwnershipInfo
 import com.spotify.ruler.plugin.report.HtmlReporter
 import com.spotify.ruler.plugin.report.JsonReporter
+import java.io.File
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
@@ -72,22 +74,37 @@ abstract class RulerTask : DefaultTask() {
 
     @TaskAction
     fun analyze() {
-        val files = getFilesFromBundle() // Get all relevant files from the provided bundle
-        val dependencies = getDependencies() // Get all entries from all dependencies
+        val getComponents = { project: Project, splitApks: Map<String, List<File>> ->
+            val files = getFilesFromSplitApks(project, splitApks) // Get all relevant files from the provided bundle
+            val dependencies = getDependencies(project) // Get all entries from all dependencies
+            // Attribute bundle entries and group into components
+            val attributor = Attributor(DependencyComponent(project.path, ComponentType.INTERNAL))
 
-        // Attribute bundle entries and group into components
-        val attributor = Attributor(DependencyComponent(project.path, ComponentType.INTERNAL))
-        val components = attributor.attribute(files, dependencies)
+            attributor.attribute(files, dependencies)
+        }
+
+        val splitApks = createSplitApksFromBundle()
+        val components = getComponents(project, splitApks)
+        val dfmComponents = HashMap<DependencyComponent, List<AppFile>>()
+        appInfo.get().dynamicFeatures.forEach {
+            dfmComponents += getComponents(project.rootProject.project(it), splitApks)
+        }
 
         val ownershipInfo = getOwnershipInfo() // Get ownership information for all components
-        generateReports(components, ownershipInfo)
+        generateReports(components, dfmComponents, ownershipInfo)
     }
 
-    private fun getFilesFromBundle(): List<AppFile> {
+    private fun createSplitApksFromBundle(): Map<String, List<File>> {
         val apkCreator = ApkCreator(project.rootDir)
-        val splits = apkCreator.createSplitApks(bundleFile.asFile.get(), deviceSpec.get(), workingDir.asFile.get())
-        val apks = splits.listFiles() ?: emptyArray()
+        return apkCreator.createSplitApks(bundleFile.asFile.get(), deviceSpec.get(), workingDir.asFile.get())
+    }
 
+    private fun getFilesFromSplitApks(specifiedProject: Project, splitApks: Map<String, List<File>>): List<AppFile> {
+        val apks = splitApks[if (specifiedProject == project) {
+            "base"
+        } else {
+            specifiedProject.name
+        }] ?: return emptyList()
         val apkParser = ApkParser()
         val entries = apks.flatMap(apkParser::parse)
 
@@ -96,9 +113,9 @@ abstract class RulerTask : DefaultTask() {
         return apkSanitizer.sanitize(entries)
     }
 
-    private fun getDependencies(): Map<String, List<DependencyComponent>> {
+    private fun getDependencies(specifiedProject: Project): Map<String, List<DependencyComponent>> {
         val dependencyParser = DependencyParser()
-        val entries = dependencyParser.parse(project, appInfo.get())
+        val entries = dependencyParser.parse(specifiedProject, appInfo.get())
 
         val classNameSanitizer = ClassNameSanitizer(mappingFile.asFile.orNull)
         val dependencySanitizer = DependencySanitizer(classNameSanitizer)
@@ -113,9 +130,9 @@ abstract class RulerTask : DefaultTask() {
         return OwnershipInfo(ownershipEntries, defaultOwner.get())
     }
 
-    private fun generateReports(components: Map<DependencyComponent, List<AppFile>>, ownershipInfo: OwnershipInfo?) {
+    private fun generateReports(components: Map<DependencyComponent, List<AppFile>>, dfmComponents: Map<DependencyComponent, List<AppFile>>, ownershipInfo: OwnershipInfo?) {
         val jsonReporter = JsonReporter()
-        val jsonReport = jsonReporter.generateReport(appInfo.get(), components, ownershipInfo, reportDir.asFile.get())
+        val jsonReport = jsonReporter.generateReport(appInfo.get(), components, dfmComponents, ownershipInfo, reportDir.asFile.get())
         project.logger.lifecycle("Wrote JSON report to ${jsonReport.toPath().toUri()}")
 
         val htmlReporter = HtmlReporter()

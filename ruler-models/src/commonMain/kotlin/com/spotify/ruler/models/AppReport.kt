@@ -27,4 +27,5 @@ data class AppReport(
     override val downloadSize: Long,
     override val installSize: Long,
     val components: List<AppComponent>,
+    val dynamicFeatureComponents: List<AppComponent>,
 ) : Measurable

@@ -23,9 +23,9 @@ import com.spotify.ruler.models.Measurable
 import com.spotify.ruler.plugin.dependency.DependencyComponent
 import com.spotify.ruler.plugin.models.AppInfo
 import com.spotify.ruler.plugin.ownership.OwnershipInfo
+import java.io.File
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.File
 
 /** Responsible for generating JSON reports. */
 class JsonReporter {
@@ -35,24 +35,21 @@ class JsonReporter {
      * Generates a JSON report. Entries will be sorted in descending order based on their size.
      *
      * @param appInfo General info about the analyzed app.
-     * @param components Map of app component names to their respective files
+     * @param appComponents Map of app component names to their respective files
+     * @param dfmComponents Map of dynamic feature component names to their respective files
      * @param ownershipInfo Optional info about the owners of components.
      * @param targetDir Directory where the generated report will be located
      * @return Generated JSON report file
      */
     fun generateReport(
         appInfo: AppInfo,
-        components: Map<DependencyComponent, List<AppFile>>,
+        appComponents: Map<DependencyComponent, List<AppFile>>,
+        dfmComponents: Map<DependencyComponent, List<AppFile>>,
         ownershipInfo: OwnershipInfo?,
         targetDir: File
     ): File {
-        val report = AppReport(
-            name = appInfo.applicationId,
-            version = appInfo.versionName,
-            variant = appInfo.variantName,
-            downloadSize = components.values.flatten().sumOf(AppFile::downloadSize),
-            installSize = components.values.flatten().sumOf(AppFile::installSize),
-            components = components.map { (component, files) ->
+        val getComponents = { components: Map<DependencyComponent, List<AppFile>> ->
+            components.map { (component, files) ->
                 AppComponent(
                     name = component.name,
                     type = component.type,
@@ -70,11 +67,28 @@ class JsonReporter {
                     }.sortedWith(comparator.reversed())
                 )
             }.sortedWith(comparator.reversed())
+        }
+        val report = AppReport(
+            name = appInfo.applicationId,
+            version = appInfo.versionName,
+            variant = appInfo.variantName,
+            downloadSize = appComponents.getDownloadSize() + dfmComponents.getDownloadSize(),
+            installSize = appComponents.getInstallSize() + dfmComponents.getInstallSize(),
+            components = getComponents(appComponents),
+            dynamicFeatureComponents = getComponents(dfmComponents)
         )
 
         val format = Json { prettyPrint = true }
         val reportFile = targetDir.resolve("report.json")
         reportFile.writeText(format.encodeToString(report))
         return reportFile
+    }
+
+    private fun Map<DependencyComponent, List<AppFile>>.getDownloadSize(): Long {
+        return values.flatten().sumOf(AppFile::downloadSize)
+    }
+
+    private fun Map<DependencyComponent, List<AppFile>>.getInstallSize(): Long {
+        return values.flatten().sumOf(AppFile::installSize)
     }
 }

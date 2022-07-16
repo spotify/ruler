@@ -19,6 +19,7 @@ package com.spotify.ruler.plugin.apk
 import com.android.SdkConstants
 import com.android.build.gradle.internal.SdkLocator
 import com.android.builder.errors.DefaultIssueReporter
+import com.android.bundle.Commands
 import com.android.bundle.Devices
 import com.android.prefs.AndroidLocationsSingleton
 import com.android.repository.api.ProgressIndicatorAdapter
@@ -28,11 +29,11 @@ import com.android.tools.build.bundletool.commands.BuildApksCommand
 import com.android.tools.build.bundletool.device.DeviceSpecParser
 import com.android.utils.StdLogger
 import com.spotify.ruler.plugin.models.DeviceSpec
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.StringReader
 import java.nio.file.Path
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /**
  * Responsible for creating APKs based on provided app bundle (AAB) files.
@@ -47,9 +48,9 @@ class ApkCreator(private val rootDir: File) {
      * @param bundleFile Source AAB file
      * @param deviceSpec Device specification for which the APKs should be created
      * @param targetDir Directory where the APKs should be located. Contents of this directory will be deleted
-     * @return Directory which contains all created APKs
+     * @return Module name to it's APKS
      */
-    fun createSplitApks(bundleFile: File, deviceSpec: DeviceSpec, targetDir: File): File {
+    fun createSplitApks(bundleFile: File, deviceSpec: DeviceSpec, targetDir: File): Map<String, List<File>> {
         targetDir.listFiles()?.forEach(File::deleteRecursively) // Overwrite existing files
 
         BuildApksCommand.builder()
@@ -61,7 +62,15 @@ class ApkCreator(private val rootDir: File) {
             .build()
             .execute()
 
-        return targetDir.resolve("splits")
+        val apks = hashMapOf<String, ArrayList<File>>()
+        Commands.BuildApksResult.parseFrom(targetDir.resolve("toc.pb").readBytes()).variantList.forEach {
+            it.apkSetList.forEach { apkSet ->
+                apkSet.apkDescriptionList.forEach { apkDesc ->
+                    apks.getOrPut(apkSet.moduleMetadata.name) { arrayListOf() }.add(targetDir.resolve(apkDesc.path))
+                }
+            }
+        }
+        return apks
     }
 
     /** Converts the given [deviceSpec] into a format which bundletool understands. */

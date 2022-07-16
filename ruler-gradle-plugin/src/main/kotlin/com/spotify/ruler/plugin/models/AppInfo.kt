@@ -19,7 +19,7 @@ package com.spotify.ruler.plugin.models
 import java.io.Serializable
 
 /** General info about an app. */
-data class AppInfo(val variantName: String, val applicationId: String, val versionName: String) : Serializable {
+data class AppInfo(val variantName: String, val applicationId: String, val versionName: String, val dynamicFeatures: List<String>) : Serializable {
     companion object {
         const val serialVersionUID = 1L
     }

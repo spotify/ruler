@@ -26,6 +26,9 @@ if (!startParameter.projectProperties.containsKey("withoutSample")) {
 
     include(":sample:app")
     include(":sample:lib")
+    include(":sample:dynamicfeature")
+    include(":sample:dynamicfeature2")
+    include(":sample:lib-dfm")
 }
 
 plugins {

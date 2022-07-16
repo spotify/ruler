@@ -43,10 +43,13 @@ android {
         resources.excludes.add("**/*.kotlin_builtins")
         resources.excludes.add("kotlin-tooling-metadata.json")
     }
+    dynamicFeatures += setOf(":sample:dynamicfeature", ":sample:dynamicfeature2")
 }
 
 dependencies {
     implementation(project(":sample:lib"))
+    implementation("com.squareup.okhttp3:okhttp:4.8.0")
+    implementation("com.google.code.gson:gson:2.8.5")
 }
 
 ruler {

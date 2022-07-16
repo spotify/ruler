@@ -17,6 +17,7 @@
 package com.spotify.ruler.plugin
 
 import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.ApplicationVariant
 import com.spotify.ruler.plugin.models.AppInfo
@@ -60,6 +61,7 @@ class RulerPlugin : Plugin<Project> {
             applicationId = variant.applicationId.get(),
             versionName = variant.outputs.first().versionName.get() ?: "-",
             variantName = variant.name,
+            dynamicFeatures = project.extensions.getByType(ApplicationExtension::class.java).dynamicFeatures.toList()
         )
     }
 

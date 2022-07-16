@@ -45,8 +45,8 @@ class OwnershipInfo(entries: List<OwnershipEntry>, private val defaultOwner: Str
      */
     fun getOwner(component: String, componentType: ComponentType): String {
         val owner = when (componentType) {
-            ComponentType.INTERNAL -> explicitOwnershipEntries[component]
             ComponentType.EXTERNAL -> explicitOwnershipEntries[component.substringBeforeLast(':')]
+            else -> explicitOwnershipEntries[component]
         }
         return owner ?: getWildcardOwner(component) ?: defaultOwner
     }

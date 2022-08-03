@@ -81,6 +81,10 @@ In larger organizations, Gradle modules and dependencies are often owned by spec
 - identifier: com.sample.MainActivity
   owner: main-team
 
+# Identifier for dynamic feature modules -> name of the module
+- identifier: dynamic-feature
+  owner: dynamic-feature-team
+
 # Wildcard identifier -> matches multiple components (modules or dependencies) or files
 - identifier: :sample:wildcard:*
   owner: wildcard-team

@@ -46,6 +46,7 @@ class RulerPlugin : Plugin<Project> {
 
                     task.bundleFile.set(getBundleFile(project, variant))
                     task.mappingFile.set(getMappingFile(project, variant))
+                    getResourceMappingFile(project, variant)?.let(task.resourceMappingFile::set)
                     task.ownershipFile.set(rulerExtension.ownershipFile)
                     task.defaultOwner.set(rulerExtension.defaultOwner)
 
@@ -117,6 +118,19 @@ class RulerPlugin : Plugin<Project> {
                 defaultMappingFile // File doesn't exist -> fall back to default
             }
         }
+    }
+
+    /**
+     * Returns a mapping file to de-obfuscate resource names. DexGuard supports this feature
+     * by default, so we need to handle it accordingly.
+     */
+    private fun getResourceMappingFile(project: Project, variant: ApplicationVariant): Provider<RegularFile>? {
+        if (!hasDexGuard(project)) {
+            return null // No DexGuard means no resource name obfuscation has taken place
+        }
+
+        val mappingFilePath = "outputs/dexguard/mapping/bundle/${variant.name}/resourcefilenamemapping.txt"
+        return project.layout.buildDirectory.file(mappingFilePath)
     }
 
     /** Checks if the given [project] is using DexGuard for obfuscation, instead of R8. */

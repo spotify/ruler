@@ -20,10 +20,11 @@ import com.google.common.truth.Truth.assertThat
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
 import com.spotify.ruler.plugin.common.ClassNameSanitizer
+import com.spotify.ruler.plugin.common.ResourceNameSanitizer
 import org.junit.jupiter.api.Test
 
 class ApkSanitizerTest {
-    private val sanitizer = ApkSanitizer(ClassNameSanitizer(null))
+    private val sanitizer = ApkSanitizer(ClassNameSanitizer(null), ResourceNameSanitizer(null))
 
     @Test
     fun `Class files are unpacked from DEX entries`() {

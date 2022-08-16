@@ -19,13 +19,18 @@ package com.spotify.ruler.plugin.apk
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
 import com.spotify.ruler.plugin.common.ClassNameSanitizer
+import com.spotify.ruler.plugin.common.ResourceNameSanitizer
 
 /**
  * Responsible for sanitizing APK entries, so they can be attributed easier.
  *
  * @param classNameSanitizer Used for sanitizing class names
+ * @param resourceNameSanitizer Used for sanitizing resource file names
  */
-class ApkSanitizer(private val classNameSanitizer: ClassNameSanitizer) {
+class ApkSanitizer(
+    private val classNameSanitizer: ClassNameSanitizer,
+    private val resourceNameSanitizer: ResourceNameSanitizer,
+) {
 
     /**
      * Sanitizes a list of APK entries, to ease further processing. Sanitizing could mean that certain entries are
@@ -40,6 +45,7 @@ class ApkSanitizer(private val classNameSanitizer: ClassNameSanitizer) {
             AndroidManifestBucket(),
             BundletoolBucket(),
             ResourcesArscBucket(),
+            ResourceBucket(),
             TypeAssigningBucket(),
         )
 
@@ -129,6 +135,16 @@ class ApkSanitizer(private val classNameSanitizer: ClassNameSanitizer) {
         }
     }
 
+    private inner class ResourceBucket : SanitizationBucket() {
+        override fun isApplicable(entry: ApkEntry) = entry.name.startsWith("/res/")
+        override fun sanitize() = entries.map(::sanitizeEntry)
+
+        private fun sanitizeEntry(entry: ApkEntry): AppFile {
+            val name = resourceNameSanitizer.sanitize(entry.name)
+            return AppFile(name, FileType.RESOURCE, entry.downloadSize, entry.installSize)
+        }
+    }
+
     /** For files that are not sanitized in any other way, we just have to assign the correct file type. */
     private class TypeAssigningBucket : SanitizationBucket() {
         override fun isApplicable(entry: ApkEntry) = true
@@ -136,7 +152,6 @@ class ApkSanitizer(private val classNameSanitizer: ClassNameSanitizer) {
 
         private fun sanitizeEntry(entry: ApkEntry): AppFile {
             val type = when {
-                entry.name.startsWith("/res/") -> FileType.RESOURCE
                 entry.name.startsWith("/assets/") -> FileType.ASSET
                 entry.name.startsWith("/lib/") -> FileType.NATIVE_LIB
                 else -> FileType.OTHER

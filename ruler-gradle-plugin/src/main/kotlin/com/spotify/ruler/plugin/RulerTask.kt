@@ -23,6 +23,7 @@ import com.spotify.ruler.plugin.apk.ApkParser
 import com.spotify.ruler.plugin.apk.ApkSanitizer
 import com.spotify.ruler.plugin.attribution.Attributor
 import com.spotify.ruler.plugin.common.ClassNameSanitizer
+import com.spotify.ruler.plugin.common.ResourceNameSanitizer
 import com.spotify.ruler.plugin.dependency.DependencyComponent
 import com.spotify.ruler.plugin.dependency.DependencyParser
 import com.spotify.ruler.plugin.dependency.DependencySanitizer
@@ -56,6 +57,10 @@ abstract class RulerTask : DefaultTask() {
     @get:Optional
     @get:InputFile
     abstract val mappingFile: RegularFileProperty
+
+    @get:Optional
+    @get:InputFile
+    abstract val resourceMappingFile: RegularFileProperty
 
     @get:Optional
     @get:InputFile
@@ -93,7 +98,8 @@ abstract class RulerTask : DefaultTask() {
 
         val apkParser = ApkParser()
         val classNameSanitizer = ClassNameSanitizer(mappingFile.asFile.orNull)
-        val apkSanitizer = ApkSanitizer(classNameSanitizer)
+        val resourceNameSanitizer = ResourceNameSanitizer(resourceMappingFile.asFile.orNull)
+        val apkSanitizer = ApkSanitizer(classNameSanitizer, resourceNameSanitizer)
 
         return splits.mapValues { (_, apks) ->
             val entries = apks.flatMap(apkParser::parse)

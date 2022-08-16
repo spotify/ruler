@@ -22,8 +22,8 @@ import kotlinx.serialization.json.Json
 import java.nio.file.Paths
 import kotlin.io.path.readText
 
-/** Parses and returns the sample project report of the given [variant]. */
-fun parseReport(variant: String): AppReport {
-    val path = Paths.get("..", "sample", "app", "build", "reports", "ruler", variant, "report.json")
+/** Parses and returns the sample project report of the given [app] and [variant]. */
+fun parseReport(app: String, variant: String): AppReport {
+    val path = Paths.get("..", "sample", app, "build", "reports", "ruler", variant, "report.json")
     return Json.decodeFromString(path.readText())
 }

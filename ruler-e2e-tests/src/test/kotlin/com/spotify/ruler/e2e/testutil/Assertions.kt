@@ -20,7 +20,7 @@ import com.google.common.truth.Correspondence
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
 
-data class FileMatcher(val name: String, val type: FileType, val owner: String)
+data class FileMatcher(val name: String, val type: FileType, val owner: String? = null)
 
 object Correspondence {
     fun file() = Correspondence.from(::compareFiles, "matches")

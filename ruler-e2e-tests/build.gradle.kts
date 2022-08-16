@@ -33,7 +33,9 @@ tasks.withType<Test> {
     useJUnitPlatform()
 
     // Make reports of the sample project available
-    dependsOn(":sample:app:analyzeDebugBundle", ":sample:app:analyzeReleaseBundle")
+    dependsOn(":sample:app:analyzeDebugBundle")
+    dependsOn(":sample:app:analyzeReleaseBundle")
+    dependsOn(":sample:proguard:analyzeReleaseBundle")
 }
 
 java {

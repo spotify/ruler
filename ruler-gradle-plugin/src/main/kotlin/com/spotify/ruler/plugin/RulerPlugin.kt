@@ -24,6 +24,8 @@ import com.spotify.ruler.plugin.models.DeviceSpec
 import org.codehaus.groovy.runtime.StringGroovyMethods
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
 
 class RulerPlugin : Plugin<Project> {
 
@@ -43,7 +45,7 @@ class RulerPlugin : Plugin<Project> {
                     task.deviceSpec.set(getDeviceSpec(rulerExtension))
 
                     task.bundleFile.set(variant.artifacts.get(SingleArtifact.BUNDLE))
-                    task.mappingFile.set(variant.artifacts.get(SingleArtifact.OBFUSCATION_MAPPING_FILE))
+                    task.mappingFile.set(getMappingFile(project, variant))
                     task.ownershipFile.set(rulerExtension.ownershipFile)
                     task.defaultOwner.set(rulerExtension.defaultOwner)
 
@@ -69,4 +71,37 @@ class RulerPlugin : Plugin<Project> {
         screenDensity = extension.screenDensity.orNull ?: error("Screen density not specified."),
         sdkVersion = extension.sdkVersion.orNull ?: error("SDK version not specified."),
     )
+
+    /**
+     * Returns the mapping file used for de-obfuscation. Different obfuscation tools like DexGuard and ProGuard place
+     * their mapping files in different directories, so we have to handle those separately.
+     */
+    private fun getMappingFile(project: Project, variant: ApplicationVariant): Provider<RegularFile> {
+        val defaultMappingFile = variant.artifacts.get(SingleArtifact.OBFUSCATION_MAPPING_FILE)
+        val mappingFilePath = when {
+            hasDexGuard(project) -> "outputs/dexguard/mapping/bundle/${variant.name}/mapping.txt"
+            hasProGuard(project) -> "outputs/proguard/${variant.name}/mapping/mapping.txt"
+            else -> return defaultMappingFile // No special obfuscation plugin -> use default path
+        }
+
+        // Mapping files can also be missing, for example when obfuscation is disabled for a variant
+        val mappingFileProvider = project.layout.buildDirectory.file(mappingFilePath)
+        return mappingFileProvider.flatMap { mappingFile ->
+            if (mappingFile.asFile.exists()) {
+                mappingFileProvider // File exists -> use it
+            } else {
+                defaultMappingFile // File doesn't exist -> fall back to default
+            }
+        }
+    }
+
+    /** Checks if the given [project] is using DexGuard for obfuscation, instead of R8. */
+    private fun hasDexGuard(project: Project): Boolean {
+        return project.pluginManager.hasPlugin("dexguard")
+    }
+
+    /** Checks if the given [project] is using ProGuard for obfuscation, instead of R8. */
+    private fun hasProGuard(project: Project): Boolean {
+        return project.pluginManager.hasPlugin("com.guardsquare.proguard")
+    }
 }

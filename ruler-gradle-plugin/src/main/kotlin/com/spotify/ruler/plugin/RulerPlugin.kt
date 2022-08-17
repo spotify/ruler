@@ -44,13 +44,16 @@ class RulerPlugin : Plugin<Project> {
                     task.appInfo.set(getAppInfo(project, variant))
                     task.deviceSpec.set(getDeviceSpec(rulerExtension))
 
-                    task.bundleFile.set(variant.artifacts.get(SingleArtifact.BUNDLE))
+                    task.bundleFile.set(getBundleFile(project, variant))
                     task.mappingFile.set(getMappingFile(project, variant))
                     task.ownershipFile.set(rulerExtension.ownershipFile)
                     task.defaultOwner.set(rulerExtension.defaultOwner)
 
                     task.workingDir.set(project.layout.buildDirectory.dir("intermediates/ruler/${variant.name}"))
                     task.reportDir.set(project.layout.buildDirectory.dir("reports/ruler/${variant.name}"))
+
+                    // Add explicit dependency to support DexGuard
+                    task.dependsOn("bundle$variantName")
                 }
             }
         }
@@ -71,6 +74,27 @@ class RulerPlugin : Plugin<Project> {
         screenDensity = extension.screenDensity.orNull ?: error("Screen density not specified."),
         sdkVersion = extension.sdkVersion.orNull ?: error("SDK version not specified."),
     )
+
+    /**
+     * Returns the bundle file that's going to be analyzed. DexGuard produces a separate bundle instead of overriding
+     * the default one, so we have to handle that separately.
+     */
+    private fun getBundleFile(project: Project, variant: ApplicationVariant): Provider<RegularFile> {
+        val defaultBundleFile = variant.artifacts.get(SingleArtifact.BUNDLE)
+        if (!hasDexGuard(project)) {
+            return defaultBundleFile // No DexGuard means we can use the default bundle
+        }
+
+        // Bundle can still be in the default location, depending on the DexGuard config
+        return defaultBundleFile.flatMap { bundle ->
+            val dexGuardBundle = bundle.asFile.parentFile.resolve("${bundle.asFile.nameWithoutExtension}-protected.aab")
+            if (dexGuardBundle.exists()) {
+                project.layout.buildDirectory.file(dexGuardBundle.absolutePath) // File exists -> use it
+            } else {
+                defaultBundleFile // File doesn't exist -> fall back to default
+            }
+        }
+    }
 
     /**
      * Returns the mapping file used for de-obfuscation. Different obfuscation tools like DexGuard and ProGuard place

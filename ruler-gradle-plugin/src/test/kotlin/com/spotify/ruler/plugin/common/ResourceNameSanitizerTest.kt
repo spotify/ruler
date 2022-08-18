@@ -23,6 +23,12 @@ class ResourceNameSanitizerTest {
     private val sanitizer = ResourceNameSanitizer("res/anim/foo.xml -> [res/raw/b.xml]")
 
     @Test
+    fun `Unknown resource files names are not changed`() {
+        val sanitized = sanitizer.sanitize("/res/anim/bar.xml")
+        assertThat(sanitized).isEqualTo("/res/anim/bar.xml")
+    }
+
+    @Test
     fun `Obfuscated resource file names are de-obfuscated`() {
         val sanitized = sanitizer.sanitize("/res/raw/b.xml")
         assertThat(sanitized).isEqualTo("/res/anim/foo.xml")

@@ -17,19 +17,37 @@
 package com.spotify.ruler.plugin.common
 
 import java.io.File
+import java.io.FileReader
+import java.io.Reader
 import java.io.StringReader
 
-/**
- * Responsible for sanitizing resource file names.
- */
+/** Responsible for sanitizing resource file names (necessary for DexGuard compatibility). */
 class ResourceNameSanitizer {
-    private val resourceNameMap = ResourceNameMap()
+    private val resourceNameMapping = mutableMapOf<String, String>()
 
-    constructor(mappingFile: File?) { mappingFile?.let(resourceNameMap::readFromFile) }
-    constructor(mapping: String) { resourceNameMap.readFromReader(StringReader(mapping)) }
+    constructor(mappingFile: File?) { mappingFile?.let { initialize(FileReader(it)) } }
+    constructor(mapping: String) { initialize(StringReader(mapping)) }
 
     /** Sanitizes a given [resourceName], which includes deobfuscation (if applicable). */
     fun sanitize(resourceName: String): String {
-        return resourceNameMap.getResourceName(resourceName) // /res/raw/dVo.xml -> /res/drawable/foo.xml
+        return resourceNameMapping[resourceName] ?: resourceName // /res/raw/dVo.xml -> /res/drawable/foo.xml
+    }
+
+    /** Initializes the [resourceNameMapping] based on the mapping file read by the given [reader]. */
+    private fun initialize(reader: Reader) = reader.forEachLine { line ->
+        val trimmed = line.trim()
+        if (trimmed.isEmpty() || !trimmed.startsWith("res/")) {
+            return@forEachLine // We're only interested in resource file name mappings for now
+        }
+
+        // Parse resource name mapping (res/anim/foo.xml -> [res/raw/a.xml])
+        val split = line.split(" -> ")
+        if (split.size != 2) {
+            return@forEachLine // Couldn't parse line, ignore for now
+        }
+        val clearName = split[0]
+        val obfuscatedName = split[1].removeSurrounding("[", "]")
+
+        resourceNameMapping["/$obfuscatedName"] = "/$clearName"
     }
 }

@@ -46,7 +46,7 @@ class RulerPlugin : Plugin<Project> {
 
                     task.bundleFile.set(getBundleFile(project, variant))
                     task.mappingFile.set(getMappingFile(project, variant))
-                    getResourceMappingFile(project, variant)?.let(task.resourceMappingFile::set)
+                    task.resourceMappingFile.set(getResourceMappingFile(project, variant))
                     task.ownershipFile.set(rulerExtension.ownershipFile)
                     task.defaultOwner.set(rulerExtension.defaultOwner)
 
@@ -121,16 +121,25 @@ class RulerPlugin : Plugin<Project> {
     }
 
     /**
-     * Returns a mapping file to de-obfuscate resource names. DexGuard supports this feature
-     * by default, so we need to handle it accordingly.
+     * Returns a mapping file to de-obfuscate resource names. DexGuard supports this feature by default, so we need to
+     * handle it accordingly.
      */
-    private fun getResourceMappingFile(project: Project, variant: ApplicationVariant): Provider<RegularFile>? {
-        if (!hasDexGuard(project)) {
-            return null // No DexGuard means no resource name obfuscation has taken place
+    private fun getResourceMappingFile(project: Project, variant: ApplicationVariant): Provider<RegularFile> {
+        val defaultResourceMappingFile = project.objects.fileProperty() // Empty by default
+        val resourceMappingFilePath = when {
+            hasDexGuard(project) -> "outputs/dexguard/mapping/bundle/${variant.name}/resourcefilenamemapping.txt"
+            else -> return defaultResourceMappingFile // No DexGuard plugin -> use default empty file
         }
 
-        val mappingFilePath = "outputs/dexguard/mapping/bundle/${variant.name}/resourcefilenamemapping.txt"
-        return project.layout.buildDirectory.file(mappingFilePath)
+        // Mapping file can still be missing, for example if resource obfuscation is disabled for a variant
+        val resourceMappingFileProvider = project.layout.buildDirectory.file(resourceMappingFilePath)
+        return resourceMappingFileProvider.flatMap { resourceMappingFile ->
+            if (resourceMappingFile.asFile.exists()) {
+                resourceMappingFileProvider // File exists -> use it
+            } else {
+                defaultResourceMappingFile // File doesn't exist -> fall back to default
+            }
+        }
     }
 
     /** Checks if the given [project] is using DexGuard for obfuscation, instead of R8. */

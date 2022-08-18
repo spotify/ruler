@@ -135,6 +135,7 @@ class ApkSanitizer(
         }
     }
 
+    /** For sanitizing and de-obfuscating resource names (mainly for DexGuard compatibility). */
     private inner class ResourceBucket : SanitizationBucket() {
         override fun isApplicable(entry: ApkEntry) = entry.name.startsWith("/res/")
         override fun sanitize() = entries.map(::sanitizeEntry)
@@ -152,6 +153,7 @@ class ApkSanitizer(
 
         private fun sanitizeEntry(entry: ApkEntry): AppFile {
             val type = when {
+                entry.name.startsWith("/res/") -> FileType.RESOURCE
                 entry.name.startsWith("/assets/") -> FileType.ASSET
                 entry.name.startsWith("/lib/") -> FileType.NATIVE_LIB
                 else -> FileType.OTHER

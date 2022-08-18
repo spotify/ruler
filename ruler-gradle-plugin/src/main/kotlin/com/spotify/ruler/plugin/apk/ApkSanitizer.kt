@@ -40,7 +40,7 @@ class ApkSanitizer(private val classNameSanitizer: ClassNameSanitizer) {
             AndroidManifestBucket(),
             BundletoolBucket(),
             ResourcesArscBucket(),
-            TyepAssigningBucket()
+            TypeAssigningBucket(),
         )
 
         // Separate entries into their different sanitization bucket
@@ -130,7 +130,7 @@ class ApkSanitizer(private val classNameSanitizer: ClassNameSanitizer) {
     }
 
     /** For files that are not sanitized in any other way, we just have to assign the correct file type. */
-    private class TyepAssigningBucket : SanitizationBucket() {
+    private class TypeAssigningBucket : SanitizationBucket() {
         override fun isApplicable(entry: ApkEntry) = true
         override fun sanitize() = entries.map(::sanitizeEntry)
 

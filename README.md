@@ -33,7 +33,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.spotify.ruler:ruler-gradle-plugin:1.3.0")
+        classpath("com.spotify.ruler:ruler-gradle-plugin:1.4.0")
     }
 }
 ```

@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ruler
+  description: |
+    Ruler is a Gradle plugin which helps you analyze the size of your Android apps.
+spec:
+  type: library
+  owner: performance-squad
+  lifecycle: experimental

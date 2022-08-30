@@ -24,3 +24,13 @@ enum class FileType {
     NATIVE_LIB,
     OTHER,
 }
+
+/** Resource type of [AppFile] when [FileType] is RESOURCE. */
+enum class ResourceType {
+    DRAWABLE,
+    LAYOUT,
+    FONT,
+    RAW,
+    VALUES,
+    OTHER,
+}

@@ -18,6 +18,7 @@ package com.spotify.ruler.plugin.apk
 
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
+import com.spotify.ruler.models.ResourceType
 import com.spotify.ruler.plugin.common.ClassNameSanitizer
 import com.spotify.ruler.plugin.common.ResourceNameSanitizer
 
@@ -142,7 +143,15 @@ class ApkSanitizer(
 
         private fun sanitizeEntry(entry: ApkEntry): AppFile {
             val name = resourceNameSanitizer.sanitize(entry.name)
-            return AppFile(name, FileType.RESOURCE, entry.downloadSize, entry.installSize)
+            val resourceType: ResourceType = when {
+                entry.name.startsWith("/res/drawable") -> ResourceType.DRAWABLE
+                entry.name.startsWith("/res/layout") -> ResourceType.LAYOUT
+                entry.name.startsWith("/res/raw") -> ResourceType.RAW
+                entry.name.startsWith("/res/values") -> ResourceType.VALUES
+                entry.name.startsWith("/res/font/") -> ResourceType.FONT
+                else -> ResourceType.OTHER
+            }
+            return AppFile(name, FileType.RESOURCE, entry.downloadSize, entry.installSize, resourceType = resourceType)
         }
     }
 
@@ -158,7 +167,16 @@ class ApkSanitizer(
                 entry.name.startsWith("/lib/") -> FileType.NATIVE_LIB
                 else -> FileType.OTHER
             }
-            return AppFile(entry.name, type, entry.downloadSize, entry.installSize)
+            val resourceType: ResourceType? = when {
+                entry.name.startsWith("/res/drawable") -> ResourceType.DRAWABLE
+                entry.name.startsWith("/res/layout") -> ResourceType.LAYOUT
+                entry.name.startsWith("/res/raw") -> ResourceType.RAW
+                entry.name.startsWith("/res/values") -> ResourceType.VALUES
+                entry.name.startsWith("/res/font/") -> ResourceType.FONT
+                entry.name.startsWith("/res/") -> ResourceType.OTHER
+                else -> null
+            }
+            return AppFile(entry.name, type, entry.downloadSize, entry.installSize, resourceType = resourceType)
         }
     }
 }

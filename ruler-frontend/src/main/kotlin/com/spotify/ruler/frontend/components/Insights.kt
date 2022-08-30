@@ -23,6 +23,7 @@ import com.spotify.ruler.frontend.chart.BarChartConfig
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.frontend.chart.seriesOf
 import com.spotify.ruler.models.AppComponent
+import com.spotify.ruler.models.FileType
 import com.spotify.ruler.models.Measurable
 import kotlinx.browser.document
 import kotlinx.html.id
@@ -39,6 +40,9 @@ fun RBuilder.insights(components: List<AppComponent>) {
     }
     div(classes = "row") {
         componentTypeGraphs(components)
+    }
+    div(classes = "row") {
+        resourcesTypeGraph(components)
     }
 }
 
@@ -114,6 +118,43 @@ fun RBuilder.componentTypeGraphs(components: List<AppComponent>) {
             chartSeries = arrayOf(seriesOf("Components", fileCounts)),
             chartHeight = 250,
             horizontal = true,
+        ),
+    )
+}
+
+@RFunction
+fun RBuilder.resourcesTypeGraph(components: List<AppComponent>) {
+    val labels = arrayOf("Drawable", "Layout", "Raw", "Values", "Font", "Other")
+    val downloadSizes = LongArray(labels.size)
+    val installSizes = LongArray(labels.size)
+    val fileCounts = LongArray(labels.size)
+
+    components.flatMap(AppComponent::files).filter { it.resourceType != null }.forEach { file ->
+        val index = file.resourceType!!.ordinal
+        downloadSizes[index] += file.getSize(Measurable.SizeType.DOWNLOAD)
+        installSizes[index] += file.getSize(Measurable.SizeType.INSTALL)
+        fileCounts[index]++
+    }
+
+    chart(
+        id = "resource-type-distribution-size-chart",
+        title = "Resource type distribution (size)",
+        description = "Shows the accumulated app size for each resource type.",
+        config = BarChartConfig(
+            chartLabels = labels,
+            chartSeries = arrayOf(seriesOf("Download size", downloadSizes), seriesOf("Install size", installSizes)),
+            chartHeight = 350,
+            yAxisFormatter = ::formatSize,
+        ),
+    )
+    chart(
+        id = "resource-type-distribution-count-chart",
+        title = "Resource type distribution (file count)",
+        description = "Shows how many files of a certain resource type are contained in the app.",
+        config = BarChartConfig(
+            chartLabels = labels,
+            chartSeries = arrayOf(seriesOf("Files", fileCounts)),
+            chartHeight = 350,
         ),
     )
 }

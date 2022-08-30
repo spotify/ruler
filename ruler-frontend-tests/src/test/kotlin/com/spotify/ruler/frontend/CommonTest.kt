@@ -43,6 +43,8 @@ class CommonTest {
             .assertVisible("File type distribution (file count)")
             .assertVisible("Component type distribution (size)")
             .assertVisible("Component type distribution (component count)")
+            .assertVisible("Resource type distribution (size)")
+            .assertVisible("Resource type distribution (file count)")
             .navigateToOwnershipTab()
             .assertVisible("Ownership overview")
             .assertVisible("Components and files grouped by owner")

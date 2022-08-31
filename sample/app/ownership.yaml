@@ -4,6 +4,9 @@
 - identifier: /res/layout/activity_main.xml
   owner: main-team
 
+- identifier: /res/layout/test_drawable.xml
+  owner: main-team
+
 - identifier: :sample:lib
   owner: lib-team
 

@@ -22,6 +22,7 @@ import com.spotify.ruler.e2e.testutil.FileMatcher
 import com.spotify.ruler.e2e.testutil.parseReport
 import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.FileType
+import com.spotify.ruler.models.ResourceType
 import org.junit.jupiter.api.Test
 
 class ReleaseReportTest {
@@ -44,7 +45,8 @@ class ReleaseReportTest {
 
         assertThat(app.files).comparingElementsUsing(Correspondence.file()).containsExactly(
             FileMatcher("com.spotify.ruler.sample.app.MainActivity", FileType.CLASS, "main-team"),
-            FileMatcher("/res/layout/activity_main.xml", FileType.RESOURCE, "main-team"),
+            FileMatcher("/res/layout/activity_main.xml", FileType.RESOURCE, "main-team", ResourceType.LAYOUT),
+            FileMatcher("/res/drawable/test_drawable.xml", FileType.RESOURCE, "default-team", ResourceType.DRAWABLE),
             FileMatcher("/AndroidManifest.xml", FileType.OTHER, "default-team"),
             FileMatcher("/resources.arsc", FileType.OTHER, "default-team"),
             FileMatcher("/META-INF/com/android/build/gradle/app-metadata.properties", FileType.OTHER, "default-team"),
@@ -60,7 +62,7 @@ class ReleaseReportTest {
         assertThat(lib.files).comparingElementsUsing(Correspondence.file()).containsExactly(
             FileMatcher("com.spotify.ruler.sample.lib.LibActivity", FileType.CLASS, "lib-team"),
             FileMatcher("com.spotify.ruler.sample.lib.ClassToObfuscate", FileType.CLASS, "lib-team"),
-            FileMatcher("/res/layout/activity_lib.xml", FileType.RESOURCE, "lib-team"),
+            FileMatcher("/res/layout/activity_lib.xml", FileType.RESOURCE, "lib-team", ResourceType.LAYOUT),
             FileMatcher("/assets/asset.txt", FileType.ASSET, "lib-team"),
         )
     }
@@ -74,7 +76,7 @@ class ReleaseReportTest {
             FileMatcher("/AndroidManifest.xml", FileType.OTHER, "dynamic-team"),
             FileMatcher("/resources.arsc", FileType.OTHER, "dynamic-team"),
             FileMatcher("com.spotify.ruler.sample.dynamic.DynamicActivity", FileType.CLASS, "dynamic-team"),
-            FileMatcher("/res/layout/activity_dynamic.xml", FileType.RESOURCE, "dynamic-team"),
+            FileMatcher("/res/layout/activity_dynamic.xml", FileType.RESOURCE, "dynamic-team", ResourceType.LAYOUT),
         )
     }
 

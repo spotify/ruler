@@ -23,6 +23,7 @@ import com.spotify.ruler.models.AppReport
 import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.DynamicFeature
 import com.spotify.ruler.models.FileType
+import com.spotify.ruler.models.ResourceType
 import com.spotify.ruler.plugin.dependency.DependencyComponent
 import com.spotify.ruler.plugin.models.AppInfo
 import com.spotify.ruler.plugin.ownership.OwnershipEntry
@@ -40,7 +41,7 @@ class JsonReporterTest {
     private val components = mapOf(
         DependencyComponent(":app", ComponentType.INTERNAL) to listOf(
             AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200),
-            AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250),
+            AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250, resourceType = ResourceType.LAYOUT),
         ),
         DependencyComponent(":lib", ComponentType.INTERNAL) to listOf(
             AppFile("/assets/license.html", FileType.ASSET, 500, 600),
@@ -49,7 +50,13 @@ class JsonReporterTest {
     private val features = mapOf(
         "dynamic" to listOf(
             AppFile("com.spotify.DynamicActivity", FileType.CLASS, 200, 300),
-            AppFile("/res/layout/activity_dynamic.xml", FileType.RESOURCE, 100, 250),
+            AppFile(
+                "/res/layout/activity_dynamic.xml",
+                FileType.RESOURCE,
+                100,
+                250,
+                resourceType = ResourceType.LAYOUT
+            ),
         ),
     )
 
@@ -66,13 +73,20 @@ class JsonReporterTest {
                 AppFile("/assets/license.html", FileType.ASSET, 500, 600, "default-team"),
             ), "default-team"),
             AppComponent(":app", ComponentType.INTERNAL, 250, 450, listOf(
-                AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250, "app-team"),
+                AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250, "app-team", ResourceType.LAYOUT),
                 AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200, "app-team"),
             ), "app-team"),
         ), listOf(
             DynamicFeature("dynamic", 300, 550, listOf(
                 AppFile("com.spotify.DynamicActivity", FileType.CLASS, 200, 300, "dynamic-team"),
-                AppFile("/res/layout/activity_dynamic.xml", FileType.RESOURCE, 100, 250, "dynamic-team"),
+                AppFile(
+                    "/res/layout/activity_dynamic.xml",
+                    FileType.RESOURCE,
+                    100,
+                    250,
+                    "dynamic-team",
+                    ResourceType.LAYOUT
+                ),
             ), "dynamic-team"),
         ))
         assertThat(report).isEqualTo(expected)

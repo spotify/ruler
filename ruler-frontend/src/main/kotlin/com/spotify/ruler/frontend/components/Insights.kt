@@ -23,7 +23,6 @@ import com.spotify.ruler.frontend.chart.BarChartConfig
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.frontend.chart.seriesOf
 import com.spotify.ruler.models.AppComponent
-import com.spotify.ruler.models.FileType
 import com.spotify.ruler.models.Measurable
 import kotlinx.browser.document
 import kotlinx.html.id
@@ -42,7 +41,7 @@ fun RBuilder.insights(components: List<AppComponent>) {
         componentTypeGraphs(components)
     }
     div(classes = "row") {
-        resourcesTypeGraph(components)
+        resourcesTypeGraphs(components)
     }
 }
 
@@ -123,7 +122,7 @@ fun RBuilder.componentTypeGraphs(components: List<AppComponent>) {
 }
 
 @RFunction
-fun RBuilder.resourcesTypeGraph(components: List<AppComponent>) {
+fun RBuilder.resourcesTypeGraphs(components: List<AppComponent>) {
     val labels = arrayOf("Drawable", "Layout", "Raw", "Values", "Font", "Other")
     val downloadSizes = LongArray(labels.size)
     val installSizes = LongArray(labels.size)

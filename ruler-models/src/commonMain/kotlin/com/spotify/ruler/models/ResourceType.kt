@@ -16,11 +16,12 @@
 
 package com.spotify.ruler.models
 
-/** Type of an [AppFile]. */
-enum class FileType {
-    CLASS,
-    RESOURCE,
-    ASSET,
-    NATIVE_LIB,
+/** Resource type for [FileType.RESOURCE]. */
+enum class ResourceType {
+    DRAWABLE,
+    LAYOUT,
+    FONT,
+    RAW,
+    VALUES,
     OTHER,
 }

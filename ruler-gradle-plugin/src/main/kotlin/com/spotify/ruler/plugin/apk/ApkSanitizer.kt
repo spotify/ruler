@@ -71,6 +71,19 @@ class ApkSanitizer(
         abstract fun sanitize(): List<AppFile>
 
         fun add(entry: ApkEntry) = entries.add(entry)
+
+        protected fun mapNameToResourceType(entry: ApkEntry): ResourceType? {
+            val resourceType: ResourceType? = when {
+                entry.name.startsWith("/res/drawable") -> ResourceType.DRAWABLE
+                entry.name.startsWith("/res/layout") -> ResourceType.LAYOUT
+                entry.name.startsWith("/res/raw") -> ResourceType.RAW
+                entry.name.startsWith("/res/values") -> ResourceType.VALUES
+                entry.name.startsWith("/res/font") -> ResourceType.FONT
+                entry.name.startsWith("/res/") -> ResourceType.OTHER
+                else -> null
+            }
+            return resourceType
+        }
     }
 
     /**
@@ -143,14 +156,7 @@ class ApkSanitizer(
 
         private fun sanitizeEntry(entry: ApkEntry): AppFile {
             val name = resourceNameSanitizer.sanitize(entry.name)
-            val resourceType: ResourceType = when {
-                entry.name.startsWith("/res/drawable") -> ResourceType.DRAWABLE
-                entry.name.startsWith("/res/layout") -> ResourceType.LAYOUT
-                entry.name.startsWith("/res/raw") -> ResourceType.RAW
-                entry.name.startsWith("/res/values") -> ResourceType.VALUES
-                entry.name.startsWith("/res/font/") -> ResourceType.FONT
-                else -> ResourceType.OTHER
-            }
+            val resourceType: ResourceType? = mapNameToResourceType(entry)
             return AppFile(name, FileType.RESOURCE, entry.downloadSize, entry.installSize, resourceType = resourceType)
         }
     }
@@ -167,16 +173,10 @@ class ApkSanitizer(
                 entry.name.startsWith("/lib/") -> FileType.NATIVE_LIB
                 else -> FileType.OTHER
             }
-            val resourceType: ResourceType? = when {
-                entry.name.startsWith("/res/drawable") -> ResourceType.DRAWABLE
-                entry.name.startsWith("/res/layout") -> ResourceType.LAYOUT
-                entry.name.startsWith("/res/raw") -> ResourceType.RAW
-                entry.name.startsWith("/res/values") -> ResourceType.VALUES
-                entry.name.startsWith("/res/font/") -> ResourceType.FONT
-                entry.name.startsWith("/res/") -> ResourceType.OTHER
-                else -> null
-            }
+            val resourceType: ResourceType? = mapNameToResourceType(entry)
             return AppFile(entry.name, type, entry.downloadSize, entry.installSize, resourceType = resourceType)
         }
     }
+
+
 }

@@ -19,8 +19,14 @@ package com.spotify.ruler.e2e.testutil
 import com.google.common.truth.Correspondence
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
+import com.spotify.ruler.models.ResourceType
 
-data class FileMatcher(val name: String, val type: FileType, val owner: String? = null)
+data class FileMatcher(
+    val name: String,
+    val type: FileType,
+    val owner: String? = null,
+    val resourceType: ResourceType? = null
+)
 
 object Correspondence {
     fun file() = Correspondence.from(::compareFiles, "matches")
@@ -29,6 +35,9 @@ object Correspondence {
     private fun compareFiles(actual: AppFile?, expected: FileMatcher?): Boolean = when {
         actual == null -> expected == null
         expected == null -> false
-        else -> actual.name == expected.name && actual.type == expected.type && actual.owner == expected.owner
+        else -> actual.name == expected.name &&
+                actual.type == expected.type &&
+                actual.owner == expected.owner &&
+                actual.resourceType == expected.resourceType
     }
 }

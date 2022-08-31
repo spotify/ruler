@@ -19,6 +19,7 @@ package com.spotify.ruler.plugin.apk
 import com.google.common.truth.Truth.assertThat
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
+import com.spotify.ruler.models.ResourceType
 import com.spotify.ruler.plugin.common.ClassNameSanitizer
 import com.spotify.ruler.plugin.common.ResourceNameSanitizer
 import org.junit.jupiter.api.Test
@@ -77,11 +78,30 @@ class ApkSanitizerTest {
     }
 
     @Test
-    fun `Resources are assigned the correct type`() {
+    fun `Layout resources are assigned the correct type`() {
         val dirty = ApkEntry.Default("/res/layout/activity_main.xml", 0, 0)
         val clean = sanitizer.sanitize(listOf(dirty)).single()
 
         assertThat(clean.type).isEqualTo(FileType.RESOURCE)
+        assertThat(clean.resourceType).isEqualTo(ResourceType.LAYOUT)
+    }
+
+    @Test
+    fun `Drawable resources are assigned the correct type`() {
+        val dirty = ApkEntry.Default("/res/drawable/test_drawable.xml", 0, 0)
+        val clean = sanitizer.sanitize(listOf(dirty)).single()
+
+        assertThat(clean.type).isEqualTo(FileType.RESOURCE)
+        assertThat(clean.resourceType).isEqualTo(ResourceType.DRAWABLE)
+    }
+
+    @Test
+    fun `Other resources are assigned the correct type`() {
+        val dirty = ApkEntry.Default("/res/mipmap-hdpi/ic_launcher.png", 0, 0)
+        val clean = sanitizer.sanitize(listOf(dirty)).single()
+
+        assertThat(clean.type).isEqualTo(FileType.RESOURCE)
+        assertThat(clean.resourceType).isEqualTo(ResourceType.OTHER)
     }
 
     @Test

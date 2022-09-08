@@ -131,6 +131,12 @@ The latest version of this plugin is compatible with
 
 Earlier versions might also work, but compatibility can't be guaranteed.
 
+## How to contribute
+
+We want your help to improve Ruler! You can contribute by opening issues for bugs and ideas for improvement.
+
+You can also contribute directly by solving open issues. Specifically look out for issues marked as [bugs](https://github.com/spotify/ruler/labels/bug), [good first issues](https://github.com/spotify/ruler/labels/good%20first%20issue) and [help wanted](https://github.com/spotify/ruler/labels/help%20wanted).
+
 ## Code of conduct
 
 This project adheres to the [Open Code of Conduct](https://github.com/spotify/code-of-conduct/blob/master/code-of-conduct.md). By participating, you are expected to honor this code.

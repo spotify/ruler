@@ -16,12 +16,13 @@
 
 package com.spotify.ruler.models
 
-/** Resource type for [FileType.RESOURCE]. */
-enum class ResourceType(val label: String) {
-    DRAWABLE("Drawable"),
-    LAYOUT("Layout"),
-    RAW("Raw"),
-    VALUES("Values"),
-    FONT("Font"),
-    OTHER("Other"),
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Insights(
+    val appDownloadSize: Long,
+    val appInstallSize: Long,
+    val fileTypeInsights: Map<FileType, TypeInsights>,
+    val resourcesTypeInsights: Map<ResourceType, TypeInsights>,
+    val componentTypeInsights: Map<ComponentType, TypeInsights>,
+)

@@ -17,10 +17,10 @@
 package com.spotify.ruler.models
 
 /** Type of an [AppFile]. */
-enum class FileType {
-    CLASS,
-    RESOURCE,
-    ASSET,
-    NATIVE_LIB,
-    OTHER,
+enum class FileType(val label: String) {
+    CLASS("Classes"),
+    RESOURCE("Resources"),
+    ASSET("Assets"),
+    NATIVE_LIB("Native libraries"),
+    OTHER("Other"),
 }

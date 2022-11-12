@@ -17,7 +17,7 @@
 package com.spotify.ruler.models
 
 /** Type of an [AppComponent]. */
-enum class ComponentType {
-    INTERNAL,
-    EXTERNAL,
+enum class ComponentType(val label: String) {
+    INTERNAL("Internal"),
+    EXTERNAL("External"),
 }

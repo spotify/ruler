@@ -88,8 +88,8 @@ class ReleaseReportTest {
             downloadSize += component.downloadSize
             installSize += component.installSize
         }
-        assertThat(downloadSize).isEqualTo(report.downloadSize)
-        assertThat(installSize).isEqualTo(report.installSize)
+        assertThat(downloadSize).isEqualTo(report.insights.appDownloadSize)
+        assertThat(installSize).isEqualTo(report.insights.appInstallSize)
     }
 
     @Test

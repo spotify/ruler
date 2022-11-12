@@ -23,7 +23,9 @@ import com.spotify.ruler.models.AppReport
 import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.DynamicFeature
 import com.spotify.ruler.models.FileType
+import com.spotify.ruler.models.Insights
 import com.spotify.ruler.models.ResourceType
+import com.spotify.ruler.models.TypeInsights
 import com.spotify.ruler.plugin.dependency.DependencyComponent
 import com.spotify.ruler.plugin.models.AppInfo
 import com.spotify.ruler.plugin.ownership.OwnershipEntry
@@ -68,27 +70,68 @@ class JsonReporterTest {
         val reportFile = reporter.generateReport(appInfo, components, features, ownershipInfo, targetDir)
         val report = Json.decodeFromString<AppReport>(reportFile.readText())
 
-        val expected = AppReport("com.spotify.music", "1.2.3", "release", 750, 1050, listOf(
-            AppComponent(":lib", ComponentType.INTERNAL, 500, 600, listOf(
-                AppFile("/assets/license.html", FileType.ASSET, 500, 600, "default-team"),
-            ), "default-team"),
-            AppComponent(":app", ComponentType.INTERNAL, 250, 450, listOf(
-                AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250, "app-team", ResourceType.LAYOUT),
-                AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200, "app-team"),
-            ), "app-team"),
-        ), listOf(
-            DynamicFeature("dynamic", 300, 550, listOf(
-                AppFile("com.spotify.DynamicActivity", FileType.CLASS, 200, 300, "dynamic-team"),
-                AppFile(
-                    "/res/layout/activity_dynamic.xml",
-                    FileType.RESOURCE,
-                    100,
-                    250,
-                    "dynamic-team",
-                    ResourceType.LAYOUT
+        val expected = AppReport(
+            name = "com.spotify.music",
+            version = "1.2.3",
+            variant = "release",
+            components = listOf(
+                AppComponent(":lib", ComponentType.INTERNAL, 500, 600, listOf(
+                    AppFile("/assets/license.html", FileType.ASSET, 500, 600, "default-team"),
+                ), "default-team"),
+                AppComponent(":app", ComponentType.INTERNAL, 250, 450, listOf(
+                    AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250, "app-team", ResourceType.LAYOUT),
+                    AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200, "app-team"),
+                ), "app-team"),
+            ),
+            dynamicFeatures = listOf(
+                DynamicFeature("dynamic", 300, 550, listOf(
+                    AppFile("com.spotify.DynamicActivity", FileType.CLASS, 200, 300, "dynamic-team"),
+                    AppFile(
+                        "/res/layout/activity_dynamic.xml",
+                        FileType.RESOURCE,
+                        100,
+                        250,
+                        "dynamic-team",
+                        ResourceType.LAYOUT
+                    ),
+                ), "dynamic-team"),
+            ),
+            insights = Insights(
+                appDownloadSize = 750,
+                appInstallSize = 1050,
+                fileTypeInsights = mapOf(
+                    FileType.CLASS to TypeInsights(
+                        downloadSize = 100,
+                        installSize = 200,
+                        count = 1
+                    ),
+                    FileType.RESOURCE to TypeInsights(
+                        downloadSize = 150,
+                        installSize = 250,
+                        count = 1
+                    ),
+                    FileType.ASSET to TypeInsights(
+                        downloadSize = 500,
+                        installSize = 600,
+                        count = 1
+                    )
                 ),
-            ), "dynamic-team"),
-        ))
+                componentTypeInsights = mapOf(
+                    ComponentType.INTERNAL to TypeInsights(
+                        downloadSize = 750,
+                        installSize = 1050,
+                        count = 2
+                    )
+                ),
+                resourcesTypeInsights = mapOf(
+                    ResourceType.LAYOUT to TypeInsights(
+                        downloadSize = 150,
+                        installSize = 250,
+                        count = 1
+                    )
+                ),
+            )
+        )
         assertThat(report).isEqualTo(expected)
     }
 

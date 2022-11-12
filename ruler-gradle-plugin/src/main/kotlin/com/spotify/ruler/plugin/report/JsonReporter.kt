@@ -19,8 +19,14 @@ package com.spotify.ruler.plugin.report
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.AppReport
+import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.DynamicFeature
+import com.spotify.ruler.models.FileType
+import com.spotify.ruler.models.Insights
 import com.spotify.ruler.models.Measurable
+import com.spotify.ruler.models.MutableTypeInsights
+import com.spotify.ruler.models.ResourceType
+import com.spotify.ruler.models.TypeInsights
 import com.spotify.ruler.plugin.dependency.DependencyComponent
 import com.spotify.ruler.plugin.models.AppInfo
 import com.spotify.ruler.plugin.ownership.OwnershipInfo
@@ -48,54 +54,127 @@ class JsonReporter {
         ownershipInfo: OwnershipInfo?,
         targetDir: File
     ): File {
+        val appComponents = getAppComponents(components, ownershipInfo)
         val report = AppReport(
             name = appInfo.applicationId,
             version = appInfo.versionName,
             variant = appInfo.variantName,
-            downloadSize = components.values.flatten().sumOf(AppFile::downloadSize),
-            installSize = components.values.flatten().sumOf(AppFile::installSize),
-            components = components.map { (component, files) ->
-                AppComponent(
-                    name = component.name,
-                    type = component.type,
-                    downloadSize = files.sumOf(AppFile::downloadSize),
-                    installSize = files.sumOf(AppFile::installSize),
-                    owner = ownershipInfo?.getOwner(component.name, component.type),
-                    files = files.map { file ->
-                        AppFile(
-                            name = file.name,
-                            type = file.type,
-                            downloadSize = file.downloadSize,
-                            installSize = file.installSize,
-                            owner = ownershipInfo?.getOwner(file.name, component.name, component.type),
-                            resourceType = file.resourceType,
-                        )
-                    }.sortedWith(comparator.reversed())
-                )
-            }.sortedWith(comparator.reversed()),
-            dynamicFeatures = features.map { (feature, files) ->
-                DynamicFeature(
-                    name = feature,
-                    downloadSize = files.sumOf(AppFile::downloadSize),
-                    installSize = files.sumOf(AppFile::installSize),
-                    owner = ownershipInfo?.getOwner(feature),
-                    files = files.map { file ->
-                        AppFile(
-                            name = file.name,
-                            type = file.type,
-                            downloadSize = file.downloadSize,
-                            installSize = file.installSize,
-                            owner = ownershipInfo?.getOwner(file.name, feature),
-                            resourceType = file.resourceType,
-                        )
-                    }.sortedWith(comparator.reversed())
-                )
-            }.sortedWith(comparator.reversed()),
+            components = appComponents,
+            dynamicFeatures = getDynamicFeatures(features, ownershipInfo),
+            insights = getInsights(components, appComponents)
         )
 
         val format = Json { prettyPrint = true }
         val reportFile = targetDir.resolve("report.json")
         reportFile.writeText(format.encodeToString(report))
         return reportFile
+    }
+
+    private fun getAppComponents(
+        components: Map<DependencyComponent, List<AppFile>>,
+        ownershipInfo: OwnershipInfo?
+    ): List<AppComponent> =
+        components.map { (component, files) ->
+            AppComponent(
+                name = component.name,
+                type = component.type,
+                downloadSize = files.sumOf(AppFile::downloadSize),
+                installSize = files.sumOf(AppFile::installSize),
+                owner = ownershipInfo?.getOwner(component.name, component.type),
+                files = files.map { file ->
+                    AppFile(
+                        name = file.name,
+                        type = file.type,
+                        downloadSize = file.downloadSize,
+                        installSize = file.installSize,
+                        owner = ownershipInfo?.getOwner(file.name, component.name, component.type),
+                        resourceType = file.resourceType,
+                    )
+                }.sortedWith(comparator.reversed())
+            )
+        }.sortedWith(comparator.reversed())
+
+    private fun getDynamicFeatures(
+        features: Map<String, List<AppFile>>,
+        ownershipInfo: OwnershipInfo?
+    ): List<DynamicFeature> =
+        features.map { (feature, files) ->
+            DynamicFeature(
+                name = feature,
+                downloadSize = files.sumOf(AppFile::downloadSize),
+                installSize = files.sumOf(AppFile::installSize),
+                owner = ownershipInfo?.getOwner(feature),
+                files = files.map { file ->
+                    AppFile(
+                        name = file.name,
+                        type = file.type,
+                        downloadSize = file.downloadSize,
+                        installSize = file.installSize,
+                        owner = ownershipInfo?.getOwner(file.name, feature),
+                        resourceType = file.resourceType,
+                    )
+                }.sortedWith(comparator.reversed())
+            )
+        }.sortedWith(comparator.reversed())
+
+    private fun getInsights(
+        components: Map<DependencyComponent, List<AppFile>>,
+        appComponents: List<AppComponent>,
+    ): Insights =
+        Insights(
+            appDownloadSize = components.values.flatten().sumOf(AppFile::downloadSize),
+            appInstallSize = components.values.flatten().sumOf(AppFile::installSize),
+            fileTypeInsights = getFileTypeInsights(appComponents),
+            componentTypeInsights = getComponentTypeInsights(appComponents),
+            resourcesTypeInsights = getResourcesTypeInsights(appComponents),
+        )
+
+    private fun getFileTypeInsights(components: List<AppComponent>): Map<FileType, TypeInsights> =
+        getTypeInsights(
+            items = components.flatMap(AppComponent::files),
+            getKey = { type }
+        )
+
+    private fun getComponentTypeInsights(components: List<AppComponent>): Map<ComponentType, TypeInsights> =
+        getTypeInsights(
+            items = components,
+            getKey = { type }
+        )
+
+    private fun getResourcesTypeInsights(components: List<AppComponent>): Map<ResourceType, TypeInsights> =
+        getTypeInsights(
+            items = components.flatMap(AppComponent::files).filter { it.resourceType != null },
+            getKey = { resourceType!! }
+        )
+
+    private inline fun <K, T : Measurable> getTypeInsights(
+        items: List<T>,
+        getKey: T.() -> K
+    ): Map<K, TypeInsights> {
+        val typeInsights = mutableMapOf<K, MutableTypeInsights>()
+
+        items.forEach { item ->
+            val key = item.getKey()
+            val currentInsights = typeInsights.getOrPut(key) {
+                MutableTypeInsights(
+                    downloadSize = 0L,
+                    installSize = 0L,
+                    count = 0L,
+                )
+            }
+            currentInsights.downloadSize += item.getSize(Measurable.SizeType.DOWNLOAD)
+            currentInsights.installSize += item.getSize(Measurable.SizeType.INSTALL)
+            currentInsights.count++
+        }
+
+        return typeInsights.asSequence()
+            .map {
+                val (type, insights) = it
+                type to TypeInsights(
+                    downloadSize = insights.downloadSize,
+                    installSize = insights.installSize,
+                    count = insights.count
+                )
+            }.toMap()
     }
 }

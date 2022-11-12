@@ -49,7 +49,7 @@ fun RBuilder.report(report: AppReport) {
 
     val tabs = listOf(
         Tab("/", "Breakdown") { breakdown(report.components, sizeType) },
-        Tab("/insights", "Insights") { insights(report.components) },
+        Tab("/insights", "Insights") { insights(report.insights) },
         Tab("/ownership", "Ownership", hasOwnershipInfo) { ownership(report.components, sizeType) },
         Tab("/dynamic", "Dynamic features", hasDynamicFeatures) { dynamicFeatures(report.dynamicFeatures, sizeType) },
     )
@@ -74,8 +74,8 @@ fun RBuilder.header(report: AppReport) {
             h3 { +report.name }
             span(classes = "text-muted") { +"Version ${report.version} (${report.variant})" }
         }
-        headerSizeItem(report.downloadSize, "Download size")
-        headerSizeItem(report.installSize, "Install size")
+        headerSizeItem(report.insights.appDownloadSize, "Download size")
+        headerSizeItem(report.insights.appInstallSize, "Install size")
     }
 }
 

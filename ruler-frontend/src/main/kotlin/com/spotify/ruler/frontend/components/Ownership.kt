@@ -22,9 +22,11 @@ import com.spotify.ruler.frontend.chart.BarChartConfig
 import com.spotify.ruler.frontend.chart.seriesOf
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppComponent
-import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.Measurable
+import com.spotify.ruler.models.OwnedSize
+import com.spotify.ruler.models.Owner
+import com.spotify.ruler.models.OwnershipOverview
 import react.RBuilder
 import react.dom.div
 import react.dom.h4
@@ -34,25 +36,21 @@ import react.useState
 const val PAGE_SIZE = 10
 
 @RFunction
-fun RBuilder.ownership(components: List<AppComponent>, sizeType: Measurable.SizeType) {
-    componentOwnershipOverview(components)
-    componentOwnershipPerTeam(components, sizeType)
+fun RBuilder.ownership(
+    components: List<AppComponent>,
+    sizeType: Measurable.SizeType,
+    ownershipOverview: Map<String, OwnershipOverview>,
+) {
+    componentOwnershipOverview(ownershipOverview)
+    componentOwnershipPerTeam(components, sizeType, ownershipOverview)
 }
 
 @RFunction
-fun RBuilder.componentOwnershipOverview(components: List<AppComponent>) {
-    val sizes = mutableMapOf<String, Measurable.Mutable>()
-    components.flatMap(AppComponent::files).forEach { file ->
-        val owner = file.owner ?: return@forEach
-        val current = sizes.getOrPut(owner) { Measurable.Mutable(0, 0) }
-        current.downloadSize += file.downloadSize
-        current.installSize += file.installSize
-    }
-
-    val sorted = sizes.entries.sortedByDescending { (_, measurable) -> measurable.downloadSize }
+fun RBuilder.componentOwnershipOverview(ownershipOverview: Map<String, OwnershipOverview>) {
+    val sorted = ownershipOverview.entries.sortedByDescending { (_, ownership) -> ownership.totalInstallSize }
     val owners = sorted.map { (owner, _) -> owner }
-    val downloadSizes = sorted.map { (_, measurable) -> measurable.downloadSize }
-    val installSizes = sorted.map { (_, measurable) -> measurable.installSize }
+    val downloadSizes = sorted.map { (_, ownership) -> ownership.totalDownloadSize }
+    val installSizes = sorted.map { (_, ownership) -> ownership.totalInstallSize }
 
     pagedContent(owners.size, PAGE_SIZE) { pageStartIndex, pageEndIndex ->
         chart(
@@ -74,34 +72,50 @@ fun RBuilder.componentOwnershipOverview(components: List<AppComponent>) {
 }
 
 @RFunction
-fun RBuilder.componentOwnershipPerTeam(components: List<AppComponent>, sizeType: Measurable.SizeType) {
+fun RBuilder.componentOwnershipPerTeam(
+    components: List<AppComponent>,
+    sizeType: Measurable.SizeType,
+    ownershipOverview: Map<String, OwnershipOverview>,
+) {
     val files = components.flatMap(AppComponent::files)
-    val owners = files.mapNotNull(AppFile::owner).distinct().sorted()
+    val owners = ownershipOverview.keys.sorted()
     var selectedOwner by useState(owners.first())
 
-    val ownedComponents = components.filter { component -> component.owner == selectedOwner }
+    val ownedComponents = components.filter { component -> component.owner?.name == selectedOwner }
     val ownedFiles = files.filter { file -> file.owner == selectedOwner }
+    val ownedFilesCount = ownershipOverview[selectedOwner]?.filesCount ?: 0
+
+    val totalOwnedDownloadSize = ownershipOverview[selectedOwner]?.totalDownloadSize ?: 0
+    val totalOwnedInstallSize = ownershipOverview[selectedOwner]?.totalInstallSize ?: 0
+    val remainingOwnedDownloadSize = ownershipOverview[selectedOwner]?.filesFromNotOwnedComponentsDownloadSize ?: 0
+    val remainingOwnedInstallSize = ownershipOverview[selectedOwner]?.filesFromNotOwnedComponentsInstallSize ?: 0
 
     val remainingOwnedFiles = ownedFiles.toMutableSet()
     val processedComponents = ownedComponents.map { component ->
         val ownedFilesFromComponent = component.files.filter { file -> file.owner == selectedOwner }
         remainingOwnedFiles.removeAll(ownedFilesFromComponent)
         component.copy(
-            downloadSize = ownedFilesFromComponent.sumOf(AppFile::downloadSize),
-            installSize = ownedFilesFromComponent.sumOf(AppFile::installSize),
+            downloadSize = component.owner?.ownedSize?.downloadSize ?: 0,
+            installSize = component.owner?.ownedSize?.installSize ?: 0,
             files = ownedFilesFromComponent,
         )
     }.toMutableList()
 
     // Group together all owned files which belong to components not owned by the currently selected owner
-    if (remainingOwnedFiles.isNotEmpty()) {
+    if (remainingOwnedDownloadSize > 0 || remainingOwnedInstallSize > 0) {
         processedComponents += AppComponent(
             name = "Other owned files",
             type = ComponentType.INTERNAL,
-            downloadSize = remainingOwnedFiles.sumOf(AppFile::downloadSize),
-            installSize = remainingOwnedFiles.sumOf(AppFile::installSize),
+            downloadSize = remainingOwnedDownloadSize,
+            installSize = remainingOwnedInstallSize,
             files = remainingOwnedFiles.toList(),
-            owner = selectedOwner,
+            owner = Owner(
+                name = selectedOwner,
+                ownedSize = OwnedSize(
+                    downloadSize = remainingOwnedDownloadSize,
+                    installSize = remainingOwnedInstallSize,
+                ),
+            ),
         )
     }
 
@@ -109,9 +123,9 @@ fun RBuilder.componentOwnershipPerTeam(components: List<AppComponent>, sizeType:
     dropdown(owners, "owner-dropdown") { owner -> selectedOwner = owner }
     div(classes = "row mt-4 mb-4") {
         highlightedValue(ownedComponents.size, "Component(s)")
-        highlightedValue(ownedFiles.size, "File(s)")
-        highlightedValue(ownedFiles.sumOf(AppFile::downloadSize), "Download size", ::formatSize)
-        highlightedValue(ownedFiles.sumOf(AppFile::installSize), "Install size", ::formatSize)
+        highlightedValue(ownedFilesCount, "File(s)")
+        highlightedValue(totalOwnedDownloadSize, "Download size", ::formatSize)
+        highlightedValue(totalOwnedInstallSize, "Install size", ::formatSize)
     }
     containerList(processedComponents, sizeType)
 }

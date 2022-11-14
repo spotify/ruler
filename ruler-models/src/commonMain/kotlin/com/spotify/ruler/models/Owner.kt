@@ -18,14 +18,8 @@ package com.spotify.ruler.models
 
 import kotlinx.serialization.Serializable
 
-/** Analysis report of an app. */
 @Serializable
-data class AppReport(
+data class Owner(
     val name: String,
-    val version: String,
-    val variant: String,
-    val components: List<AppComponent>,
-    val dynamicFeatures: List<DynamicFeature>,
-    val insights: Insights,
-    val ownershipOverview: Map<String, OwnershipOverview>?,
+    val ownedSize: OwnedSize,
 )

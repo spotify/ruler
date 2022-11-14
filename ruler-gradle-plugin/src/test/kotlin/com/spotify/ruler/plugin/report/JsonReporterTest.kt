@@ -24,6 +24,9 @@ import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.DynamicFeature
 import com.spotify.ruler.models.FileType
 import com.spotify.ruler.models.Insights
+import com.spotify.ruler.models.OwnedSize
+import com.spotify.ruler.models.Owner
+import com.spotify.ruler.models.OwnershipOverview
 import com.spotify.ruler.models.ResourceType
 import com.spotify.ruler.models.TypeInsights
 import com.spotify.ruler.plugin.dependency.DependencyComponent
@@ -44,6 +47,7 @@ class JsonReporterTest {
         DependencyComponent(":app", ComponentType.INTERNAL) to listOf(
             AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200),
             AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250, resourceType = ResourceType.LAYOUT),
+            AppFile("com.spotify.LoginActivity", FileType.CLASS, 50, 100, "login-team"),
         ),
         DependencyComponent(":lib", ComponentType.INTERNAL) to listOf(
             AppFile("/assets/license.html", FileType.ASSET, 500, 600),
@@ -62,7 +66,11 @@ class JsonReporterTest {
         ),
     )
 
-    private val ownershipEntries = listOf(OwnershipEntry(":app", "app-team"), OwnershipEntry("dynamic", "dynamic-team"))
+    private val ownershipEntries = listOf(
+        OwnershipEntry(":app", "app-team"),
+        OwnershipEntry("com.spotify.LoginActivity", "login-team"),
+        OwnershipEntry("dynamic", "dynamic-team")
+    )
     private val ownershipInfo = OwnershipInfo(ownershipEntries, "default-team")
 
     @Test
@@ -75,61 +83,78 @@ class JsonReporterTest {
             version = "1.2.3",
             variant = "release",
             components = listOf(
-                AppComponent(":lib", ComponentType.INTERNAL, 500, 600, listOf(
-                    AppFile("/assets/license.html", FileType.ASSET, 500, 600, "default-team"),
-                ), "default-team"),
-                AppComponent(":app", ComponentType.INTERNAL, 250, 450, listOf(
-                    AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250, "app-team", ResourceType.LAYOUT),
-                    AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200, "app-team"),
-                ), "app-team"),
+                AppComponent(
+                    name =":lib",
+                    type = ComponentType.INTERNAL,
+                    downloadSize = 500,
+                    installSize = 600,
+                    files = listOf(
+                        AppFile("/assets/license.html", FileType.ASSET, 500, 600, "default-team"),
+                    ),
+                    owner = Owner(name = "default-team", ownedSize = OwnedSize(downloadSize = 500, installSize = 600))
+                ),
+                AppComponent(
+                    name = ":app",
+                    type = ComponentType.INTERNAL,
+                    downloadSize = 300,
+                    installSize = 550,
+                    files = listOf(
+                        AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 150, 250, "app-team", ResourceType.LAYOUT),
+                        AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200, "app-team"),
+                        AppFile("com.spotify.LoginActivity", FileType.CLASS, 50, 100, "login-team"),
+                    ),
+                    owner = Owner(name = "app-team", ownedSize = OwnedSize(downloadSize = 250, installSize = 450))
+                ),
             ),
             dynamicFeatures = listOf(
-                DynamicFeature("dynamic", 300, 550, listOf(
-                    AppFile("com.spotify.DynamicActivity", FileType.CLASS, 200, 300, "dynamic-team"),
-                    AppFile(
-                        "/res/layout/activity_dynamic.xml",
-                        FileType.RESOURCE,
-                        100,
-                        250,
-                        "dynamic-team",
-                        ResourceType.LAYOUT
+                DynamicFeature(
+                    name = "dynamic",
+                    downloadSize = 300,
+                    installSize = 550,
+                    files = listOf(
+                        AppFile("com.spotify.DynamicActivity", FileType.CLASS, 200, 300, "dynamic-team"),
+                        AppFile("/res/layout/activity_dynamic.xml", FileType.RESOURCE, 100, 250, "dynamic-team", ResourceType.LAYOUT),
                     ),
-                ), "dynamic-team"),
+                    owner = Owner(name = "dynamic-team", ownedSize = OwnedSize(downloadSize = 300, installSize = 550))
+                ),
             ),
             insights = Insights(
-                appDownloadSize = 750,
-                appInstallSize = 1050,
+                appDownloadSize = 800,
+                appInstallSize = 1150,
                 fileTypeInsights = mapOf(
-                    FileType.CLASS to TypeInsights(
-                        downloadSize = 100,
-                        installSize = 200,
-                        count = 1
-                    ),
-                    FileType.RESOURCE to TypeInsights(
-                        downloadSize = 150,
-                        installSize = 250,
-                        count = 1
-                    ),
-                    FileType.ASSET to TypeInsights(
-                        downloadSize = 500,
-                        installSize = 600,
-                        count = 1
-                    )
+                    FileType.CLASS to TypeInsights(downloadSize = 150, installSize = 300, count = 2),
+                    FileType.RESOURCE to TypeInsights(downloadSize = 150, installSize = 250, count = 1),
+                    FileType.ASSET to TypeInsights(downloadSize = 500, installSize = 600, count = 1)
                 ),
                 componentTypeInsights = mapOf(
-                    ComponentType.INTERNAL to TypeInsights(
-                        downloadSize = 750,
-                        installSize = 1050,
-                        count = 2
-                    )
+                    ComponentType.INTERNAL to TypeInsights(downloadSize = 800, installSize = 1150, count = 2)
                 ),
                 resourcesTypeInsights = mapOf(
-                    ResourceType.LAYOUT to TypeInsights(
-                        downloadSize = 150,
-                        installSize = 250,
-                        count = 1
-                    )
+                    ResourceType.LAYOUT to TypeInsights(downloadSize = 150, installSize = 250, count = 1)
                 ),
+            ),
+            ownershipOverview = mapOf(
+                "default-team" to OwnershipOverview(
+                    totalDownloadSize = 500,
+                    totalInstallSize = 600,
+                    filesCount = 1,
+                    filesFromNotOwnedComponentsDownloadSize = 0,
+                    filesFromNotOwnedComponentsInstallSize = 0,
+                ),
+                "app-team" to OwnershipOverview(
+                    totalDownloadSize = 250,
+                    totalInstallSize = 450,
+                    filesCount = 2,
+                    filesFromNotOwnedComponentsDownloadSize = 0,
+                    filesFromNotOwnedComponentsInstallSize = 0,
+                ),
+                "login-team" to OwnershipOverview(
+                    totalDownloadSize = 50,
+                    totalInstallSize = 100,
+                    filesCount = 1,
+                    filesFromNotOwnedComponentsDownloadSize = 50,
+                    filesFromNotOwnedComponentsInstallSize = 100,
+                )
             )
         )
         assertThat(report).isEqualTo(expected)
@@ -139,7 +164,8 @@ class JsonReporterTest {
     fun `Ownership info is omitted from report if it is null`(@TempDir targetDir: File) {
         val reportFile = reporter.generateReport(appInfo, components, features, null, targetDir)
         val reportContent = reportFile.readText()
-        assertThat(reportContent).doesNotContain("owner")
+        assertThat(reportContent).doesNotContain("\"owner\"")
+        assertThat(reportContent).contains("\"ownershipOverview\": null")
     }
 
     @Test

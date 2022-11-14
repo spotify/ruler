@@ -64,7 +64,7 @@ fun RBuilder.containerListItemHeader(id: Int, container: FileContainer, sizeType
             attrs["data-bs-toggle"] = "collapse"
             attrs["data-bs-target"] = "#module-$id-body"
             span(classes = "font-monospace text-truncate me-3") { +container.name }
-            container.owner?.let { owner -> span(classes = "badge bg-secondary me-3") { +owner } }
+            container.owner?.let { owner -> span(classes = "badge bg-secondary me-3") { +owner.name } }
             span(classes = "ms-auto me-3 text-nowrap") {
                 +formatSize(container, sizeType)
             }

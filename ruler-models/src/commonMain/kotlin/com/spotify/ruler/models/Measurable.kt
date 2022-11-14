@@ -33,7 +33,4 @@ interface Measurable {
         SizeType.DOWNLOAD -> downloadSize
         SizeType.INSTALL -> installSize
     }
-
-    /** A mutable [Measurable] implementation. */
-    data class Mutable(override var downloadSize: Long, override var installSize: Long) : Measurable
 }

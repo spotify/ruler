@@ -25,6 +25,9 @@ import com.spotify.ruler.models.FileType
 import com.spotify.ruler.models.Insights
 import com.spotify.ruler.models.Measurable
 import com.spotify.ruler.models.MutableTypeInsights
+import com.spotify.ruler.models.OwnedSize
+import com.spotify.ruler.models.Owner
+import com.spotify.ruler.models.OwnershipOverview
 import com.spotify.ruler.models.ResourceType
 import com.spotify.ruler.models.TypeInsights
 import com.spotify.ruler.plugin.dependency.DependencyComponent
@@ -61,7 +64,8 @@ class JsonReporter {
             variant = appInfo.variantName,
             components = appComponents,
             dynamicFeatures = getDynamicFeatures(features, ownershipInfo),
-            insights = getInsights(components, appComponents)
+            insights = getInsights(components, appComponents),
+            ownershipOverview = ownershipInfo?.let { getOwnershipOverview(appComponents) },
         )
 
         val format = Json { prettyPrint = true }
@@ -75,22 +79,25 @@ class JsonReporter {
         ownershipInfo: OwnershipInfo?
     ): List<AppComponent> =
         components.map { (component, files) ->
+            val componentFiles = files.map { file ->
+                AppFile(
+                    name = file.name,
+                    type = file.type,
+                    downloadSize = file.downloadSize,
+                    installSize = file.installSize,
+                    owner = ownershipInfo?.getOwner(file.name, component.name, component.type),
+                    resourceType = file.resourceType,
+                )
+            }.sortedWith(comparator.reversed())
             AppComponent(
                 name = component.name,
                 type = component.type,
                 downloadSize = files.sumOf(AppFile::downloadSize),
                 installSize = files.sumOf(AppFile::installSize),
-                owner = ownershipInfo?.getOwner(component.name, component.type),
-                files = files.map { file ->
-                    AppFile(
-                        name = file.name,
-                        type = file.type,
-                        downloadSize = file.downloadSize,
-                        installSize = file.installSize,
-                        owner = ownershipInfo?.getOwner(file.name, component.name, component.type),
-                        resourceType = file.resourceType,
-                    )
-                }.sortedWith(comparator.reversed())
+                owner = ownershipInfo?.let {
+                    getOwner(ownershipInfo.getOwner(component.name, component.type), componentFiles)
+                },
+                files = componentFiles
             )
         }.sortedWith(comparator.reversed())
 
@@ -99,23 +106,44 @@ class JsonReporter {
         ownershipInfo: OwnershipInfo?
     ): List<DynamicFeature> =
         features.map { (feature, files) ->
+            val dynamicFeatureFiles = files.map { file ->
+                AppFile(
+                    name = file.name,
+                    type = file.type,
+                    downloadSize = file.downloadSize,
+                    installSize = file.installSize,
+                    owner = ownershipInfo?.getOwner(file.name, feature),
+                    resourceType = file.resourceType,
+                )
+            }.sortedWith(comparator.reversed())
             DynamicFeature(
                 name = feature,
                 downloadSize = files.sumOf(AppFile::downloadSize),
                 installSize = files.sumOf(AppFile::installSize),
-                owner = ownershipInfo?.getOwner(feature),
-                files = files.map { file ->
-                    AppFile(
-                        name = file.name,
-                        type = file.type,
-                        downloadSize = file.downloadSize,
-                        installSize = file.installSize,
-                        owner = ownershipInfo?.getOwner(file.name, feature),
-                        resourceType = file.resourceType,
-                    )
-                }.sortedWith(comparator.reversed())
+                owner = ownershipInfo?.let { getOwner(ownershipInfo.getOwner(feature), dynamicFeatureFiles) },
+                files = dynamicFeatureFiles
             )
         }.sortedWith(comparator.reversed())
+
+    private fun getOwner(
+        componentOwnerName: String,
+        files: List<AppFile>,
+    ): Owner {
+        var ownedDownloadSize = 0L
+        var ownedInstallSize = 0L
+        files.filter { it.owner == componentOwnerName }.forEach { ownedFile ->
+            ownedDownloadSize += ownedFile.downloadSize
+            ownedInstallSize += ownedFile.installSize
+        }
+
+        return Owner(
+            name = componentOwnerName,
+            ownedSize = OwnedSize(
+                downloadSize = ownedDownloadSize,
+                installSize = ownedInstallSize,
+            )
+        )
+    }
 
     private fun getInsights(
         components: Map<DependencyComponent, List<AppFile>>,
@@ -176,5 +204,34 @@ class JsonReporter {
                     count = insights.count
                 )
             }.toMap()
+    }
+
+    private fun getOwnershipOverview(appComponents: List<AppComponent>): Map<String, OwnershipOverview> {
+        val overview = mutableMapOf<String, OwnershipOverview>()
+
+        appComponents.forEach { component ->
+            component.files.forEach { file ->
+                file.owner?.let { fileOwner ->
+                    val current = overview.getOrPut(fileOwner) {
+                        OwnershipOverview(
+                            totalDownloadSize = 0,
+                            totalInstallSize = 0,
+                            filesCount = 0,
+                            filesFromNotOwnedComponentsDownloadSize = 0,
+                            filesFromNotOwnedComponentsInstallSize = 0,
+                        )
+                    }
+                    current.totalDownloadSize += file.downloadSize
+                    current.totalInstallSize += file.installSize
+                    current.filesCount++
+                    if (fileOwner != component.owner?.name) {
+                        current.filesFromNotOwnedComponentsDownloadSize += file.downloadSize
+                        current.filesFromNotOwnedComponentsInstallSize += file.installSize
+                    }
+                }
+            }
+        }
+
+        return overview
     }
 }

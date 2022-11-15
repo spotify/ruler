@@ -53,6 +53,8 @@ class RulerPlugin : Plugin<Project> {
                     task.workingDir.set(project.layout.buildDirectory.dir("intermediates/ruler/${variant.name}"))
                     task.reportDir.set(project.layout.buildDirectory.dir("reports/ruler/${variant.name}"))
 
+                    task.shouldExcludeFileListing.set(rulerExtension.shouldExcludeFileListing)
+
                     // Add explicit dependency to support DexGuard
                     task.dependsOn("bundle$variantName")
                 }
@@ -64,7 +66,7 @@ class RulerPlugin : Plugin<Project> {
     private fun getAppInfo(project: Project, variant: ApplicationVariant) = project.provider {
         AppInfo(
             applicationId = variant.applicationId.get(),
-            versionName = variant.outputs.first().versionName.get() ?: "-",
+            versionName = variant.outputs.first().versionName.orNull ?: "-",
             variantName = variant.name,
         )
     }

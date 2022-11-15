@@ -55,6 +55,7 @@ class JsonReporter {
         components: Map<DependencyComponent, List<AppFile>>,
         features: Map<String, List<AppFile>>,
         ownershipInfo: OwnershipInfo?,
+        shouldExcludeFileListing: Boolean,
         targetDir: File
     ): File {
         val appComponents = getAppComponents(components, ownershipInfo)
@@ -62,8 +63,9 @@ class JsonReporter {
             name = appInfo.applicationId,
             version = appInfo.versionName,
             variant = appInfo.variantName,
-            components = appComponents,
-            dynamicFeatures = getDynamicFeatures(features, ownershipInfo),
+            components = appComponents.excludeComponentFilesIfNeeded(shouldExcludeFileListing),
+            dynamicFeatures = getDynamicFeatures(features, ownershipInfo)
+                .excludeDyamicFeatureFilesIfNeeded(shouldExcludeFileListing),
             insights = getInsights(components, appComponents),
             ownershipOverview = ownershipInfo?.let { getOwnershipOverview(appComponents) },
         )
@@ -234,4 +236,22 @@ class JsonReporter {
 
         return overview
     }
+
+    private fun List<AppComponent>.excludeComponentFilesIfNeeded(
+        shouldExcludeFileListing: Boolean
+    ): List<AppComponent> =
+        if (shouldExcludeFileListing) {
+            map { it.copy(files = emptyList()) }
+        } else {
+            this
+        }
+
+    private fun List<DynamicFeature>.excludeDyamicFeatureFilesIfNeeded(
+        shouldExcludeFileListing: Boolean
+    ): List<DynamicFeature> =
+        if (shouldExcludeFileListing) {
+            map { it.copy(files = emptyList()) }
+        } else {
+            this
+        }
 }

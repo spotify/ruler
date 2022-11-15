@@ -75,7 +75,7 @@ class JsonReporterTest {
 
     @Test
     fun `JSON report is generated`(@TempDir targetDir: File) {
-        val reportFile = reporter.generateReport(appInfo, components, features, ownershipInfo, targetDir)
+        val reportFile = reporter.generateReport(appInfo, components, features, ownershipInfo, false, targetDir)
         val report = Json.decodeFromString<AppReport>(reportFile.readText())
 
         val expected = AppReport(
@@ -161,8 +161,63 @@ class JsonReporterTest {
     }
 
     @Test
+    fun `JSON report is generated without file listing`(@TempDir targetDir: File) {
+        val components = mapOf(
+            DependencyComponent(":app", ComponentType.INTERNAL) to listOf(
+                AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200),
+            ),
+        )
+        val features = mapOf(
+            "dynamic" to listOf(
+                AppFile("com.spotify.DynamicActivity", FileType.CLASS, 200, 300)
+            )
+        )
+        val reportFile = reporter.generateReport(appInfo, components, features, null, true, targetDir)
+        val report = Json.decodeFromString<AppReport>(reportFile.readText())
+
+        val expected = AppReport(
+            name = "com.spotify.music",
+            version = "1.2.3",
+            variant = "release",
+            components = listOf(
+                AppComponent(
+                    name =":app",
+                    type = ComponentType.INTERNAL,
+                    downloadSize = 100,
+                    installSize = 200,
+                    files = emptyList(),
+                    owner = null
+                ),
+            ),
+            dynamicFeatures = listOf(
+                DynamicFeature(
+                    name = "dynamic",
+                    downloadSize = 200,
+                    installSize = 300,
+                    files = emptyList(),
+                    owner = null
+                ),
+            ),
+            insights = Insights(
+                appDownloadSize = 100,
+                appInstallSize = 200,
+                fileTypeInsights = mapOf(
+                    FileType.CLASS to TypeInsights(downloadSize = 100, installSize = 200, count = 1),
+                ),
+                componentTypeInsights = mapOf(
+                    ComponentType.INTERNAL to TypeInsights(downloadSize = 100, installSize = 200, count = 1)
+                ),
+                resourcesTypeInsights = emptyMap(),
+            ),
+            ownershipOverview = null
+        )
+
+        assertThat(expected).isEqualTo(report)
+    }
+
+    @Test
     fun `Ownership info is omitted from report if it is null`(@TempDir targetDir: File) {
-        val reportFile = reporter.generateReport(appInfo, components, features, null, targetDir)
+        val reportFile = reporter.generateReport(appInfo, components, features, null, false, targetDir)
         val reportContent = reportFile.readText()
         assertThat(reportContent).doesNotContain("\"owner\"")
         assertThat(reportContent).contains("\"ownershipOverview\": null")
@@ -171,7 +226,7 @@ class JsonReporterTest {
     @Test
     fun `Existing reports are overwritten`(@TempDir targetDir: File) {
         repeat(2) {
-            reporter.generateReport(appInfo, components, features, ownershipInfo, targetDir)
+            reporter.generateReport(appInfo, components, features, ownershipInfo, false, targetDir)
         }
     }
 }

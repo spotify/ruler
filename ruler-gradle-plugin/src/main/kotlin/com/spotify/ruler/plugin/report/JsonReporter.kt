@@ -25,8 +25,8 @@ import com.spotify.ruler.models.FileType
 import com.spotify.ruler.models.Insights
 import com.spotify.ruler.models.Measurable
 import com.spotify.ruler.models.MutableTypeInsights
-import com.spotify.ruler.models.OwnedSize
-import com.spotify.ruler.models.Owner
+import com.spotify.ruler.models.OwnedComponentSize
+import com.spotify.ruler.models.ComponentOwner
 import com.spotify.ruler.models.OwnershipOverview
 import com.spotify.ruler.models.ResourceType
 import com.spotify.ruler.models.TypeInsights
@@ -47,6 +47,7 @@ class JsonReporter {
      * @param appInfo General info about the analyzed app.
      * @param components Map of app component names to their respective files
      * @param ownershipInfo Optional info about the owners of components.
+     * @param shouldExcludeFileListing Flag to determine if file listing should be included in the report
      * @param targetDir Directory where the generated report will be located
      * @return Generated JSON report file
      */
@@ -130,7 +131,7 @@ class JsonReporter {
     private fun getOwner(
         componentOwnerName: String,
         files: List<AppFile>,
-    ): Owner {
+    ): ComponentOwner {
         var ownedDownloadSize = 0L
         var ownedInstallSize = 0L
         files.filter { it.owner == componentOwnerName }.forEach { ownedFile ->
@@ -138,9 +139,9 @@ class JsonReporter {
             ownedInstallSize += ownedFile.installSize
         }
 
-        return Owner(
+        return ComponentOwner(
             name = componentOwnerName,
-            ownedSize = OwnedSize(
+            ownedSize = OwnedComponentSize(
                 downloadSize = ownedDownloadSize,
                 installSize = ownedInstallSize,
             )

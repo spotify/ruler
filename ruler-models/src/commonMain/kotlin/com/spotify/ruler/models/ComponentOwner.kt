@@ -18,8 +18,11 @@ package com.spotify.ruler.models
 
 import kotlinx.serialization.Serializable
 
+/** Representation of the relation between the owner of a component
+ * and the corresponding OwnedComponentSize
+ * */
 @Serializable
-data class Owner(
+data class ComponentOwner(
     val name: String,
-    val ownedSize: OwnedSize,
+    val ownedSize: OwnedComponentSize,
 )

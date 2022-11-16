@@ -24,8 +24,8 @@ import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.DynamicFeature
 import com.spotify.ruler.models.FileType
 import com.spotify.ruler.models.Insights
-import com.spotify.ruler.models.OwnedSize
-import com.spotify.ruler.models.Owner
+import com.spotify.ruler.models.OwnedComponentSize
+import com.spotify.ruler.models.ComponentOwner
 import com.spotify.ruler.models.OwnershipOverview
 import com.spotify.ruler.models.ResourceType
 import com.spotify.ruler.models.TypeInsights
@@ -91,7 +91,7 @@ class JsonReporterTest {
                     files = listOf(
                         AppFile("/assets/license.html", FileType.ASSET, 500, 600, "default-team"),
                     ),
-                    owner = Owner(name = "default-team", ownedSize = OwnedSize(downloadSize = 500, installSize = 600))
+                    owner = ComponentOwner(name = "default-team", ownedSize = OwnedComponentSize(downloadSize = 500, installSize = 600))
                 ),
                 AppComponent(
                     name = ":app",
@@ -103,7 +103,7 @@ class JsonReporterTest {
                         AppFile("com.spotify.MainActivity", FileType.CLASS, 100, 200, "app-team"),
                         AppFile("com.spotify.LoginActivity", FileType.CLASS, 50, 100, "login-team"),
                     ),
-                    owner = Owner(name = "app-team", ownedSize = OwnedSize(downloadSize = 250, installSize = 450))
+                    owner = ComponentOwner(name = "app-team", ownedSize = OwnedComponentSize(downloadSize = 250, installSize = 450))
                 ),
             ),
             dynamicFeatures = listOf(
@@ -115,7 +115,7 @@ class JsonReporterTest {
                         AppFile("com.spotify.DynamicActivity", FileType.CLASS, 200, 300, "dynamic-team"),
                         AppFile("/res/layout/activity_dynamic.xml", FileType.RESOURCE, 100, 250, "dynamic-team", ResourceType.LAYOUT),
                     ),
-                    owner = Owner(name = "dynamic-team", ownedSize = OwnedSize(downloadSize = 300, installSize = 550))
+                    owner = ComponentOwner(name = "dynamic-team", ownedSize = OwnedComponentSize(downloadSize = 300, installSize = 550))
                 ),
             ),
             insights = Insights(

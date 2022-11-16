@@ -24,8 +24,8 @@ import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.Measurable
-import com.spotify.ruler.models.OwnedSize
-import com.spotify.ruler.models.Owner
+import com.spotify.ruler.models.OwnedComponentSize
+import com.spotify.ruler.models.ComponentOwner
 import com.spotify.ruler.models.OwnershipOverview
 import react.RBuilder
 import react.dom.div
@@ -109,9 +109,9 @@ fun RBuilder.componentOwnershipPerTeam(
             downloadSize = remainingOwnedDownloadSize,
             installSize = remainingOwnedInstallSize,
             files = remainingOwnedFiles.toList(),
-            owner = Owner(
+            owner = ComponentOwner(
                 name = selectedOwner,
-                ownedSize = OwnedSize(
+                ownedSize = OwnedComponentSize(
                     downloadSize = remainingOwnedDownloadSize,
                     installSize = remainingOwnedInstallSize,
                 ),

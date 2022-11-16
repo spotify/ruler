@@ -18,6 +18,7 @@ package com.spotify.ruler.models
 
 import kotlinx.serialization.Serializable
 
+/** Insights about some type of measurable item (e.g: a file) */
 @Serializable
 data class TypeInsights(
     val downloadSize: Long,
@@ -25,6 +26,7 @@ data class TypeInsights(
     val count: Long,
 )
 
+/** Helper and mutable class used in intermediate calculation of TypeInsights */
 data class MutableTypeInsights(
     var downloadSize: Long,
     var installSize: Long,

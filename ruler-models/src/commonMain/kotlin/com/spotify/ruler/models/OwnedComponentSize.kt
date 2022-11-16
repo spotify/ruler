@@ -18,8 +18,9 @@ package com.spotify.ruler.models
 
 import kotlinx.serialization.Serializable
 
+/** Total size of a component that belongs to a specific owner */
 @Serializable
-data class OwnedSize(
+data class OwnedComponentSize(
     override val downloadSize: Long,
     override val installSize: Long
 ) : Measurable

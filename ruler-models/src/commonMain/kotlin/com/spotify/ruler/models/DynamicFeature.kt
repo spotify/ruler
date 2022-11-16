@@ -25,5 +25,5 @@ data class DynamicFeature(
     override val downloadSize: Long,
     override val installSize: Long,
     override val files: List<AppFile>,
-    override val owner: Owner? = null,
+    override val owner: ComponentOwner? = null,
 ) : FileContainer

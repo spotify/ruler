@@ -18,6 +18,7 @@ package com.spotify.ruler.models
 
 import kotlinx.serialization.Serializable
 
+/** Global Insights about the app size */
 @Serializable
 data class Insights(
     val appDownloadSize: Long,

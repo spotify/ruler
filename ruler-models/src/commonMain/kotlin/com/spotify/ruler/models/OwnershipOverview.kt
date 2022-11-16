@@ -18,6 +18,7 @@ package com.spotify.ruler.models
 
 import kotlinx.serialization.Serializable
 
+/** Overview with global size details obout the components/files owned by some owner */
 @Serializable
 data class OwnershipOverview(
     var totalDownloadSize: Long,

@@ -50,7 +50,7 @@ fun RBuilder.report(report: AppReport) {
     val tabs = listOf(
         Tab("/", "Breakdown") { breakdown(report.components, sizeType) },
         Tab("/insights", "Insights") { insights(report.insights) },
-        Tab("/ownership", "Ownership", hasOwnershipInfo) { ownership(report.components, sizeType, report.ownershipOverview!!) },
+        Tab("/ownership", "Ownership", hasOwnershipInfo) { ownership(report.components, sizeType, report.ownershipOverview ?: emptyMap()) },
         Tab("/dynamic", "Dynamic features", hasDynamicFeatures) { dynamicFeatures(report.dynamicFeatures, sizeType) },
     )
 

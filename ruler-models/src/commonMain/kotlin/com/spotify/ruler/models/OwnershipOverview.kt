@@ -21,6 +21,15 @@ import kotlinx.serialization.Serializable
 /** Overview with global size details obout the components/files owned by some owner */
 @Serializable
 data class OwnershipOverview(
+    val totalDownloadSize: Long,
+    val totalInstallSize: Long,
+    val filesCount: Long,
+    val filesFromNotOwnedComponentsDownloadSize: Long,
+    val filesFromNotOwnedComponentsInstallSize: Long,
+)
+
+/** Helper and mutable class used in intermediate calculation of OwnershipOverview */
+data class MutableOwnershipOverview(
     var totalDownloadSize: Long,
     var totalInstallSize: Long,
     var filesCount: Long,

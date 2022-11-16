@@ -27,6 +27,7 @@ import com.spotify.ruler.models.Measurable
 import com.spotify.ruler.models.MutableTypeInsights
 import com.spotify.ruler.models.OwnedComponentSize
 import com.spotify.ruler.models.ComponentOwner
+import com.spotify.ruler.models.MutableOwnershipOverview
 import com.spotify.ruler.models.OwnershipOverview
 import com.spotify.ruler.models.ResourceType
 import com.spotify.ruler.models.TypeInsights
@@ -210,13 +211,13 @@ class JsonReporter {
     }
 
     private fun getOwnershipOverview(appComponents: List<AppComponent>): Map<String, OwnershipOverview> {
-        val overview = mutableMapOf<String, OwnershipOverview>()
+        val overview = mutableMapOf<String, MutableOwnershipOverview>()
 
         appComponents.forEach { component ->
             component.files.forEach { file ->
                 file.owner?.let { fileOwner ->
                     val current = overview.getOrPut(fileOwner) {
-                        OwnershipOverview(
+                        MutableOwnershipOverview(
                             totalDownloadSize = 0,
                             totalInstallSize = 0,
                             filesCount = 0,
@@ -235,7 +236,16 @@ class JsonReporter {
             }
         }
 
-        return overview
+        return overview.map {
+            val (owner, ownershipOverview) = it
+            owner to OwnershipOverview(
+                totalDownloadSize = ownershipOverview.totalDownloadSize,
+                totalInstallSize = ownershipOverview.totalInstallSize,
+                filesCount = ownershipOverview.filesCount,
+                filesFromNotOwnedComponentsDownloadSize = ownershipOverview.filesFromNotOwnedComponentsDownloadSize,
+                filesFromNotOwnedComponentsInstallSize = ownershipOverview.filesFromNotOwnedComponentsInstallSize,
+            )
+        }.toMap()
     }
 
     private fun List<AppComponent>.excludeComponentFilesIfNeeded(

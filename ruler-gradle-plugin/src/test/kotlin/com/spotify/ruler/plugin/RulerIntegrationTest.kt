@@ -77,7 +77,7 @@ class RulerIntegrationTest {
         gradlew(task)
 
         val reportDir = projectDir.resolve("app/build/reports/ruler/$variant")
-        assertThat(reportDir.resolve("report.json").readText()).doesNotContain("owner")
+        assertThat(reportDir.resolve("report.json").readText()).contains("\"ownershipOverview\": null")
     }
 
     @ParameterizedTest

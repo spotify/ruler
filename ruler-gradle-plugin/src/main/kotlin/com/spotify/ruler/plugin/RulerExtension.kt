@@ -29,8 +29,11 @@ open class RulerExtension(objects: ObjectFactory) {
     val ownershipFile: RegularFileProperty = objects.fileProperty()
     val defaultOwner: Property<String> = objects.property(String::class.java)
 
+    val omitFileBreakdown: Property<Boolean> = objects.property(Boolean::class.java)
+
     // Set up default values
     init {
         defaultOwner.convention("unknown")
+        omitFileBreakdown.convention(false)
     }
 }

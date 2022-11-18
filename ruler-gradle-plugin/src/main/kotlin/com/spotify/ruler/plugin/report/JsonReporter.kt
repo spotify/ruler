@@ -39,6 +39,7 @@ class JsonReporter {
      * @param components Map of app component names to their respective files
      * @param ownershipInfo Optional info about the owners of components.
      * @param targetDir Directory where the generated report will be located
+     * @param omitFileBreakdown If true, the list of files for each component and dynamic feature will be omitted
      * @return Generated JSON report file
      */
     fun generateReport(
@@ -46,7 +47,8 @@ class JsonReporter {
         components: Map<DependencyComponent, List<AppFile>>,
         features: Map<String, List<AppFile>>,
         ownershipInfo: OwnershipInfo?,
-        targetDir: File
+        targetDir: File,
+        omitFileBreakdown: Boolean,
     ): File {
         val report = AppReport(
             name = appInfo.applicationId,
@@ -61,16 +63,20 @@ class JsonReporter {
                     downloadSize = files.sumOf(AppFile::downloadSize),
                     installSize = files.sumOf(AppFile::installSize),
                     owner = ownershipInfo?.getOwner(component.name, component.type),
-                    files = files.map { file ->
-                        AppFile(
-                            name = file.name,
-                            type = file.type,
-                            downloadSize = file.downloadSize,
-                            installSize = file.installSize,
-                            owner = ownershipInfo?.getOwner(file.name, component.name, component.type),
-                            resourceType = file.resourceType,
-                        )
-                    }.sortedWith(comparator.reversed())
+                    files = if (omitFileBreakdown) {
+                        null
+                    } else {
+                        files.map { file ->
+                            AppFile(
+                                name = file.name,
+                                type = file.type,
+                                downloadSize = file.downloadSize,
+                                installSize = file.installSize,
+                                owner = ownershipInfo?.getOwner(file.name, component.name, component.type),
+                                resourceType = file.resourceType,
+                            )
+                        }.sortedWith(comparator.reversed())
+                    }
                 )
             }.sortedWith(comparator.reversed()),
             dynamicFeatures = features.map { (feature, files) ->
@@ -79,16 +85,20 @@ class JsonReporter {
                     downloadSize = files.sumOf(AppFile::downloadSize),
                     installSize = files.sumOf(AppFile::installSize),
                     owner = ownershipInfo?.getOwner(feature),
-                    files = files.map { file ->
-                        AppFile(
-                            name = file.name,
-                            type = file.type,
-                            downloadSize = file.downloadSize,
-                            installSize = file.installSize,
-                            owner = ownershipInfo?.getOwner(file.name, feature),
-                            resourceType = file.resourceType,
-                        )
-                    }.sortedWith(comparator.reversed())
+                    files = if (omitFileBreakdown) {
+                        null
+                    } else {
+                        files.map { file ->
+                            AppFile(
+                                name = file.name,
+                                type = file.type,
+                                downloadSize = file.downloadSize,
+                                installSize = file.installSize,
+                                owner = ownershipInfo?.getOwner(file.name, feature),
+                                resourceType = file.resourceType,
+                            )
+                        }.sortedWith(comparator.reversed())
+                    }
                 )
             }.sortedWith(comparator.reversed()),
         )

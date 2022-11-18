@@ -52,8 +52,10 @@ fun RBuilder.containerList(containers: List<FileContainer>, sizeType: Measurable
 @Suppress("UNUSED_PARAMETER")
 fun RBuilder.containerListItem(id: Int, container: FileContainer, sizeType: Measurable.SizeType, @RKey key: String) {
     div(classes = "accordion-item") {
-        containerListItemHeader(id, container, sizeType)
-        containerListItemBody(id, container, sizeType)
+        container.files?.let {
+            containerListItemHeader(id, container, sizeType)
+            containerListItemBody(id, container, sizeType)
+        } ?: containerWithoutFilesListItemHeader(container, sizeType)
     }
 }
 
@@ -63,12 +65,24 @@ fun RBuilder.containerListItemHeader(id: Int, container: FileContainer, sizeType
         button(classes = "accordion-button collapsed") {
             attrs["data-bs-toggle"] = "collapse"
             attrs["data-bs-target"] = "#module-$id-body"
-            span(classes = "font-monospace text-truncate me-3") { +container.name }
-            container.owner?.let { owner -> span(classes = "badge bg-secondary me-3") { +owner } }
-            span(classes = "ms-auto me-3 text-nowrap") {
-                +formatSize(container, sizeType)
-            }
+            containerHeader(container, sizeType)
         }
+    }
+}
+
+@RFunction
+fun RBuilder.containerWithoutFilesListItemHeader(container: FileContainer, sizeType: Measurable.SizeType) {
+    div(classes = "list-group-item d-flex border-0") {
+        containerHeader(container, sizeType)
+    }
+}
+
+@RFunction
+fun RBuilder.containerHeader(container: FileContainer, sizeType: Measurable.SizeType) {
+    span(classes = "font-monospace text-truncate me-3") { +container.name }
+    container.owner?.let { owner -> span(classes = "badge bg-secondary me-3") { +owner } }
+    span(classes = "ms-auto me-3 text-nowrap") {
+        +formatSize(container, sizeType)
     }
 }
 
@@ -77,7 +91,7 @@ fun RBuilder.containerListItemBody(id: Int, container: FileContainer, sizeType: 
     div(classes = "accordion-collapse collapse") {
         attrs.id = "module-$id-body"
         div(classes = "accordion-body p-0") {
-            fileList(container.files, sizeType)
+            fileList(container.files ?: emptyList(), sizeType)
         }
     }
 }

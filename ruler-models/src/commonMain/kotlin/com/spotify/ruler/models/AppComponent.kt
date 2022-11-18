@@ -25,6 +25,6 @@ data class AppComponent(
     val type: ComponentType,
     override val downloadSize: Long,
     override val installSize: Long,
-    override val files: List<AppFile>,
+    override val files: List<AppFile>?,
     override val owner: String? = null,
 ) : FileContainer

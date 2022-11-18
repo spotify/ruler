@@ -20,5 +20,5 @@ package com.spotify.ruler.models
 interface FileContainer : Measurable {
     val name: String
     val owner: String?
-    val files: List<AppFile>
+    val files: List<AppFile>?
 }

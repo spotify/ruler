@@ -22,7 +22,9 @@ import com.spotify.ruler.frontend.chart.ChartConfig
 import com.spotify.ruler.frontend.chart.BarChartConfig
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.frontend.chart.seriesOf
+import com.spotify.ruler.frontend.filesWereOmitted
 import com.spotify.ruler.models.AppComponent
+import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.Measurable
 import kotlinx.browser.document
 import kotlinx.html.id
@@ -34,25 +36,36 @@ import react.useEffect
 
 @RFunction
 fun RBuilder.insights(components: List<AppComponent>) {
-    div(classes = "row mb-3") {
-        fileTypeGraphs(components)
+    val omitFileInsights = components.filesWereOmitted()
+    val componentFiles = if (omitFileInsights) {
+        emptyList()
+    } else {
+        components.flatMap { it.files ?: emptyList() }
+    }
+
+    if (!omitFileInsights) {
+        div(classes = "row mb-3") {
+            fileTypeGraphs(componentFiles)
+        }
     }
     div(classes = "row") {
         componentTypeGraphs(components)
     }
-    div(classes = "row") {
-        resourcesTypeGraphs(components)
+    if (!omitFileInsights) {
+        div(classes = "row") {
+            resourcesTypeGraphs(componentFiles)
+        }
     }
 }
 
 @RFunction
-fun RBuilder.fileTypeGraphs(components: List<AppComponent>) {
+fun RBuilder.fileTypeGraphs(files: List<AppFile>) {
     val labels = arrayOf("Classes", "Resources", "Assets", "Native libraries", "Other")
     val downloadSizes = LongArray(labels.size)
     val installSizes = LongArray(labels.size)
     val fileCounts = LongArray(labels.size)
 
-    components.flatMap(AppComponent::files).forEach { file ->
+    files.forEach { file ->
         val index = file.type.ordinal
         downloadSizes[index] += file.getSize(Measurable.SizeType.DOWNLOAD)
         installSizes[index] += file.getSize(Measurable.SizeType.INSTALL)
@@ -122,13 +135,13 @@ fun RBuilder.componentTypeGraphs(components: List<AppComponent>) {
 }
 
 @RFunction
-fun RBuilder.resourcesTypeGraphs(components: List<AppComponent>) {
+fun RBuilder.resourcesTypeGraphs(files: List<AppFile>) {
     val labels = arrayOf("Drawable", "Layout", "Raw", "Values", "Font", "Other")
     val downloadSizes = LongArray(labels.size)
     val installSizes = LongArray(labels.size)
     val fileCounts = LongArray(labels.size)
 
-    components.flatMap(AppComponent::files).filter { it.resourceType != null }.forEach { file ->
+    files.filter { it.resourceType != null }.forEach { file ->
         val index = file.resourceType!!.ordinal
         downloadSizes[index] += file.getSize(Measurable.SizeType.DOWNLOAD)
         installSizes[index] += file.getSize(Measurable.SizeType.INSTALL)

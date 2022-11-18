@@ -65,7 +65,7 @@ class JsonReporterTest {
 
     @Test
     fun `JSON report is generated`(@TempDir targetDir: File) {
-        val reportFile = reporter.generateReport(appInfo, components, features, ownershipInfo, targetDir)
+        val reportFile = reporter.generateReport(appInfo, components, features, ownershipInfo, targetDir, false)
         val report = Json.decodeFromString<AppReport>(reportFile.readText())
 
         val expected = AppReport("com.spotify.music", "1.2.3", "release", 750, 1050, listOf(
@@ -93,8 +93,22 @@ class JsonReporterTest {
     }
 
     @Test
+    fun `JSON report is generated without file breakdown`(@TempDir targetDir: File) {
+        val reportFile = reporter.generateReport(appInfo, components, features, ownershipInfo, targetDir, true)
+        val report = Json.decodeFromString<AppReport>(reportFile.readText())
+
+        val expected = AppReport("com.spotify.music", "1.2.3", "release", 750, 1050, listOf(
+            AppComponent(":lib", ComponentType.INTERNAL, 500, 600, null, "default-team"),
+            AppComponent(":app", ComponentType.INTERNAL, 250, 450, null, "app-team"),
+        ), listOf(
+            DynamicFeature("dynamic", 300, 550, null, "dynamic-team"),
+        ))
+        assertThat(report).isEqualTo(expected)
+    }
+
+    @Test
     fun `Ownership info is omitted from report if it is null`(@TempDir targetDir: File) {
-        val reportFile = reporter.generateReport(appInfo, components, features, null, targetDir)
+        val reportFile = reporter.generateReport(appInfo, components, features, null, targetDir, false)
         val reportContent = reportFile.readText()
         assertThat(reportContent).doesNotContain("owner")
     }
@@ -102,7 +116,7 @@ class JsonReporterTest {
     @Test
     fun `Existing reports are overwritten`(@TempDir targetDir: File) {
         repeat(2) {
-            reporter.generateReport(appInfo, components, features, ownershipInfo, targetDir)
+            reporter.generateReport(appInfo, components, features, ownershipInfo, targetDir, false)
         }
     }
 }

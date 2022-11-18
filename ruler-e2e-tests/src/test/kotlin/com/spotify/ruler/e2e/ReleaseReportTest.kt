@@ -97,7 +97,7 @@ class ReleaseReportTest {
         report.components.forEach { component ->
             var downloadSize = 0L
             var installSize = 0L
-            component.files.forEach { file ->
+            component.files?.forEach { file ->
                 downloadSize += file.downloadSize
                 installSize += file.installSize
             }
@@ -111,7 +111,7 @@ class ReleaseReportTest {
         report.dynamicFeatures.forEach { feature ->
             var downloadSize = 0L
             var installSize = 0L
-            feature.files.forEach { file ->
+            feature.files?.forEach { file ->
                 downloadSize += file.downloadSize
                 installSize += file.installSize
             }

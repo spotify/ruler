@@ -69,6 +69,9 @@ abstract class RulerTask : DefaultTask() {
     @get:Input
     abstract val defaultOwner: Property<String>
 
+    @get:Input
+    abstract val omitFileBreakdown: Property<Boolean>
+
     @get:OutputDirectory
     abstract val workingDir: DirectoryProperty
 
@@ -132,7 +135,14 @@ abstract class RulerTask : DefaultTask() {
         val reportDir = reportDir.asFile.get()
 
         val jsonReporter = JsonReporter()
-        val jsonReport = jsonReporter.generateReport(appInfo.get(), components, features, ownershipInfo, reportDir)
+        val jsonReport = jsonReporter.generateReport(
+            appInfo.get(),
+            components,
+            features,
+            ownershipInfo,
+            reportDir,
+            omitFileBreakdown.get()
+        )
         project.logger.lifecycle("Wrote JSON report to ${jsonReport.toPath().toUri()}")
 
         val htmlReporter = HtmlReporter()

@@ -60,16 +60,6 @@ ruler {
 }
 ```
 
-#### Omitting file breakdown
-
-Sometimes, a lighter version of the report is enough to have an overview about app size. With `omitFileBreakdown` flag set to `true`, all file related info will be omitted (list of files and charts). The size of the generated report is therefore drastically reduced (this can be useful when dealing with low disk space on CI machines, for example).
-
-```kotlin
-ruler {
-    omitFileBreakdown.set(true) // false by default
-}
-```
-
 ### Running the task
 
 Once this is done, `analyze<VariantName>Bundle` tasks will be added for each of your app variants. Running this task will build the app and generate a HTML report, which you can use to analyze your app size. It will also generate a JSON report, in case you want to further process the data.

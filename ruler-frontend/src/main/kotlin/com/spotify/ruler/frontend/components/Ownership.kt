@@ -72,9 +72,16 @@ fun RBuilder.componentOwnershipPerTeam(
     hasFileLevelInfo: Boolean,
     sizeType: Measurable.SizeType,
 ) {
-    val files: List<AppFile>? = if (hasFileLevelInfo) components.mapNotNull(AppComponent::files).flatten() else null
-    val fileLevelOwners = files?.mapNotNull(AppFile::owner)
-    val owners: List<String> = (fileLevelOwners ?: components.mapNotNull(AppComponent::owner)).distinct().sorted()
+    val files: List<AppFile>?
+    var owners: List<String>
+    if (hasFileLevelInfo) {
+        files = components.mapNotNull(AppComponent::files).flatten()
+        owners = files.mapNotNull(AppFile::owner)
+    } else {
+        files = null
+        owners = components.mapNotNull(AppComponent::owner)
+    }
+    owners = owners.distinct().sorted()
     var selectedOwner by useState(owners.first())
 
     val ownedComponents = components.filter { component -> component.owner == selectedOwner }
@@ -82,17 +89,16 @@ fun RBuilder.componentOwnershipPerTeam(
 
     val remainingOwnedFiles = ownedFiles?.toMutableSet()
     val processedComponents = ownedComponents.map { component ->
-        val ownedFilesFromComponent = component.files?.filter { file -> file.owner == selectedOwner }
-        if (ownedFilesFromComponent != null) {
-            remainingOwnedFiles?.removeAll(ownedFilesFromComponent.toSet())
-            component.copy(
-                downloadSize = ownedFilesFromComponent.sumOf(AppFile::downloadSize),
-                installSize = ownedFilesFromComponent.sumOf(AppFile::installSize),
-                files = ownedFilesFromComponent,
-            )
-        } else {
-            component
-        }
+        val ownedFilesFromComponent = component.files?.filter { file ->
+            file.owner == selectedOwner
+        } ?: return@map component
+
+        remainingOwnedFiles?.removeAll(ownedFilesFromComponent.toSet())
+        component.copy(
+            downloadSize = ownedFilesFromComponent.sumOf(AppFile::downloadSize),
+            installSize = ownedFilesFromComponent.sumOf(AppFile::installSize),
+            files = ownedFilesFromComponent,
+        )
     }.toMutableList()
 
     // Group together all owned files which belong to components not owned by the currently selected owner

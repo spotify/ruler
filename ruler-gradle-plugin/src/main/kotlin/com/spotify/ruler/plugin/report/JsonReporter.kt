@@ -42,6 +42,7 @@ class JsonReporter {
      * @param omitFileBreakdown If true, the list of files for each component and dynamic feature will be omitted
      * @return Generated JSON report file
      */
+    @Suppress("LongParameterList")
     fun generateReport(
         appInfo: AppInfo,
         components: Map<DependencyComponent, List<AppFile>>,

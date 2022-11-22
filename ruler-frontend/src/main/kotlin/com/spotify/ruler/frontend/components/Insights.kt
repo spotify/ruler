@@ -35,7 +35,7 @@ import react.useEffect
 
 @RFunction
 fun RBuilder.insights(components: List<AppComponent>, hasFileLevelInfo: Boolean) {
-    div(classes = "row") {
+    div(classes = "row mb-3") {
         componentTypeGraphs(components)
     }
 

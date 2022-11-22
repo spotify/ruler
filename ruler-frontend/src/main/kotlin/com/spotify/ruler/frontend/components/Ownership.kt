@@ -20,7 +20,6 @@ import com.bnorm.react.RFunction
 import com.spotify.ruler.frontend.binding.NumberFormatter
 import com.spotify.ruler.frontend.chart.BarChartConfig
 import com.spotify.ruler.frontend.chart.seriesOf
-import com.spotify.ruler.frontend.filesWereOmitted
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
@@ -35,13 +34,9 @@ import react.useState
 const val PAGE_SIZE = 10
 
 @RFunction
-fun RBuilder.ownership(components: List<AppComponent>, sizeType: Measurable.SizeType) {
+fun RBuilder.ownership(components: List<AppComponent>, hasFileLevelInfo: Boolean, sizeType: Measurable.SizeType) {
     componentOwnershipOverview(components)
-    if (components.filesWereOmitted()) {
-        componentOwnershipPerTeamWithoutFilesBreakdown(components, sizeType)
-    } else {
-        componentOwnershipPerTeamWithFilesBreakdown(components, sizeType)
-    }
+    componentOwnershipPerTeam(components, hasFileLevelInfo, sizeType)
 }
 
 @RFunction
@@ -72,52 +67,36 @@ fun RBuilder.componentOwnershipOverview(components: List<AppComponent>) {
 }
 
 @RFunction
-fun RBuilder.componentOwnershipPerTeamWithoutFilesBreakdown(
+fun RBuilder.componentOwnershipPerTeam(
     components: List<AppComponent>,
+    hasFileLevelInfo: Boolean,
     sizeType: Measurable.SizeType,
 ) {
-    val owners = components.mapNotNull(AppComponent::owner).distinct().sorted()
+    val files: List<AppFile>? = if (hasFileLevelInfo) components.mapNotNull(AppComponent::files).flatten() else null
+    val fileLevelOwners = files?.mapNotNull(AppFile::owner)
+    val owners: List<String> = (fileLevelOwners ?: components.mapNotNull(AppComponent::owner)).distinct().sorted()
     var selectedOwner by useState(owners.first())
 
     val ownedComponents = components.filter { component -> component.owner == selectedOwner }
+    val ownedFiles = files?.filter { file -> file.owner == selectedOwner }
 
-    componentOwnershipPerTeam(
-        onSelectedOwnerUpdated = { owner -> selectedOwner = owner },
-        owners = owners,
-        ownedComponentsCount = ownedComponents.size,
-        ownedFilesCount = null,
-        downloadSize = ownedComponents.sumOf(AppComponent::downloadSize),
-        installSize = ownedComponents.sumOf(AppComponent::installSize),
-        processedComponents = ownedComponents,
-        sizeType = sizeType,
-    )
-}
-
-@RFunction
-fun RBuilder.componentOwnershipPerTeamWithFilesBreakdown(
-    components: List<AppComponent>,
-    sizeType: Measurable.SizeType,
-) {
-    val files = components.flatMap { it.files ?: emptyList() }
-    val owners = files.mapNotNull(AppFile::owner).distinct().sorted()
-    var selectedOwner by useState(owners.first())
-
-    val ownedComponents = components.filter { component -> component.owner == selectedOwner }
-    val ownedFiles = files.filter { file -> file.owner == selectedOwner }
-
-    val remainingOwnedFiles = ownedFiles.toMutableSet()
+    val remainingOwnedFiles = ownedFiles?.toMutableSet()
     val processedComponents = ownedComponents.map { component ->
-        val ownedFilesFromComponent = component.files?.filter { file -> file.owner == selectedOwner } ?: emptyList()
-        remainingOwnedFiles.removeAll(ownedFilesFromComponent.toSet())
-        component.copy(
-            downloadSize = ownedFilesFromComponent.sumOf(AppFile::downloadSize),
-            installSize = ownedFilesFromComponent.sumOf(AppFile::installSize),
-            files = ownedFilesFromComponent,
-        )
+        val ownedFilesFromComponent = component.files?.filter { file -> file.owner == selectedOwner }
+        if (ownedFilesFromComponent != null) {
+            remainingOwnedFiles?.removeAll(ownedFilesFromComponent.toSet())
+            component.copy(
+                downloadSize = ownedFilesFromComponent.sumOf(AppFile::downloadSize),
+                installSize = ownedFilesFromComponent.sumOf(AppFile::installSize),
+                files = ownedFilesFromComponent,
+            )
+        } else {
+            component
+        }
     }.toMutableList()
 
     // Group together all owned files which belong to components not owned by the currently selected owner
-    if (remainingOwnedFiles.isNotEmpty()) {
+    if (!remainingOwnedFiles.isNullOrEmpty()) {
         processedComponents += AppComponent(
             name = "Other owned files",
             type = ComponentType.INTERNAL,
@@ -128,34 +107,23 @@ fun RBuilder.componentOwnershipPerTeamWithFilesBreakdown(
         )
     }
 
-    componentOwnershipPerTeam(
-        onSelectedOwnerUpdated = { owner -> selectedOwner = owner },
-        owners = owners,
-        ownedComponentsCount = ownedComponents.size,
-        ownedFilesCount = ownedFiles.size,
-        downloadSize = ownedFiles.sumOf(AppFile::downloadSize),
-        installSize = ownedFiles.sumOf(AppFile::installSize),
-        processedComponents = processedComponents,
-        sizeType = sizeType,
-    )
-}
+    val downloadSize: Long
+    val installSize: Long
+    if (ownedFiles == null) {
+        // If there is no file-level ownership info, use component-level ownership info
+        downloadSize = ownedComponents.sumOf(AppComponent::downloadSize)
+        installSize = ownedComponents.sumOf(AppComponent::installSize)
+    } else {
+        // Otherwise rely on file-level ownership info
+        downloadSize = ownedFiles.sumOf(AppFile::downloadSize)
+        installSize = ownedFiles.sumOf(AppFile::installSize)
+    }
 
-@RFunction
-fun RBuilder.componentOwnershipPerTeam(
-    onSelectedOwnerUpdated: (owner: String) -> Unit,
-    owners: List<String>,
-    ownedComponentsCount: Int,
-    ownedFilesCount: Int?,
-    downloadSize: Long,
-    installSize: Long,
-    processedComponents: List<AppComponent>,
-    sizeType: Measurable.SizeType,
-) {
     h4(classes = "mb-3 mt-4") { +"Components and files grouped by owner" }
-    dropdown(owners, "owner-dropdown", onSelectedOwnerUpdated)
+    dropdown(owners, "owner-dropdown") { owner -> selectedOwner = owner }
     div(classes = "row mt-4 mb-4") {
-        highlightedValue(ownedComponentsCount, "Component(s)")
-        ownedFilesCount?.let { highlightedValue(it, "File(s)") }
+        highlightedValue(ownedComponents.size, "Component(s)")
+        ownedFiles?.size?.let { highlightedValue(it, "File(s)") }
         highlightedValue(downloadSize, "Download size", ::formatSize)
         highlightedValue(installSize, "Install size", ::formatSize)
     }
@@ -173,30 +141,24 @@ fun RBuilder.highlightedValue(value: Number, label: String, formatter: NumberFor
 private fun getSizesByOwner(components: List<AppComponent>): Map<String, Measurable> {
     val sizes = mutableMapOf<String, Measurable.Mutable>()
 
-    val omitFileOwnership = components.filesWereOmitted()
-    if (omitFileOwnership) {
-        sizes.populateWithSizesByOwner(
-            getOwner = { component -> component.owner },
-            measurables = components,
-        )
-    } else {
-        sizes.populateWithSizesByOwner(
-            getOwner = { file -> file.owner },
-            measurables = components.flatMap { it.files ?: emptyList() },
-        )
+    components.forEach { component ->
+        // If there is no file-level ownership info, use component-level ownership info
+        if (component.files == null) {
+            val owner = component.owner ?: return@forEach
+            val current = sizes.getOrPut(owner) { Measurable.Mutable(0, 0) }
+            current.downloadSize += component.downloadSize
+            current.installSize += component.installSize
+            return@forEach
+        }
+
+        // Otherwise rely on file-level ownership info
+        component.files?.forEach fileLevelLoop@ { file ->
+            val owner = file.owner ?: return@fileLevelLoop
+            val current = sizes.getOrPut(owner) { Measurable.Mutable(0, 0) }
+            current.downloadSize += file.downloadSize
+            current.installSize += file.installSize
+        }
     }
 
     return sizes
-}
-
-private inline fun <T : Measurable> MutableMap<String, Measurable.Mutable>.populateWithSizesByOwner(
-    getOwner: (T) -> String?,
-    measurables: List<T>,
-) {
-    measurables.forEach { measurable ->
-        val owner = getOwner(measurable) ?: return@forEach
-        val current = getOrPut(owner) { Measurable.Mutable(0, 0) }
-        current.downloadSize += measurable.downloadSize
-        current.installSize += measurable.installSize
-    }
 }

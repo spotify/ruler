@@ -22,7 +22,6 @@ import com.spotify.ruler.frontend.chart.ChartConfig
 import com.spotify.ruler.frontend.chart.BarChartConfig
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.frontend.chart.seriesOf
-import com.spotify.ruler.frontend.filesWereOmitted
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.Measurable
@@ -35,23 +34,16 @@ import react.dom.p
 import react.useEffect
 
 @RFunction
-fun RBuilder.insights(components: List<AppComponent>) {
-    val omitFileInsights = components.filesWereOmitted()
-    val componentFiles = if (omitFileInsights) {
-        emptyList()
-    } else {
-        components.flatMap { it.files ?: emptyList() }
-    }
-
-    if (!omitFileInsights) {
-        div(classes = "row mb-3") {
-            fileTypeGraphs(componentFiles)
-        }
-    }
+fun RBuilder.insights(components: List<AppComponent>, hasFileLevelInfo: Boolean) {
     div(classes = "row") {
         componentTypeGraphs(components)
     }
-    if (!omitFileInsights) {
+
+    if (hasFileLevelInfo) {
+        val componentFiles = components.mapNotNull(AppComponent::files).flatten()
+        div(classes = "row mb-3") {
+            fileTypeGraphs(componentFiles)
+        }
         div(classes = "row") {
             resourcesTypeGraphs(componentFiles)
         }

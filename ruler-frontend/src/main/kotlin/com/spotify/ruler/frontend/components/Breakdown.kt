@@ -52,37 +52,27 @@ fun RBuilder.containerList(containers: List<FileContainer>, sizeType: Measurable
 @Suppress("UNUSED_PARAMETER")
 fun RBuilder.containerListItem(id: Int, container: FileContainer, sizeType: Measurable.SizeType, @RKey key: String) {
     div(classes = "accordion-item") {
-        container.files?.let {
-            containerListItemHeader(id, container, sizeType)
-            containerListItemBody(id, container, sizeType)
-        } ?: containerWithoutFilesListItemHeader(container, sizeType)
+        containerListItemHeader(id, container, sizeType)
+        containerListItemBody(id, container, sizeType)
     }
 }
 
 @RFunction
 fun RBuilder.containerListItemHeader(id: Int, container: FileContainer, sizeType: Measurable.SizeType) {
     h2(classes = "accordion-header") {
-        button(classes = "accordion-button collapsed") {
+        var classes = "accordion-button collapsed"
+        if (container.files == null) {
+            classes = "$classes disabled"
+        }
+        button(classes = classes) {
             attrs["data-bs-toggle"] = "collapse"
             attrs["data-bs-target"] = "#module-$id-body"
-            containerHeader(container, sizeType)
+            span(classes = "font-monospace text-truncate me-3") { +container.name }
+            container.owner?.let { owner -> span(classes = "badge bg-secondary me-3") { +owner } }
+            span(classes = "ms-auto me-3 text-nowrap") {
+                +formatSize(container, sizeType)
+            }
         }
-    }
-}
-
-@RFunction
-fun RBuilder.containerWithoutFilesListItemHeader(container: FileContainer, sizeType: Measurable.SizeType) {
-    div(classes = "list-group-item d-flex border-0") {
-        containerHeader(container, sizeType)
-    }
-}
-
-@RFunction
-fun RBuilder.containerHeader(container: FileContainer, sizeType: Measurable.SizeType) {
-    span(classes = "font-monospace text-truncate me-3") { +container.name }
-    container.owner?.let { owner -> span(classes = "badge bg-secondary me-3") { +owner } }
-    span(classes = "ms-auto me-3 text-nowrap") {
-        +formatSize(container, sizeType)
     }
 }
 

@@ -22,6 +22,10 @@ body {
     margin-left: unset !important;
 }
 
+.accordion-button.disabled {
+    pointer-events: none;
+}
+
 .me-custom {
     margin-right: calc(24px + 1rem);
 }

@@ -46,11 +46,12 @@ fun RBuilder.report(report: AppReport) {
 
     val hasOwnershipInfo = report.components.any { component -> component.owner != null }
     val hasDynamicFeatures = report.dynamicFeatures.isNotEmpty()
+    val hasFileLevelInfo = report.components.any { it.files != null }
 
     val tabs = listOf(
         Tab("/", "Breakdown") { breakdown(report.components, sizeType) },
-        Tab("/insights", "Insights") { insights(report.components) },
-        Tab("/ownership", "Ownership", hasOwnershipInfo) { ownership(report.components, sizeType) },
+        Tab("/insights", "Insights") { insights(report.components, hasFileLevelInfo) },
+        Tab("/ownership", "Ownership", hasOwnershipInfo) { ownership(report.components, hasFileLevelInfo, sizeType) },
         Tab("/dynamic", "Dynamic features", hasDynamicFeatures) { dynamicFeatures(report.dynamicFeatures, sizeType) },
     )
 

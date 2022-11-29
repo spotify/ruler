@@ -59,9 +59,10 @@ fun RBuilder.containerListItem(id: Int, container: FileContainer, sizeType: Meas
 
 @RFunction
 fun RBuilder.containerListItemHeader(id: Int, container: FileContainer, sizeType: Measurable.SizeType) {
+    val containsFiles = container.files != null
     h2(classes = "accordion-header") {
         var classes = "accordion-button collapsed"
-        if (container.files == null) {
+        if (!containsFiles) {
             classes = "$classes disabled"
         }
         button(classes = classes) {
@@ -69,7 +70,11 @@ fun RBuilder.containerListItemHeader(id: Int, container: FileContainer, sizeType
             attrs["data-bs-target"] = "#module-$id-body"
             span(classes = "font-monospace text-truncate me-3") { +container.name }
             container.owner?.let { owner -> span(classes = "badge bg-secondary me-3") { +owner } }
-            span(classes = "ms-auto me-3 text-nowrap") {
+            var sizeClasses = "ms-auto text-nowrap"
+            if (containsFiles) {
+                sizeClasses = "$sizeClasses me-3"
+            }
+            span(classes = sizeClasses) {
                 +formatSize(container, sizeType)
             }
         }

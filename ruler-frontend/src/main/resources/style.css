@@ -26,6 +26,10 @@ body {
     pointer-events: none;
 }
 
+.accordion-button.disabled::after {
+    display: none;
+}
+
 .me-custom {
     margin-right: calc(24px + 1rem);
 }

@@ -30,18 +30,18 @@ class DependencyParser {
 
     /** Parses and returns the list of entries contained in all dependencies of the given [project]. */
     fun parse(project: Project, appInfo: AppInfo): List<DependencyEntry> {
-        val configuration = project.configurations.getByName("${appInfo.variantName}RuntimeClasspath")
+//        val configuration = project.configurations.getByName("${appInfo.variantName}RuntimeClasspath")
         val entries = mutableListOf<DependencyEntry>()
-
-        val jarArtifactParser = JarArtifactParser()
-        listOf("android-classes").forEach { artifactType ->
-            entries += jarArtifactParser.parse(configuration, artifactType)
-        }
-
-        val defaultArtifactParser = DefaultArtifactParser()
-        listOf("android-res", "android-assets", "android-jni").forEach { artifactType ->
-            entries += defaultArtifactParser.parse(configuration, artifactType)
-        }
+//
+//        val jarArtifactParser = JarArtifactParser()
+//        listOf("android-classes").forEach { artifactType ->
+//            entries += jarArtifactParser.parse(configuration, artifactType)
+//        }
+//
+//        val defaultArtifactParser = DefaultArtifactParser()
+//        listOf("android-res", "android-assets", "android-jni").forEach { artifactType ->
+//            entries += defaultArtifactParser.parse(configuration, artifactType)
+//        }
 
         return entries
     }

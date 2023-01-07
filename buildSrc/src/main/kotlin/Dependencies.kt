@@ -47,6 +47,7 @@ object Dependencies {
     const val KOTLIN_REACT_ROUTER = "org.jetbrains.kotlin-wrappers:kotlin-react-router-dom:${Versions.KOTLIN_REACT_ROUTER}"
     const val KOTLIN_JS_EXTENSIONS = "org.jetbrains.kotlin-wrappers:kotlin-extensions:${Versions.KOTLIN_JS_EXTENSIONS}"
     const val KOTLIN_REACT_FUNCTION = "com.bnorm.react:kotlin-react-function:${Versions.KOTLIN_REACT_FUNCTION}"
+    const val KOTLIN_REACT_TABLE = "org.jetbrains.kotlin-wrappers:kotlin-react-table:${Versions.KOTLIN_REACT_TABLE}"
 
     const val SELENIUM_WEBDRIVER = "org.seleniumhq.selenium:selenium-java:${Versions.SELENIUM_WEBDRIVER}"
     const val SELENIUM_WEBDRIVER_MANAGER = "io.github.bonigarcia:webdrivermanager:${Versions.SELENIUM_WEBDRIVER_MANAGER}"
@@ -79,6 +80,7 @@ object Dependencies {
         const val KOTLIN_REACT = "18.1.0-pre.343" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react
         const val KOTLIN_REACT_ROUTER = "6.3.0-pre.343" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react-router-dom
         const val KOTLIN_JS_EXTENSIONS = "1.0.1-pre.343" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-extensions
+        const val KOTLIN_REACT_TABLE = "7.8.0-pre.343" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react-table
 
         const val SELENIUM_WEBDRIVER = "4.3.0" // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
         const val SELENIUM_WEBDRIVER_MANAGER = "5.2.1" // https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager

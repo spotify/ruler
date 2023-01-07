@@ -20,6 +20,7 @@ body {
 
 .accordion-button::after {
     margin-left: unset !important;
+    background-image: none !important;
 }
 
 .accordion-button.disabled {

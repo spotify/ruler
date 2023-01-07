@@ -22,11 +22,39 @@ import com.spotify.ruler.models.Measurable
 import react.RBuilder
 import react.dom.div
 import react.dom.h4
+import react.table.columns
+import react.table.useTable
+import react.table.TableInstance
+import kotlinx.js.jso
+import com.spotify.ruler.models.FileContainer
+
+private val COLUMNS = columns<DynamicFeature> {
+    column<String> {
+        header = "Name"
+        accessor = "name"
+    }
+}
 
 @RFunction
 fun RBuilder.dynamicFeatures(features: List<DynamicFeature>, sizeType: Measurable.SizeType) {
     h4(classes = "mb-3") { +"Dynamic features" }
+
+    val table = useTable<DynamicFeature>(
+        options = jso {
+            data = features.toTypedArray()
+            columns = COLUMNS
+        }
+    );
+
+    table.getTableProps()
+    table.getTableBodyProps()
+
     div(classes = "row") {
-        containerList(features, sizeType)
+        containerList(table as TableInstance<FileContainer>, sizeType)
     }
+
+    //
+    // div(classes = "row") {
+    //     containerList(features, sizeType)
+    // }
 }

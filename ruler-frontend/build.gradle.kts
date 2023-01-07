@@ -40,6 +40,7 @@ dependencies {
     implementation(Dependencies.KOTLIN_JS_EXTENSIONS)
     implementation(Dependencies.KOTLIN_REACT_FUNCTION)
     implementation(Dependencies.KOTLINX_SERIALIZATION_JSON)
+    implementation(Dependencies.KOTLIN_REACT_TABLE)
 
     implementation(npm(Dependencies.REACT, Dependencies.Versions.REACT))
     implementation(npm(Dependencies.REACT_DOM, Dependencies.Versions.REACT))
@@ -47,4 +48,8 @@ dependencies {
     implementation(npm(Dependencies.APEX_CHARTS, Dependencies.Versions.APEX_CHARTS))
 
     testImplementation(kotlin("test-js"))
+}
+
+rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
+    versions.webpackCli.version = "4.10.0"
 }

@@ -22,6 +22,7 @@ import com.spotify.ruler.frontend.chart.BarChartConfig
 import com.spotify.ruler.frontend.chart.seriesOf
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppComponent
+import com.spotify.ruler.models.FileContainer
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.Measurable
@@ -30,8 +31,34 @@ import react.dom.div
 import react.dom.h4
 import react.dom.span
 import react.useState
+import react.table.columns
+import react.table.useTable
+import react.table.TableInstance
+import kotlinx.js.jso
+import react.table.usePagination
 
 const val PAGE_SIZE = 10
+private val COMPONENTS_COLUMNS = columns<AppComponent> {
+    column<String> {
+        accessorFunction = { it.name }
+        id = "name"
+    }
+
+    column<String?> {
+        accessorFunction = { it.owner }
+        id = "owner"
+    }
+
+    column<Long> {
+        accessorFunction = { it.downloadSize }
+        id = "downloadSize"
+    }
+
+    column<Long> {
+        accessorFunction = { it.installSize }
+        id = "installSize"
+    }
+}
 
 @RFunction
 fun RBuilder.ownership(components: List<AppComponent>, hasFileLevelInfo: Boolean, sizeType: Measurable.SizeType) {
@@ -133,7 +160,22 @@ fun RBuilder.componentOwnershipPerTeam(
         highlightedValue(downloadSize, "Download size", ::formatSize)
         highlightedValue(installSize, "Install size", ::formatSize)
     }
-    containerList(processedComponents, sizeType)
+
+    val table = useTable<AppComponent>(
+        options = jso {
+            data = processedComponents.toTypedArray()
+            columns = COMPONENTS_COLUMNS
+            // initialState = jso {
+            //     pageSize = 50
+            // },
+            // usePagination
+        }
+    );
+
+    table.getTableProps()
+    table.getTableBodyProps()
+
+    containerList(table  as TableInstance<FileContainer>, sizeType)
 }
 
 @RFunction

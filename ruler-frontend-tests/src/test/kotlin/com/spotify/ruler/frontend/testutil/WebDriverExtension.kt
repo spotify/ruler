@@ -23,7 +23,6 @@ import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
-import org.junit.jupiter.api.extension.TestInstancePostProcessor
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
@@ -47,6 +46,7 @@ class WebDriverExtension : BeforeAllCallback, BeforeEachCallback, AfterEachCallb
             .addArguments("--start-maximized")
             .addArguments("--no-sandbox")
             .addArguments("--disable-dev-shm-usage")
+            .addArguments("--remote-allow-origins=*")
 
         driver = ChromeDriver(options)
 

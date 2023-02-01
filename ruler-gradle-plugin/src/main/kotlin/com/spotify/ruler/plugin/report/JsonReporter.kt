@@ -104,7 +104,7 @@ class JsonReporter {
             }.sortedWith(comparator.reversed()),
         )
 
-        val format = Json { prettyPrint = true }
+        val format = Json { prettyPrint = false }
         val reportFile = targetDir.resolve("report.json")
         reportFile.writeText(format.encodeToString(report))
         return reportFile

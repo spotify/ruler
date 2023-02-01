@@ -1,3 +1,4 @@
+
 /*
 * Copyright 2021 Spotify AB
 *
@@ -13,7 +14,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 package com.spotify.ruler.plugin.apk
 
 import com.android.SdkConstants
@@ -28,7 +28,7 @@ import com.android.tools.build.bundletool.androidtools.Aapt2Command
 import com.android.tools.build.bundletool.commands.BuildApksCommand
 import com.android.tools.build.bundletool.device.DeviceSpecParser
 import com.android.utils.StdLogger
-import com.spotify.ruler.plugin.models.DeviceSpec
+import com.spotify.ruler.common.models.DeviceSpec
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File

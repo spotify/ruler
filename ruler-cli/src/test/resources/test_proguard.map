@@ -1,0 +1,10 @@
+com.spotify.ruler.sample.app.MainActivity -> com.spotify.ruler.sample.app.MainActivity:
+    void <init>() -> <init>
+    void onCreate(android.os.Bundle) -> onCreate
+com.spotify.ruler.sample.lib.ClassToObfuscate -> com.spotify.ruler.sample.lib.a:
+    com.spotify.ruler.sample.lib.ClassToObfuscate INSTANCE -> a
+    void <clinit>() -> <clinit>
+    void <init>() -> <init>
+com.spotify.ruler.sample.lib.LibActivity -> com.spotify.ruler.sample.lib.LibActivity:
+    void <init>() -> <init>
+    void onCreate(android.os.Bundle) -> onCreate

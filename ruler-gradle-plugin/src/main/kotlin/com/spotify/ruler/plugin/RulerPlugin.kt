@@ -19,8 +19,8 @@ package com.spotify.ruler.plugin
 import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.ApplicationVariant
-import com.spotify.ruler.plugin.models.AppInfo
-import com.spotify.ruler.plugin.models.DeviceSpec
+import com.spotify.ruler.common.models.AppInfo
+import com.spotify.ruler.common.models.DeviceSpec
 import org.codehaus.groovy.runtime.StringGroovyMethods
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -36,10 +36,14 @@ class RulerPlugin : Plugin<Project> {
         val rulerExtension = project.extensions.create(name, RulerExtension::class.java)
 
         project.plugins.withId("com.android.application") {
-            val androidComponents = project.extensions.getByType(ApplicationAndroidComponentsExtension::class.java)
+            val androidComponents =
+                project.extensions.getByType(ApplicationAndroidComponentsExtension::class.java)
             androidComponents.onVariants { variant ->
                 val variantName = StringGroovyMethods.capitalize(variant.name)
-                project.tasks.register("analyze${variantName}Bundle", RulerTask::class.java) { task ->
+                project.tasks.register(
+                    "analyze${variantName}Bundle",
+                    RulerTask::class.java
+                ) { task ->
                     task.group = name
                     task.appInfo.set(getAppInfo(project, variant))
                     task.deviceSpec.set(getDeviceSpec(rulerExtension))
@@ -82,7 +86,10 @@ class RulerPlugin : Plugin<Project> {
      * Returns the bundle file that's going to be analyzed. DexGuard produces a separate bundle instead of overriding
      * the default one, so we have to handle that separately.
      */
-    private fun getBundleFile(project: Project, variant: ApplicationVariant): Provider<RegularFile> {
+    private fun getBundleFile(
+        project: Project,
+        variant: ApplicationVariant
+    ): Provider<RegularFile> {
         val defaultBundleFile = variant.artifacts.get(SingleArtifact.BUNDLE)
         if (!hasDexGuard(project)) {
             return defaultBundleFile // No DexGuard means we can use the default bundle
@@ -90,7 +97,8 @@ class RulerPlugin : Plugin<Project> {
 
         // Bundle can still be in the default location, depending on the DexGuard config
         return defaultBundleFile.flatMap { bundle ->
-            val dexGuardBundle = bundle.asFile.parentFile.resolve("${bundle.asFile.nameWithoutExtension}-protected.aab")
+            val dexGuardBundle =
+                bundle.asFile.parentFile.resolve("${bundle.asFile.nameWithoutExtension}-protected.aab")
             if (dexGuardBundle.exists()) {
                 project.layout.buildDirectory.file(dexGuardBundle.absolutePath) // File exists -> use it
             } else {
@@ -103,7 +111,10 @@ class RulerPlugin : Plugin<Project> {
      * Returns the mapping file used for de-obfuscation. Different obfuscation tools like DexGuard and ProGuard place
      * their mapping files in different directories, so we have to handle those separately.
      */
-    private fun getMappingFile(project: Project, variant: ApplicationVariant): Provider<RegularFile> {
+    private fun getMappingFile(
+        project: Project,
+        variant: ApplicationVariant
+    ): Provider<RegularFile> {
         val defaultMappingFile = variant.artifacts.get(SingleArtifact.OBFUSCATION_MAPPING_FILE)
         val mappingFilePath = when {
             hasDexGuard(project) -> "outputs/dexguard/mapping/bundle/${variant.name}/mapping.txt"
@@ -126,7 +137,10 @@ class RulerPlugin : Plugin<Project> {
      * Returns a mapping file to de-obfuscate resource names. DexGuard supports this feature by default, so we need to
      * handle it accordingly.
      */
-    private fun getResourceMappingFile(project: Project, variant: ApplicationVariant): Provider<RegularFile> {
+    private fun getResourceMappingFile(
+        project: Project,
+        variant: ApplicationVariant
+    ): Provider<RegularFile> {
         val defaultResourceMappingFile = project.objects.fileProperty() // Empty by default
         val resourceMappingFilePath = when {
             hasDexGuard(project) -> "outputs/dexguard/mapping/bundle/${variant.name}/resourcefilenamemapping.txt"
@@ -134,7 +148,8 @@ class RulerPlugin : Plugin<Project> {
         }
 
         // Mapping file can still be missing, for example if resource obfuscation is disabled for a variant
-        val resourceMappingFileProvider = project.layout.buildDirectory.file(resourceMappingFilePath)
+        val resourceMappingFileProvider =
+            project.layout.buildDirectory.file(resourceMappingFilePath)
         return resourceMappingFileProvider.flatMap { resourceMappingFile ->
             if (resourceMappingFile.asFile.exists()) {
                 resourceMappingFileProvider // File exists -> use it

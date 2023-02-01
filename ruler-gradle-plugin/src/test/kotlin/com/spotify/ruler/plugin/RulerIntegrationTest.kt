@@ -17,7 +17,6 @@
 package com.spotify.ruler.plugin
 
 import com.google.common.truth.Truth.assertThat
-import com.spotify.ruler.plugin.testutil.ProjectFixture
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome

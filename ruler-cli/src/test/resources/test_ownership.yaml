@@ -1,0 +1,5 @@
+- identifier: com.spotify.ruler.sample.MainActivity
+  owner: ruler-test-team
+
+- identifier: /res/layout/activity_main.xml
+  owner: ruler-test-team

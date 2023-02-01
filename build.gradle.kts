@@ -36,6 +36,7 @@ buildscript {
         classpath(Dependencies.KOTLIN_REACT_FUNCTION_GRADLE_PLUGIN)
         classpath(Dependencies.DETEKT_GRADLE_PLUGIN)
         classpath(Dependencies.NEXUS_PUBLISH_GRADLE_PLUGIN)
+        classpath(Dependencies.SHADOW_GRADLE_PLUGIN)
 
         if (!properties.containsKey("withoutSample")) {
             classpath(Dependencies.RULER_GRADLE_PLUGIN)

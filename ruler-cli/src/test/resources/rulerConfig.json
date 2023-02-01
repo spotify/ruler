@@ -1,0 +1,11 @@
+{
+  "appInfo": {
+    "applicationId": "com.ruler.example-bazel",
+    "variantName": "release",
+    "versionName": "1.0.0"
+  },
+  "defaultOwner": "main_activity",
+  "omitFileBreakdown": false,
+  "ownershipFile": "src/test/resources/test_ownership.yaml",
+  "projectPath": "RulerTest"
+}

@@ -20,7 +20,8 @@ include(":ruler-frontend")
 include(":ruler-frontend-tests")
 include(":ruler-gradle-plugin")
 include(":ruler-models")
-
+include(":ruler-common")
+include(":ruler-cli")
 if (!startParameter.projectProperties.containsKey("withoutSample")) {
     include(":ruler-e2e-tests")
 

@@ -1,0 +1,20 @@
+{
+  "assets": [
+    {
+      "filename": "/assets/test_asset.txt",
+      "module": "app"
+    }
+  ],
+  "jars": [
+    {
+      "jar": "src/test/resources/test_jar.jar",
+      "module": "app"
+    }
+  ],
+  "resources": [
+    {
+      "filename": "/drawable/activity_main.xml",
+      "module": "app"
+    }
+  ]
+}

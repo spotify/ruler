@@ -20,7 +20,12 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
     id("io.gitlab.arturbosch.detekt")
     id("com.github.johnrengelman.shadow")
+    id("maven-publish")
+    id("signing")
 }
+
+extra[EXT_POM_NAME] = "Ruler CLI"
+extra[EXT_POM_DESCRIPTION] = "Command line interface for Ruler"
 
 java {
     withSourcesJar()
@@ -46,4 +51,17 @@ application {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            artifact(tasks["shadowJar"])
+        }
+    }
+    configurePublications(project)
+}
+
+signing {
+    configureSigning(publishing.publications)
 }

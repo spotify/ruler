@@ -16,17 +16,29 @@
 
 package com.spotify.ruler.frontend.components
 
-import com.bnorm.react.RFunction
+import androidx.compose.runtime.Composable
 import com.spotify.ruler.models.DynamicFeature
 import com.spotify.ruler.models.Measurable
-import react.RBuilder
-import react.dom.div
-import react.dom.h4
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.H4
+import org.jetbrains.compose.web.dom.Text
 
-@RFunction
-fun RBuilder.dynamicFeatures(features: List<DynamicFeature>, sizeType: Measurable.SizeType) {
-    h4(classes = "mb-3") { +"Dynamic features" }
-    div(classes = "row") {
-        containerList(features, sizeType)
+@Composable
+fun DynamicFeatures(
+    features: List<DynamicFeature>,
+    sizeType: Measurable.SizeType
+) {
+    H4(attrs = {
+        classes("mb-3")
+    }) {
+        Text("Dynamic features")
+    }
+    Div(attrs = {
+        classes("row")
+    }) {
+        ContainerList(
+            containers = features,
+            sizeType = sizeType
+        )
     }
 }

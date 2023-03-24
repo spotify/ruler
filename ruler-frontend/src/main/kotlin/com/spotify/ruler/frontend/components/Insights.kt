@@ -16,42 +16,54 @@
 
 package com.spotify.ruler.frontend.components
 
-import com.bnorm.react.RFunction
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import com.spotify.ruler.frontend.binding.ApexCharts
-import com.spotify.ruler.frontend.chart.ChartConfig
 import com.spotify.ruler.frontend.chart.BarChartConfig
-import com.spotify.ruler.frontend.formatSize
+import com.spotify.ruler.frontend.chart.ChartConfig
 import com.spotify.ruler.frontend.chart.seriesOf
+import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.Measurable
 import kotlinx.browser.document
-import kotlinx.html.id
-import react.RBuilder
-import react.dom.div
-import react.dom.h4
-import react.dom.p
-import react.useEffect
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.H4
+import org.jetbrains.compose.web.dom.P
+import org.jetbrains.compose.web.dom.Text
 
-@RFunction
-fun RBuilder.insights(components: List<AppComponent>, hasFileLevelInfo: Boolean) {
-    div(classes = "row mb-3") {
-        componentTypeGraphs(components)
+
+@Composable
+fun Insights(    components: List<AppComponent>,
+                 hasFileLevelInfo: Boolean
+) {
+    Div(attrs  = {
+        classes("row", "mb-3")
+    }) {
+        ComponentTypeGraphs(components)
     }
 
     if (hasFileLevelInfo) {
         val componentFiles = components.mapNotNull(AppComponent::files).flatten()
-        div(classes = "row mb-3") {
-            fileTypeGraphs(componentFiles)
+        Div(attrs = {
+            classes("row", "mb-3")
+        }) {
+            FileTypeGraphs(
+                componentFiles
+            )
         }
-        div(classes = "row") {
-            resourcesTypeGraphs(componentFiles)
+        Div(attrs = {
+            classes("row")
+        }) {
+            ResourceTypeGraphs(
+                componentFiles
+            )
         }
     }
 }
 
-@RFunction
-fun RBuilder.fileTypeGraphs(files: List<AppFile>) {
+@Composable
+fun FileTypeGraphs(files: List<AppFile>) {
     val labels = arrayOf("Classes", "Resources", "Assets", "Native libraries", "Other")
     val downloadSizes = LongArray(labels.size)
     val installSizes = LongArray(labels.size)
@@ -64,7 +76,7 @@ fun RBuilder.fileTypeGraphs(files: List<AppFile>) {
         fileCounts[index]++
     }
 
-    chart(
+    Chart(
         id = "file-type-distribution-size-chart",
         title = "File type distribution (size)",
         description = "Shows the accumulated app size for each file type.",
@@ -73,9 +85,10 @@ fun RBuilder.fileTypeGraphs(files: List<AppFile>) {
             chartSeries = arrayOf(seriesOf("Download size", downloadSizes), seriesOf("Install size", installSizes)),
             chartHeight = 350,
             yAxisFormatter = ::formatSize,
-        ),
+        )
     )
-    chart(
+
+    Chart(
         id = "file-type-distribution-count-chart",
         title = "File type distribution (file count)",
         description = "Shows how many files of a certain type are contained in the app.",
@@ -83,12 +96,13 @@ fun RBuilder.fileTypeGraphs(files: List<AppFile>) {
             chartLabels = labels,
             chartSeries = arrayOf(seriesOf("Files", fileCounts)),
             chartHeight = 350,
-        ),
+        )
     )
 }
 
-@RFunction
-fun RBuilder.componentTypeGraphs(components: List<AppComponent>) {
+
+@Composable
+fun ComponentTypeGraphs(components: List<AppComponent>) {
     val labels = arrayOf("Internal", "External")
     val downloadSizes = LongArray(labels.size)
     val installSizes = LongArray(labels.size)
@@ -101,7 +115,7 @@ fun RBuilder.componentTypeGraphs(components: List<AppComponent>) {
         fileCounts[index]++
     }
 
-    chart(
+    Chart(
         id = "component-type-distribution-size-chart",
         title = "Component type distribution (size)",
         description = "Shows the accumulated app size for each component type.",
@@ -111,9 +125,9 @@ fun RBuilder.componentTypeGraphs(components: List<AppComponent>) {
             chartHeight = 250,
             horizontal = true,
             xAxisFormatter = ::formatSize,
-        ),
+        )
     )
-    chart(
+    Chart(
         id = "component-type-distribution-count-chart",
         title = "Component type distribution (component count)",
         description = "Shows how many components of a certain type are contained in the app.",
@@ -122,12 +136,13 @@ fun RBuilder.componentTypeGraphs(components: List<AppComponent>) {
             chartSeries = arrayOf(seriesOf("Components", fileCounts)),
             chartHeight = 250,
             horizontal = true,
-        ),
+        )
     )
 }
 
-@RFunction
-fun RBuilder.resourcesTypeGraphs(files: List<AppFile>) {
+
+@Composable
+fun ResourceTypeGraphs(files: List<AppFile>) {
     val labels = arrayOf("Drawable", "Layout", "Raw", "Values", "Font", "Other")
     val downloadSizes = LongArray(labels.size)
     val installSizes = LongArray(labels.size)
@@ -140,7 +155,7 @@ fun RBuilder.resourcesTypeGraphs(files: List<AppFile>) {
         fileCounts[index]++
     }
 
-    chart(
+    Chart(
         id = "resource-type-distribution-size-chart",
         title = "Resource type distribution (size)",
         description = "Shows the accumulated app size for each resource type.",
@@ -149,9 +164,9 @@ fun RBuilder.resourcesTypeGraphs(files: List<AppFile>) {
             chartSeries = arrayOf(seriesOf("Download size", downloadSizes), seriesOf("Install size", installSizes)),
             chartHeight = 350,
             yAxisFormatter = ::formatSize,
-        ),
+        )
     )
-    chart(
+    Chart(
         id = "resource-type-distribution-count-chart",
         title = "Resource type distribution (file count)",
         description = "Shows how many files of a certain resource type are contained in the app.",
@@ -159,21 +174,37 @@ fun RBuilder.resourcesTypeGraphs(files: List<AppFile>) {
             chartLabels = labels,
             chartSeries = arrayOf(seriesOf("Files", fileCounts)),
             chartHeight = 350,
-        ),
+        )
     )
 }
 
-@RFunction
-fun RBuilder.chart(id: String, title: String, description: String, config: ChartConfig) {
-    div(classes = "col") {
-        h4 { +title }
-        p(classes = "text-muted") { +description }
-        div {
-            attrs.id = id
-            useEffect {
-                val chart = ApexCharts(document.getElementById(id), config.getOptions())
+@Composable
+fun Chart(
+    id: String,
+    title: String,
+    description: String,
+    config: ChartConfig
+) {
+    Div(attrs = {
+        classes("col")
+    }){
+        H4 { Text(title) }
+        P(attrs  = {
+            classes("text-muted")
+        }) {
+            Text(description)
+        }
+        Div(attrs = {
+            id(id)
+        }) {
+            DisposableEffect(config) {
+                val chart = ApexCharts(
+                    document.getElementById(id),
+                    config.getOptions()
+                )
                 chart.render()
-                cleanup {
+
+                onDispose {
                     chart.destroy()
                 }
             }

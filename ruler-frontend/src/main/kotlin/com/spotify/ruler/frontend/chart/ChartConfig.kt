@@ -17,7 +17,7 @@
 package com.spotify.ruler.frontend.chart
 
 import com.spotify.ruler.frontend.binding.ApexChartOptions
-import kotlinx.js.jso
+import js.core.jso
 
 /** Base config for displaying charts. Check https://apexcharts.com/docs/options/ for all chart types and options. */
 abstract class ChartConfig {

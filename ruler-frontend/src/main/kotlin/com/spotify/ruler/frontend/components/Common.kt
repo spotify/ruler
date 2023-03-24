@@ -16,134 +16,181 @@
 
 package com.spotify.ruler.frontend.components
 
-import com.bnorm.react.RFunction
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import app.softwork.routingcompose.HashRouter
+import app.softwork.routingcompose.Router
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppReport
 import com.spotify.ruler.models.Measurable
-import csstype.ClassName
-import kotlinx.html.id
-import kotlinx.html.js.onChangeFunction
-import org.w3c.dom.HTMLSelectElement
-import react.Props
-import react.RBuilder
-import react.createElement
-import react.dom.div
-import react.dom.h3
-import react.dom.li
-import react.dom.option
-import react.dom.select
-import react.dom.span
-import react.dom.ul
-import react.router.Route
-import react.router.Routes
-import react.router.dom.HashRouter
-import react.router.dom.NavLink
-import react.useState
+import org.jetbrains.compose.web.attributes.href
+import org.jetbrains.compose.web.dom.A
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.H3
+import org.jetbrains.compose.web.dom.Li
+import org.jetbrains.compose.web.dom.Option
+import org.jetbrains.compose.web.dom.Select
+import org.jetbrains.compose.web.dom.Span
+import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.dom.Ul
 
-@RFunction
-fun RBuilder.report(report: AppReport) {
-    val (sizeType, setSizeType) = useState(Measurable.SizeType.DOWNLOAD)
+
+@Composable
+fun Report(report: AppReport) {
+    var sizeType: Measurable.SizeType by remember { mutableStateOf(Measurable.SizeType.DOWNLOAD) }
 
     val hasOwnershipInfo = report.components.any { component -> component.owner != null }
     val hasDynamicFeatures = report.dynamicFeatures.isNotEmpty()
     val hasFileLevelInfo = report.components.any { it.files != null }
 
     val tabs = listOf(
-        Tab("/", "Breakdown") { breakdown(report.components, sizeType) },
-        Tab("/insights", "Insights") { insights(report.components, hasFileLevelInfo) },
-        Tab("/ownership", "Ownership", hasOwnershipInfo) { ownership(report.components, hasFileLevelInfo, sizeType) },
-        Tab("/dynamic", "Dynamic features", hasDynamicFeatures) { dynamicFeatures(report.dynamicFeatures, sizeType) },
+        Tab("/", "Breakdown"),
+        Tab("/insights", "Insights"),
+        Tab("/ownership", "Ownership", hasOwnershipInfo),
+        Tab("/dynamic", "Dynamic features", hasDynamicFeatures),
     )
 
-    div(classes = "container mt-4 mb-5") {
-        div(classes = "shadow-sm p-4 mb-4 bg-white rounded-1") {
-            header(report)
+    Div(attrs = {
+        classes("container", "mt-4", "mb-5")
+    }) {
+        Div(attrs = {
+            classes("shadow-sm", "p-4", "mb-4", "bg-white", "rounded-1")
+        }) {
+            Header(report)
         }
-        div(classes = "shadow-sm p-4 bg-white rounded-1") {
-            HashRouter {
-                navigation(tabs, onSizeTypeSelected = { setSizeType(it) })
-                content(tabs)
-            }
-        }
-    }
-}
-
-@RFunction
-fun RBuilder.header(report: AppReport) {
-    div(classes = "row") {
-        div(classes = "col") {
-            h3 { +report.name }
-            span(classes = "text-muted") { +"Version ${report.version} (${report.variant})" }
-        }
-        headerSizeItem(report.downloadSize, "Download size")
-        headerSizeItem(report.installSize, "Install size")
-    }
-}
-
-@RFunction
-fun RBuilder.headerSizeItem(size: Number, label: String) {
-    div(classes = "col-auto text-center ms-5 me-5") {
-        h3 { +formatSize(size) }
-        span(classes = "text-muted m-0") { +label }
-    }
-}
-
-@RFunction
-fun RBuilder.navigation(tabs: List<Tab>, onSizeTypeSelected: (Measurable.SizeType) -> Unit) {
-    div(classes = "row align-items-center mb-4") {
-        div(classes = "col") {
-            tabs(tabs)
-        }
-        div(classes = "col-auto") {
-            val options = mapOf(
-                "Download size" to Measurable.SizeType.DOWNLOAD,
-                "Install size" to Measurable.SizeType.INSTALL,
-            )
-            dropdown(options.keys, "size-type-dropdown") { selectedOption ->
-                onSizeTypeSelected(options.getValue(selectedOption))
-            }
-        }
-    }
-}
-
-@RFunction
-fun RBuilder.tabs(tabs: List<Tab>) {
-    ul(classes = "nav nav-pills") {
-        tabs.filter(Tab::enabled).forEach { (path, label) ->
-            li(classes = "nav-item") {
-                NavLink {
-                    attrs.to = path
-                    attrs.className = ClassName("nav-link")
-                    +label
+        Div(attrs = {
+            classes("shadow-sm", "p-4", "bg-white", "rounded-1")
+        }) {
+            HashRouter(initPath = "/") { // or BrowserRouter(initPath = "/hello") {
+                Navigation(
+                    tabs = tabs
+                ) { sizeType = it }
+                route("/") {
+                    BreakDown(report.components, sizeType)
+                }
+                route("/insights") {
+                    Insights(report.components, hasFileLevelInfo)
+                }
+                route("/ownership") {
+                    Ownership(report.components, hasFileLevelInfo, sizeType)
+                }
+                route("/dynamic") {
+                    DynamicFeatures(report.dynamicFeatures, sizeType)
                 }
             }
         }
     }
 }
 
-@RFunction
-fun RBuilder.content(tabs: List<Tab>) {
-    Routes {
-        tabs.forEach { tab ->
-            Route {
-                attrs.path = tab.path
-                attrs.element = createElement<Props>(tab.content)
+@Composable
+fun Header(report: AppReport) {
+    Div(attrs = {
+        classes("row")
+    }) {
+        Div(attrs = {
+            classes("col")
+        }) {
+            H3 {
+                Text(report.name)
+            }
+            Span(attrs = {
+                classes("text-muted")
+            }) {
+                Text("Version ${report.version} (${report.variant})")
+            }
+        }
+        HeaderSizeItem(report.downloadSize, "Download Size")
+        HeaderSizeItem(report.installSize, "Install Size")
+    }
+}
+
+
+@Composable
+fun HeaderSizeItem(size: Number, label: String) {
+    Div(attrs = {
+        classes("col-auto", "text-center", "ms-5", "me-5")
+    }) {
+        H3 { Text(formatSize(size)) }
+        Span(attrs = {
+            classes("text-muted", "m-0")
+        }) {
+            Text(label)
+        }
+    }
+}
+
+@Composable
+fun Navigation(tabs: List<Tab>, onSizeTypeSelected: (Measurable.SizeType) -> Unit) {
+    Div(attrs = {
+        classes("row", "align-items-center", "mb-4")
+    }) {
+        Div(attrs = {
+            classes("col")
+        }) {
+            Tabs(tabs)
+        }
+        Div(attrs = {
+            classes("col-auto")
+        }) {
+            val options = mapOf(
+                "Download size" to Measurable.SizeType.DOWNLOAD,
+                "Install size" to Measurable.SizeType.INSTALL,
+            )
+            Dropdown(
+                id = "size-type-dropdown",
+                options = options.keys,
+                onOptionSelected = { selectedOption ->
+                    onSizeTypeSelected(options.getValue(selectedOption))
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun Tabs(tabs: List<Tab>) {
+    Ul(attrs = {
+        classes("nav", "nav-pills")
+    }) {
+        tabs.filter(Tab::enabled).forEach { (path, label) ->
+            val router = Router.current
+            val classes = buildList {
+                add("nav-link")
+                if (router.currentPath.path == path) {
+                    add("active")
+                }
+            }
+            Li(attrs = { classes("nav-item") }) {
+                A(attrs = {
+                    classes(classes)
+                    onClick {
+                        it.preventDefault()
+                        router.navigate(to = path)
+                    }
+                    href("#")
+                }) {
+                    Text(label)
+                }
             }
         }
     }
 }
 
-@RFunction
-fun RBuilder.dropdown(options: Iterable<String>, id: String, onOptionSelected: (String) -> Unit) {
-    select(classes = "form-select") {
-        attrs.id = id
-        attrs.onChangeFunction = { event ->
-            onOptionSelected((event.target as HTMLSelectElement).value)
+@Composable
+fun Dropdown(options: Iterable<String>, id: String, onOptionSelected: (String) -> Unit) {
+    Select(attrs = {
+        id(id)
+        classes("form-select")
+        onChange {
+            onOptionSelected(it.target.value)
         }
+    }) {
         options.forEach { option ->
-            option {
-                attrs.value = option
-                +option
+            Option(option) {
+                Text(option)
             }
         }
     }
@@ -153,5 +200,4 @@ data class Tab(
     val path: String,
     val label: String,
     val enabled: Boolean = true,
-    val content: RBuilder.() -> Unit
 )

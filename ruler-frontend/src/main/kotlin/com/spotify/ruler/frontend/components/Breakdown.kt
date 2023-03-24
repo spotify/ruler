@@ -16,97 +16,167 @@
 
 package com.spotify.ruler.frontend.components
 
-import com.bnorm.react.RFunction
-import com.bnorm.react.RKey
+import androidx.compose.runtime.Composable
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileContainer
 import com.spotify.ruler.models.Measurable
-import kotlinx.html.id
-import react.RBuilder
-import react.dom.button
-import react.dom.div
-import react.dom.h2
-import react.dom.h4
-import react.dom.span
+import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.H2
+import org.jetbrains.compose.web.dom.H4
+import org.jetbrains.compose.web.dom.Span
+import org.jetbrains.compose.web.dom.Text
 
-@RFunction
-fun RBuilder.breakdown(components: List<AppComponent>, sizeType: Measurable.SizeType) {
-    h4(classes = "mb-3") { +"Breakdown (${components.size} components)" }
-    div(classes = "row") {
-        containerList(components, sizeType)
+@Composable
+fun BreakDown(
+    components: List<AppComponent>,
+    sizeType: Measurable.SizeType
+) {
+    H4(attrs = {
+        classes("mb-3")
+    }) {
+        Text("Breakdown (${components.size} components)")
+    }
+    Div(attrs = {
+        classes("row")
+    }) {
+        ContainerList(
+            containers = components,
+            sizeType = sizeType
+        )
     }
 }
 
-@RFunction
-fun RBuilder.containerList(containers: List<FileContainer>, sizeType: Measurable.SizeType) {
-    div(classes = "accordion") {
+@Composable
+fun ContainerList(containers: List<FileContainer>, sizeType: Measurable.SizeType) {
+    Div(attrs = { classes("accordion") }) {
         containers.forEachIndexed { index, container ->
-            containerListItem(index, container, sizeType, container.name)
+            ContainerListItem(
+                id = index,
+                container = container,
+                sizeType = sizeType,
+            )
         }
     }
 }
 
-@RFunction
-@Suppress("UNUSED_PARAMETER")
-fun RBuilder.containerListItem(id: Int, container: FileContainer, sizeType: Measurable.SizeType, @RKey key: String) {
-    div(classes = "accordion-item") {
-        containerListItemHeader(id, container, sizeType)
-        containerListItemBody(id, container, sizeType)
+
+@Composable
+fun ContainerListItem(
+    id: Int,
+    container: FileContainer,
+    sizeType: Measurable.SizeType
+) {
+    Div(attrs = {
+        classes("accordion-item")
+    }) {
+        ContainerListItemHeader(
+            id = id,
+            container = container,
+            sizeType = sizeType
+        )
+        ContainerListItemBody(
+            id = id,
+            container = container,
+            sizeType = sizeType
+        )
     }
 }
 
-@RFunction
-fun RBuilder.containerListItemHeader(id: Int, container: FileContainer, sizeType: Measurable.SizeType) {
+@Composable
+fun ContainerListItemHeader(
+    id: Int,
+    container: FileContainer,
+    sizeType: Measurable.SizeType
+) {
     val containsFiles = container.files != null
-    h2(classes = "accordion-header") {
-        var classes = "accordion-button collapsed"
+    H2(attrs = {
+        classes("accordion-header")
+    }) {
+        val classes = mutableListOf("accordion-button", "collapsed")
         if (!containsFiles) {
-            classes = "$classes disabled"
+            classes.add("disabled")
         }
-        button(classes = classes) {
-            attrs["data-bs-toggle"] = "collapse"
-            attrs["data-bs-target"] = "#module-$id-body"
-            span(classes = "font-monospace text-truncate me-3") { +container.name }
-            container.owner?.let { owner -> span(classes = "badge bg-secondary me-3") { +owner } }
-            var sizeClasses = "ms-auto text-nowrap"
+        Button(
+            attrs = {
+                classes(classes)
+                attr("data-bs-toggle", "collapse")
+                attr("data-bs-target", "#module-$id-body")
+            },
+        ) {
+            Span(attrs = {
+                classes("font-monospace", "text-truncate", "me-3")
+            }) {
+                Text(container.name)
+            }
+            container.owner?.let { owner ->
+                Span(attrs = {
+                    classes("badge", "bg-secondary", "me-3")
+                }) {
+                    Text(owner)
+                }
+            }
+            val sizeClasses = mutableListOf("ms-auto", "text-nowrap")
             if (containsFiles) {
-                sizeClasses = "$sizeClasses me-3"
+                sizeClasses.add("me-3")
             }
-            span(classes = sizeClasses) {
-                +formatSize(container, sizeType)
+            Span(attrs = {
+                classes(sizeClasses)
+            }) {
+                Text(formatSize(container, sizeType))
             }
         }
     }
 }
 
-@RFunction
-fun RBuilder.containerListItemBody(id: Int, container: FileContainer, sizeType: Measurable.SizeType) {
-    div(classes = "accordion-collapse collapse") {
-        attrs.id = "module-$id-body"
-        div(classes = "accordion-body p-0") {
-            fileList(container.files ?: emptyList(), sizeType)
+@Composable
+fun ContainerListItemBody(
+    id: Int,
+    container: FileContainer,
+    sizeType: Measurable.SizeType
+) {
+    Div(
+        attrs = {
+            id("module-$id-body")
+            classes("accordion-collapse", "collapse")
+        }
+    ) {
+        Div(attrs = {
+            classes("accordion-body", "p-0")
+        }) {
+            FileList(container.files ?: emptyList(), sizeType)
         }
     }
 }
 
-@RFunction
-fun RBuilder.fileList(files: List<AppFile>, sizeType: Measurable.SizeType) {
-    div(classes = "list-group list-group-flush") {
+@Composable
+fun FileList(files: List<AppFile>, sizeType: Measurable.SizeType) {
+    Div(attrs = {
+        classes("list-group", "list-group-flush")
+    }) {
         files.forEach { file ->
-            fileListItem(file, sizeType, file.name)
+            FileListItem(file = file, sizeType = sizeType)
         }
     }
 }
 
-@RFunction
-@Suppress("UNUSED_PARAMETER")
-fun RBuilder.fileListItem(file: AppFile, sizeType: Measurable.SizeType, @RKey key: String) {
-    div(classes = "list-group-item d-flex border-0") {
-        span(classes = "font-monospace text-truncate me-2") { +file.name }
-        span(classes = "ms-auto me-custom text-nowrap") {
-            +formatSize(file, sizeType)
+
+@Composable
+fun FileListItem(file: AppFile, sizeType: Measurable.SizeType) {
+    Div(attrs = {
+        classes("list-group-item", "d-flex", "border-0")
+    }) {
+        Span(attrs = {
+            classes("font-monospace", "text-truncate", "me-2")
+        }) {
+            Text(file.name)
+        }
+        Span(attrs = {
+            classes("ms-auto", "me-custom", "text-nowrap")
+        }) {
+            Text(formatSize(file, sizeType))
         }
     }
 }

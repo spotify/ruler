@@ -33,7 +33,6 @@ buildscript {
         classpath(Dependencies.KOTLIN_GRADLE_PLUGIN)
         classpath(Dependencies.PROGUARD_GRADLE_PLUGIN)
         classpath(Dependencies.KOTLINX_SERIALIZATION_GRADLE_PLUGIN)
-        classpath(Dependencies.KOTLIN_REACT_FUNCTION_GRADLE_PLUGIN)
         classpath(Dependencies.DETEKT_GRADLE_PLUGIN)
         classpath(Dependencies.NEXUS_PUBLISH_GRADLE_PLUGIN)
         classpath(Dependencies.SHADOW_GRADLE_PLUGIN)

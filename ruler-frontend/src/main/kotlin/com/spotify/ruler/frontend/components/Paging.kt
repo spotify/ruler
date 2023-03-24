@@ -16,32 +16,53 @@
 
 package com.spotify.ruler.frontend.components
 
-import com.bnorm.react.RFunction
-import kotlinx.html.js.onClickFunction
-import react.RBuilder
-import react.dom.button
-import react.dom.li
-import react.dom.ul
-import react.useState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.Li
+import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.dom.Ul
 import kotlin.math.ceil
 import kotlin.math.min
 
-@RFunction
-fun RBuilder.pagedContent(itemCount: Int, pageSize: Int, content: RBuilder.(Int, Int) -> Unit) {
-    val pageCount = ceil(itemCount / pageSize.toFloat()).toInt()
-    var activePage by useState(1)
 
+@Composable
+fun PagedContent(
+    itemCount: Int,
+    pageSize: Int,
+    content: @Composable (Int, Int) -> Unit
+) {
+    val pageCount = ceil(itemCount / pageSize.toFloat()).toInt()
+    var activePage by remember {  mutableStateOf(1)  }
     val pageStartIndex = pageSize * (activePage - 1)
     val pageEndIndex = min(pageStartIndex + pageSize, itemCount)
-    content.invoke(this, pageStartIndex, pageEndIndex)
+    println("$pageStartIndex - $pageEndIndex")
+    content(pageStartIndex, pageEndIndex)
 
-    ul(classes = "pagination justify-content-center") {
+    Ul(attrs = {
+        classes("pagination", "justify-content-center")
+    }) {
         for (page in 1..pageCount) {
-            val activeClass = if (page == activePage) "active" else ""
-            li(classes = "page-item $activeClass") {
-                button(classes = "page-link") {
-                    attrs.onClickFunction = { activePage = page }
-                    +page.toString()
+            val classes = buildList<String> {
+                add("page-item")
+                if (page == activePage) {
+                    add("active")
+                }
+            }
+            Li(attrs = {
+                classes(classes)
+
+            }) {
+                Button(attrs = {
+                    classes("page-link")
+                    onClick {
+                        activePage = page
+                    }
+                }) {
+                    Text(page.toString())
                 }
             }
         }

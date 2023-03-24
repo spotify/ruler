@@ -16,15 +16,18 @@
 
 plugins {
     id("org.jetbrains.kotlin.js")
-    id("com.bnorm.react.kotlin-react-function")
     id("io.gitlab.arturbosch.detekt")
+    id("org.jetbrains.compose") version "1.4.0"
+    kotlin("plugin.serialization")
 }
 
 kotlin {
     js(IR) {
         browser {
             commonWebpackConfig {
-                cssSupport.enabled = true
+                cssSupport {
+                    enabled.set(true)
+                }
             }
         }
         binaries.executable()
@@ -34,15 +37,12 @@ kotlin {
 dependencies {
     implementation(project(":ruler-models"))
 
-    implementation(Dependencies.KOTLIN_REACT)
-    implementation(Dependencies.KOTLIN_REACT_DOM)
-    implementation(Dependencies.KOTLIN_REACT_ROUTER)
     implementation(Dependencies.KOTLIN_JS_EXTENSIONS)
-    implementation(Dependencies.KOTLIN_REACT_FUNCTION)
     implementation(Dependencies.KOTLINX_SERIALIZATION_JSON)
+    implementation(compose.html.core)
+    implementation(compose.runtime)
+    implementation(Dependencies.ROUTING_COMPOSE)
 
-    implementation(npm(Dependencies.REACT, Dependencies.Versions.REACT))
-    implementation(npm(Dependencies.REACT_DOM, Dependencies.Versions.REACT))
     implementation(npm(Dependencies.BOOTSTRAP, Dependencies.Versions.BOOTSTRAP))
     implementation(npm(Dependencies.APEX_CHARTS, Dependencies.Versions.APEX_CHARTS))
 

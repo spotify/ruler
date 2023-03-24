@@ -27,19 +27,19 @@ interface ArtifactParser<in T> {
 /** Plain artifact parser which returns a list of all artifact files. */
 class DefaultArtifactParser : ArtifactParser<ArtifactResult.DefaultArtifact> {
 
-    override fun parseFile(artifact: ArtifactResult.DefaultArtifact): List<DependencyEntry> {
+    override fun parseFile(artifactResult: ArtifactResult.DefaultArtifact): List<DependencyEntry> {
         val name =
-            artifact.file.absolutePath.removePrefix(artifact.resolvedArtifactFile.absolutePath)
-        return listOf(DependencyEntry.Default(name, artifact.component))
+            artifactResult.file.absolutePath.removePrefix(artifactResult.resolvedArtifactFile.absolutePath)
+        return listOf(DependencyEntry.Default(name, artifactResult.component))
     }
 }
 
 /** Artifact parser for .class files that returns a list of the class artifact. */
 class ClassArtifactParser : ArtifactParser<ArtifactResult.ClassArtifact> {
-    override fun parseFile(artifact: ArtifactResult.ClassArtifact): List<DependencyEntry> {
+    override fun parseFile(artifactResult: ArtifactResult.ClassArtifact): List<DependencyEntry> {
         val name =
-            artifact.file.absolutePath.removePrefix(artifact.resolvedArtifactFile.absolutePath)
-        return listOf(DependencyEntry.Class(name, artifact.component))
+            artifactResult.file.absolutePath.removePrefix(artifactResult.resolvedArtifactFile.absolutePath)
+        return listOf(DependencyEntry.Class(name, artifactResult.component))
     }
 }
 

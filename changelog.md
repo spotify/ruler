@@ -7,9 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Upgraded to Kotlin 1.8.20
+- Rewrote web frontend in Compose for Web
+
+## [2.0.0-alpha-3] - 2023-04-25
+
 ### Added
 
-- Added supper for Android Gradle Plugin 7.4.x
+- Added support for Android Gradle Plugin 7.4.x
+
+### Fixed
+
+- Fix issues with AGP 8
 
 ## [2.0.0-alpha-2] - 2023-03-31
 

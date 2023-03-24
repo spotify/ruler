@@ -59,7 +59,7 @@ object Dependencies {
     const val APEX_CHARTS = "apexcharts"
 
     object Versions {
-        const val ANDROID_GRADLE_PLUGIN = "7.3.0" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
+        const val ANDROID_GRADLE_PLUGIN = "7.4.2" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
         const val KOTLIN = "1.6.21" // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
         const val PROGUARD_GRADLE_PLUGIN = "7.2.1" // https://mvnrepository.com/artifact/com.guardsquare/proguard-gradle
         const val KOTLIN_REACT_FUNCTION = "0.7.0" // https://mvnrepository.com/artifact/com.bnorm.react.kotlin-react-function/com.bnorm.react.kotlin-react-function.gradle.plugin

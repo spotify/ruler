@@ -61,20 +61,22 @@ class EntryParser {
     private fun parseFile(
         configuration: Configuration,
         artifactType: String,
-        isJar: Boolean
+        isJarOrClass: Boolean
     ) = getArtifactView(configuration, artifactType).flatMap { artifactResult ->
         val artifactFiles = artifactResult.file.walkTopDown().filter(File::isFile)
-        if (isJar) {
+        val component = getComponentIdentifier(artifactResult)
+        if (isJarOrClass) {
             artifactFiles.map { artifactFile ->
-                ArtifactResult.JarArtifact(artifactFile, getComponentIdentifier(artifactResult))
+                when (artifactFile.extension.lowercase()) {
+                    "jar" -> ArtifactResult.JarArtifact(artifactFile, component)
+                    "class" -> ArtifactResult.ClassArtifact(artifactFile, artifactResult.file, component)
+                    // in case there are files we don't recognize on the classpath, fallback to a default artifact
+                    else -> ArtifactResult.DefaultArtifact(artifactFile, artifactResult.file, component)
+                }
             }
         } else {
             artifactFiles.map { artifactFile ->
-                ArtifactResult.DefaultArtifact(
-                    artifactFile,
-                    artifactResult.file,
-                    getComponentIdentifier(artifactResult)
-                )
+                ArtifactResult.DefaultArtifact(artifactFile, artifactResult.file, component)
             }
         }
     }

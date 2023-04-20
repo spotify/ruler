@@ -25,10 +25,14 @@ class DependencyParser {
 
         val jarArtifactParser = JarArtifactParser()
         val defaultArtifactParser = DefaultArtifactParser()
+        val classArtifactParser = ClassArtifactParser()
         entries.forEach {
             result += when (it) {
                 is ArtifactResult.DefaultArtifact -> {
                     defaultArtifactParser.parseFile(it)
+                }
+                is ArtifactResult.ClassArtifact -> {
+                    classArtifactParser.parseFile(it)
                 }
                 is ArtifactResult.JarArtifact -> {
                     jarArtifactParser.parseFile(it)

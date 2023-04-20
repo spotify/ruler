@@ -34,6 +34,15 @@ class DefaultArtifactParser : ArtifactParser<ArtifactResult.DefaultArtifact> {
     }
 }
 
+/** Artifact parser for .class files that returns a list of the class artifact. */
+class ClassArtifactParser : ArtifactParser<ArtifactResult.ClassArtifact> {
+    override fun parseFile(artifact: ArtifactResult.ClassArtifact): List<DependencyEntry> {
+        val name =
+            artifact.file.absolutePath.removePrefix(artifact.resolvedArtifactFile.absolutePath)
+        return listOf(DependencyEntry.Class(name, artifact.component))
+    }
+}
+
 /** Artifact parser which parses JAR artifacts and returns the contents of those JAR files. */
 class JarArtifactParser : ArtifactParser<ArtifactResult.JarArtifact> {
 
@@ -62,4 +71,6 @@ sealed interface ArtifactResult {
     ) : ArtifactResult
 
     data class JarArtifact(val file: File, val component: String) : ArtifactResult
+
+    data class ClassArtifact(val file: File, val resolvedArtifactFile: File, val component: String) : ArtifactResult
 }

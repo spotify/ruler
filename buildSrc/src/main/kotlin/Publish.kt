@@ -24,7 +24,7 @@ import org.gradle.plugins.signing.SigningExtension
 import java.net.URI
 
 const val RULER_PLUGIN_GROUP = "com.spotify.ruler"
-const val RULER_PLUGIN_VERSION = "2.0.0-alpha-2" // Also adapt this version in the README
+const val RULER_PLUGIN_VERSION = "2.0.0-alpha-3" // Also adapt this version in the README
 
 const val EXT_POM_NAME = "POM_NAME"
 const val EXT_POM_DESCRIPTION = "POM_DESCRIPTION"

@@ -16,16 +16,14 @@
 
 package com.spotify.ruler.frontend
 
-import com.spotify.ruler.frontend.components.report
+import com.spotify.ruler.frontend.components.Report
 import com.spotify.ruler.models.AppReport
 import kotlinext.js.require
 import kotlinx.browser.document
-import kotlinx.html.dom.append
-import kotlinx.html.js.link
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import react.Props
-import react.createElement
+import react.Fragment
+import react.create
 import react.dom.client.createRoot
 
 fun main() {
@@ -35,16 +33,23 @@ fun main() {
     require("bootstrap/dist/js/bootstrap.bundle.js")
 
     // Load and show the favicon
-    val favicon = require("./favicon.svg").toString()
-    document.head?.append?.link(href = favicon, rel = "icon")
+    val favicon = kotlinext.js.require("./favicon.svg").toString()
+    val link = document.createElement("link").apply {
+        setAttribute("rel", "icon")
+        setAttribute("href", favicon)
+    }
+    document.head?.append(link)
 
     // Load and deserialize the report data
     val rawReport = require("report.json").toString()
-    val report = Json.decodeFromString<AppReport>(rawReport)
+    val reportData = Json.decodeFromString<AppReport>(rawReport)
 
     // Visualize and display the report data
-    val root = createRoot(requireNotNull(document.getElementById("root")))
-    root.render(createElement<Props> {
-        report(report)
+    val container =
+        web.dom.document.getElementById("root") ?: error("Couldn't find root container!")
+    createRoot(container).render(Fragment.create {
+        Report {
+            report = reportData
+        }
     })
 }

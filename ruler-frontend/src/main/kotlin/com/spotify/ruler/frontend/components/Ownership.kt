@@ -16,7 +16,6 @@
 
 package com.spotify.ruler.frontend.components
 
-import com.bnorm.react.RFunction
 import com.spotify.ruler.frontend.binding.NumberFormatter
 import com.spotify.ruler.frontend.chart.BarChartConfig
 import com.spotify.ruler.frontend.chart.seriesOf
@@ -25,66 +24,104 @@ import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.models.Measurable
-import react.RBuilder
-import react.dom.div
-import react.dom.h4
-import react.dom.span
+import react.FC
+import react.Props
+import react.dom.html.ReactHTML.div
+import react.dom.html.ReactHTML.h4
+import react.dom.html.ReactHTML.span
 import react.useState
+import web.cssom.ClassName
+import kotlin.math.ceil
+import kotlin.math.min
 
 const val PAGE_SIZE = 10
 
-@RFunction
-fun RBuilder.ownership(components: List<AppComponent>, hasFileLevelInfo: Boolean, sizeType: Measurable.SizeType) {
-    componentOwnershipOverview(components)
-    componentOwnershipPerTeam(components, hasFileLevelInfo, sizeType)
+
+external interface OwnershipProps : Props {
+    var components: List<AppComponent>
+    var hasFileLevelInfo: Boolean
+    var sizeType: Measurable.SizeType
 }
 
-@RFunction
-fun RBuilder.componentOwnershipOverview(components: List<AppComponent>) {
-    val sizes = getSizesByOwner(components)
+val Ownership = FC<OwnershipProps> { props ->
+    ComponentOwnershipOverview {
+        components = props.components
+    }
+    ComponentOwnershipPerTeam {
+        components = props.components
+        hasFileLevelInfo = props.hasFileLevelInfo
+        sizeType = props.sizeType
+    }
+}
+
+external interface ComponentOwnershipOverviewProps : Props {
+    var components: List<AppComponent>
+}
+
+val ComponentOwnershipOverview = FC<ComponentOwnershipOverviewProps>  { props ->
+    val sizes = getSizesByOwner(props.components)
     val sorted = sizes.entries.sortedByDescending { (_, measurable) -> measurable.downloadSize }
     val owners = sorted.map { (owner, _) -> owner }
     val downloadSizes = sorted.map { (_, measurable) -> measurable.downloadSize }
     val installSizes = sorted.map { (_, measurable) -> measurable.installSize }
 
-    pagedContent(owners.size, PAGE_SIZE) { pageStartIndex, pageEndIndex ->
-        chart(
-            id = "owner-chart",
-            title = "Ownership overview",
-            description = "Shows how much of the overall app size is owned by each owner.",
-            config = BarChartConfig(
-                chartLabels = owners.subList(pageStartIndex, pageEndIndex).toTypedArray(),
-                chartSeries = arrayOf(
-                    seriesOf("Download size", downloadSizes.subList(pageStartIndex, pageEndIndex).toLongArray()),
-                    seriesOf("Install size", installSizes.subList(pageStartIndex, pageEndIndex).toLongArray()),
+    val pageCount = ceil(owners.size / PAGE_SIZE.toFloat()).toInt()
+    var activePage by useState(1)
+
+    val pageStartIndex = PAGE_SIZE * (activePage - 1)
+    val pageEndIndex = min(pageStartIndex + PAGE_SIZE, owners.size)
+
+    Chart {
+        id = "owner-chart"
+        title = "Ownership overview"
+        description = "Shows how much of the overall app size is owned by each owner."
+        config = BarChartConfig(
+            chartLabels = owners.subList(pageStartIndex, pageEndIndex).toTypedArray(),
+            chartSeries = arrayOf(
+                seriesOf(
+                    "Download size",
+                    downloadSizes.subList(pageStartIndex, pageEndIndex).toLongArray()
                 ),
-                chartHeight = 400,
-                yAxisFormatter = ::formatSize,
-                chartSeriesTotals = longArrayOf(downloadSizes.sum(), installSizes.sum()),
-            )
+                seriesOf(
+                    "Install size",
+                    installSizes.subList(pageStartIndex, pageEndIndex).toLongArray()
+                ),
+            ),
+            chartHeight = 400,
+            yAxisFormatter = ::formatSize,
+            chartSeriesTotals = longArrayOf(downloadSizes.sum(), installSizes.sum()),
         )
+    }
+
+    PageControl {
+        this.pageCount = pageCount
+        this.activePage = activePage
+        onChangePage = {
+            activePage = it
+        }
     }
 }
 
-@RFunction
-fun RBuilder.componentOwnershipPerTeam(
-    components: List<AppComponent>,
-    hasFileLevelInfo: Boolean,
-    sizeType: Measurable.SizeType,
-) {
+external interface ComponentOwnershipPerTeamProps : Props {
+    var components: List<AppComponent>
+    var hasFileLevelInfo: Boolean
+    var sizeType: Measurable.SizeType
+}
+
+val ComponentOwnershipPerTeam = FC<ComponentOwnershipPerTeamProps> { props ->
     val files: List<AppFile>?
     var owners: List<String>
-    if (hasFileLevelInfo) {
-        files = components.mapNotNull(AppComponent::files).flatten()
+    if (props.hasFileLevelInfo) {
+        files = props.components.mapNotNull(AppComponent::files).flatten()
         owners = files.mapNotNull(AppFile::owner)
     } else {
         files = null
-        owners = components.mapNotNull(AppComponent::owner)
+        owners = props.components.mapNotNull(AppComponent::owner)
     }
     owners = owners.distinct().sorted()
     var selectedOwner by useState(owners.first())
 
-    val ownedComponents = components.filter { component -> component.owner == selectedOwner }
+    val ownedComponents = props.components.filter { component -> component.owner == selectedOwner }
     val ownedFiles = files?.filter { file -> file.owner == selectedOwner }
 
     val remainingOwnedFiles = ownedFiles?.toMutableSet()
@@ -125,24 +162,64 @@ fun RBuilder.componentOwnershipPerTeam(
         installSize = ownedFiles.sumOf(AppFile::installSize)
     }
 
-    h4(classes = "mb-3 mt-4") { +"Components and files grouped by owner" }
-    dropdown(owners, "owner-dropdown") { owner -> selectedOwner = owner }
-    div(classes = "row mt-4 mb-4") {
-        highlightedValue(ownedComponents.size, "Component(s)")
-        ownedFiles?.size?.let { highlightedValue(it, "File(s)") }
-        highlightedValue(downloadSize, "Download size", ::formatSize)
-        highlightedValue(installSize, "Install size", ::formatSize)
+    h4 {
+        className = ClassName("mb-3 mt-4")
+        +"Components and files grouped by owner"
     }
-    containerList(processedComponents, sizeType)
+    DropDown {
+        options = owners
+        id = "owner-dropdown"
+        onOptionSelected = { owner -> selectedOwner = owner }
+    }
+    div {
+        className = ClassName("row mt-4 mb-4")
+        HighlightedValue {
+            value = ownedComponents.size
+            label =  "Component(s)"
+            formatter = Number::toString
+        }
+        ownedFiles?.size?.let {
+            HighlightedValue {
+                value = it
+                label =  "File(s)"
+                formatter = Number::toString
+            }
+        }
+        HighlightedValue {
+            value = downloadSize
+            label =  "Download size"
+            formatter = ::formatSize
+        }
+        HighlightedValue {
+            value = installSize
+            label =  "Install size"
+            formatter = ::formatSize
+        }
+    }
+
+    ContainerList {
+        containers = processedComponents
+        this@ContainerList.sizeType = props.sizeType
+    }
 }
 
-@RFunction
-fun RBuilder.highlightedValue(value: Number, label: String, formatter: NumberFormatter = Number::toString) {
-    div(classes = "col text-center") {
-        h4 { +formatter.invoke(value) }
-        span(classes = "text-muted m-0") { +label }
+external interface HighlightedValueProps : Props {
+    var value: Number
+    var label: String
+    var formatter: NumberFormatter
+}
+
+val HighlightedValue = FC<HighlightedValueProps> { props ->
+    Column {
+        className = ClassName("text-center")
+        h4 { +props.formatter.invoke(props.value) }
+        span {
+            className = ClassName("text-muted m-0")
+            +props.label
+        }
     }
 }
+
 
 private fun getSizesByOwner(components: List<AppComponent>): Map<String, Measurable> {
     val sizes = mutableMapOf<String, Measurable.Mutable>()

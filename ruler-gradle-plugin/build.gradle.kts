@@ -27,7 +27,14 @@ extra[EXT_POM_DESCRIPTION] = "Gradle plugin for analyzing Android app size"
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly(Dependencies.ANDROID_GRADLE_PLUGIN)
+    compileOnly(Dependencies.ANDROID_GRADLE_PLUGIN) {
+        val version = System.getenv("ANDROID_GRADLE_PLUGIN_VERSION")
+        if (version != null) {
+            version {
+                strictly(version)
+            }
+        }
+    }
     compileOnly(Dependencies.BUNDLETOOL)
     compileOnly(Dependencies.PROTOBUF_CORE)
     compileOnly(Dependencies.ANDROID_TOOLS_COMMON)

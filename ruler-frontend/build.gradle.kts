@@ -16,7 +16,6 @@
 
 plugins {
     id("org.jetbrains.kotlin.js")
-    id("com.bnorm.react.kotlin-react-function")
     id("io.gitlab.arturbosch.detekt")
 }
 
@@ -24,7 +23,9 @@ kotlin {
     js(IR) {
         browser {
             commonWebpackConfig {
-                cssSupport.enabled = true
+                cssSupport {
+                    enabled.set(true)
+                }
             }
         }
         binaries.executable()
@@ -38,7 +39,6 @@ dependencies {
     implementation(Dependencies.KOTLIN_REACT_DOM)
     implementation(Dependencies.KOTLIN_REACT_ROUTER)
     implementation(Dependencies.KOTLIN_JS_EXTENSIONS)
-    implementation(Dependencies.KOTLIN_REACT_FUNCTION)
     implementation(Dependencies.KOTLINX_SERIALIZATION_JSON)
 
     implementation(npm(Dependencies.REACT, Dependencies.Versions.REACT))

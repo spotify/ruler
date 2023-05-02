@@ -16,32 +16,39 @@
 
 package com.spotify.ruler.frontend.components
 
-import com.bnorm.react.RFunction
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppReport
 import com.spotify.ruler.models.Measurable
-import csstype.ClassName
-import kotlinx.html.id
-import kotlinx.html.js.onChangeFunction
-import org.w3c.dom.HTMLSelectElement
+import js.core.jso
+import react.FC
 import react.Props
-import react.RBuilder
-import react.createElement
-import react.dom.div
-import react.dom.h3
-import react.dom.li
-import react.dom.option
-import react.dom.select
-import react.dom.span
-import react.dom.ul
-import react.router.Route
-import react.router.Routes
-import react.router.dom.HashRouter
+import react.PropsWithChildren
+import react.PropsWithClassName
+import react.ReactNode
+import react.asElementOrNull
+import react.create
+import react.dom.html.ReactHTML.div
+import react.dom.html.ReactHTML.h3
+import react.dom.html.ReactHTML.li
+import react.dom.html.ReactHTML.option
+import react.dom.html.ReactHTML.select
+import react.dom.html.ReactHTML.span
+import react.dom.html.ReactHTML.ul
+import react.router.Outlet
+import react.router.RouteObject
+import react.router.RouterProvider
 import react.router.dom.NavLink
+import react.router.dom.createHashRouter
 import react.useState
+import web.cssom.ClassName
 
-@RFunction
-fun RBuilder.report(report: AppReport) {
+external interface ReportProps : Props {
+    var report: AppReport
+}
+
+val Report = FC<ReportProps> { props ->
+    val report = props.report
+
     val (sizeType, setSizeType) = useState(Measurable.SizeType.DOWNLOAD)
 
     val hasOwnershipInfo = report.components.any { component -> component.owner != null }
@@ -49,71 +56,161 @@ fun RBuilder.report(report: AppReport) {
     val hasFileLevelInfo = report.components.any { it.files != null }
 
     val tabs = listOf(
-        Tab("/", "Breakdown") { breakdown(report.components, sizeType) },
-        Tab("/insights", "Insights") { insights(report.components, hasFileLevelInfo) },
-        Tab("/ownership", "Ownership", hasOwnershipInfo) { ownership(report.components, hasFileLevelInfo, sizeType) },
-        Tab("/dynamic", "Dynamic features", hasDynamicFeatures) { dynamicFeatures(report.dynamicFeatures, sizeType) },
+        Tab("/", "Breakdown") {
+            Breakdown.create {
+                components = report.components
+                this.sizeType = sizeType
+            }
+        },
+        Tab("/insights", "Insights") {
+            Insights.create {
+                components = report.components
+                this.hasFileLevelInfo = hasFileLevelInfo
+            }
+        },
+        Tab("/ownership", "Ownership", hasOwnershipInfo) {
+            Ownership.create {
+                components = report.components
+                this.hasFileLevelInfo = hasFileLevelInfo
+                this.sizeType = sizeType
+            }
+        },
+        Tab(
+            "/dynamic",
+            "Dynamic features",
+            hasDynamicFeatures
+        ) {
+            DynamicFeatures.create {
+                features = report.dynamicFeatures
+                this.sizeType = sizeType
+            }
+        },
     )
 
-    div(classes = "container mt-4 mb-5") {
-        div(classes = "shadow-sm p-4 mb-4 bg-white rounded-1") {
-            header(report)
+
+    val layout = div.create {
+        className = ClassName("container mt-4 mb-5")
+        div {
+            className = ClassName("shadow-sm p-4 mb-4 bg-white rounded-1")
+            Header {
+                this@Header.report = report
+            }
         }
-        div(classes = "shadow-sm p-4 bg-white rounded-1") {
-            HashRouter {
-                navigation(tabs, onSizeTypeSelected = { setSizeType(it) })
-                content(tabs)
+        div {
+            className = ClassName("shadow-sm p-4 bg-white rounded-1")
+
+            Navigation {
+                this@Navigation.tabs = tabs
+                onSizeTypeSelected = { setSizeType(it) }
+
+            }
+            Outlet {
+
             }
         }
     }
+
+    val hashRouter = createHashRouter(
+        routes = arrayOf(jso {
+            element = layout
+            children = tabs.map {
+                jso<RouteObject> {
+                    path = it.path
+                    element = it.content.invoke().asElementOrNull()
+                }
+            }.toTypedArray()
+        })
+    )
+
+    RouterProvider {
+        router = hashRouter
+    }
 }
 
-@RFunction
-fun RBuilder.header(report: AppReport) {
-    div(classes = "row") {
-        div(classes = "col") {
+
+val Header = FC<ReportProps> { props ->
+    val report = props.report
+
+    Row {
+        Column {
             h3 { +report.name }
-            span(classes = "text-muted") { +"Version ${report.version} (${report.variant})" }
+            span {
+                className = ClassName("text-muted")
+
+                +"Version ${report.version} (${report.variant})"
+            }
         }
-        headerSizeItem(report.downloadSize, "Download size")
-        headerSizeItem(report.installSize, "Install size")
+        HeaderSizeItem {
+            size = report.downloadSize
+            label = "Download size"
+        }
+        HeaderSizeItem {
+            size = report.installSize
+            label = "Install size"
+        }
     }
 }
 
-@RFunction
-fun RBuilder.headerSizeItem(size: Number, label: String) {
-    div(classes = "col-auto text-center ms-5 me-5") {
-        h3 { +formatSize(size) }
-        span(classes = "text-muted m-0") { +label }
+external interface HeaderSizeItemProps : Props {
+    var size: Number
+    var label: String
+}
+
+val HeaderSizeItem = FC<HeaderSizeItemProps> { props ->
+    div {
+        className = ClassName("col-auto text-center ms-5 me-5")
+        h3 { +formatSize(props.size) }
+        span {
+            className = ClassName("text-muted m-0")
+            +props.label
+        }
     }
 }
 
-@RFunction
-fun RBuilder.navigation(tabs: List<Tab>, onSizeTypeSelected: (Measurable.SizeType) -> Unit) {
-    div(classes = "row align-items-center mb-4") {
-        div(classes = "col") {
-            tabs(tabs)
+external interface NavigationProps : Props {
+    var tabs: List<Tab>
+    var onSizeTypeSelected: (Measurable.SizeType) -> Unit
+}
+
+val Navigation = FC<NavigationProps> { props ->
+    Row {
+
+        className = ClassName("row align-items-center mb-4")
+        Column {
+            Tabs {
+                tabs = props.tabs
+            }
         }
-        div(classes = "col-auto") {
-            val options = mapOf(
+        div {
+            className = ClassName("col-auto")
+            val optionMap = mapOf(
                 "Download size" to Measurable.SizeType.DOWNLOAD,
                 "Install size" to Measurable.SizeType.INSTALL,
             )
-            dropdown(options.keys, "size-type-dropdown") { selectedOption ->
-                onSizeTypeSelected(options.getValue(selectedOption))
+            DropDown {
+                options = optionMap.keys
+                id = "size-type-dropdown"
+                onOptionSelected = { selectedOption ->
+                    props.onSizeTypeSelected(optionMap.getValue(selectedOption))
+                }
             }
         }
     }
 }
 
-@RFunction
-fun RBuilder.tabs(tabs: List<Tab>) {
-    ul(classes = "nav nav-pills") {
-        tabs.filter(Tab::enabled).forEach { (path, label) ->
-            li(classes = "nav-item") {
+external interface TabsProps : Props {
+    var tabs: List<Tab>
+}
+
+val Tabs = FC<TabsProps> { props ->
+    ul {
+        className = ClassName("nav nav-pills")
+        props.tabs.filter(Tab::enabled).forEach { (path, label) ->
+            li {
+                className = ClassName("nav-item")
                 NavLink {
-                    attrs.to = path
-                    attrs.className = ClassName("nav-link")
+                    to = path
+                    className = ClassName("nav-link")
                     +label
                 }
             }
@@ -121,31 +218,42 @@ fun RBuilder.tabs(tabs: List<Tab>) {
     }
 }
 
-@RFunction
-fun RBuilder.content(tabs: List<Tab>) {
-    Routes {
-        tabs.forEach { tab ->
-            Route {
-                attrs.path = tab.path
-                attrs.element = createElement<Props>(tab.content)
+external interface DropDownProps : Props {
+    var options: Iterable<String>
+    var id: String
+    var onOptionSelected: (String) -> Unit
+}
+
+
+val DropDown = FC<DropDownProps> { props ->
+    select {
+        className = ClassName("form-select")
+        id = props.id
+        onChange = { event ->
+            props.onOptionSelected(event.target.value)
+        }
+        props.options.forEach { option ->
+            option {
+                value = option
+                +option
             }
         }
     }
 }
 
-@RFunction
-fun RBuilder.dropdown(options: Iterable<String>, id: String, onOptionSelected: (String) -> Unit) {
-    select(classes = "form-select") {
-        attrs.id = id
-        attrs.onChangeFunction = { event ->
-            onOptionSelected((event.target as HTMLSelectElement).value)
-        }
-        options.forEach { option ->
-            option {
-                attrs.value = option
-                +option
-            }
-        }
+external interface PropsWithChildrenAndClassName : PropsWithChildren, PropsWithClassName
+
+val Row = FC<PropsWithChildrenAndClassName> { props ->
+    div {
+        className = ClassName("row ${props.className ?: ""}")
+        children = props.children
+    }
+}
+
+val Column = FC<PropsWithChildrenAndClassName> { props ->
+    div {
+        className = ClassName("col ${props.className ?: ""}")
+        children = props.children
     }
 }
 
@@ -153,5 +261,5 @@ data class Tab(
     val path: String,
     val label: String,
     val enabled: Boolean = true,
-    val content: RBuilder.() -> Unit
+    val content: () -> ReactNode
 )

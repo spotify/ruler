@@ -16,162 +16,202 @@
 
 package com.spotify.ruler.frontend.components
 
-import com.bnorm.react.RFunction
 import com.spotify.ruler.frontend.binding.ApexCharts
-import com.spotify.ruler.frontend.chart.ChartConfig
 import com.spotify.ruler.frontend.chart.BarChartConfig
-import com.spotify.ruler.frontend.formatSize
+import com.spotify.ruler.frontend.chart.ChartConfig
 import com.spotify.ruler.frontend.chart.seriesOf
+import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.Measurable
 import kotlinx.browser.document
-import kotlinx.html.id
-import react.RBuilder
-import react.dom.div
-import react.dom.h4
-import react.dom.p
+import react.FC
+import react.Props
+import react.dom.html.ReactHTML.div
+import react.dom.html.ReactHTML.h4
+import react.dom.html.ReactHTML.p
 import react.useEffect
+import web.cssom.ClassName
 
-@RFunction
-fun RBuilder.insights(components: List<AppComponent>, hasFileLevelInfo: Boolean) {
-    div(classes = "row mb-3") {
-        componentTypeGraphs(components)
-    }
-
-    if (hasFileLevelInfo) {
-        val componentFiles = components.mapNotNull(AppComponent::files).flatten()
-        div(classes = "row mb-3") {
-            fileTypeGraphs(componentFiles)
-        }
-        div(classes = "row") {
-            resourcesTypeGraphs(componentFiles)
-        }
-    }
+external interface InsightsProps: Props {
+    var components: List<AppComponent>
+    var hasFileLevelInfo: Boolean
 }
 
-@RFunction
-fun RBuilder.fileTypeGraphs(files: List<AppFile>) {
+val Insights = FC<InsightsProps> { props ->
+    Row {
+        className = ClassName("mb-3")
+        ComponentTypeGraphs {
+            components = props.components
+        }
+    }
+
+    if (props.hasFileLevelInfo) {
+        val componentFiles = props.components.mapNotNull(AppComponent::files).flatten()
+        Row {
+            className = ClassName("mb-3")
+            FileTypeGraphs {
+                files =  componentFiles
+            }
+        }
+        Row {
+            ResourcesTypeGraphs {
+                files = componentFiles
+            }
+        }
+    }
+
+}
+
+external interface FileTypeGraphsProps : Props {
+    var files: List<AppFile>
+}
+
+val FileTypeGraphs = FC<FileTypeGraphsProps> { props ->
     val labels = arrayOf("Classes", "Resources", "Assets", "Native libraries", "Other")
     val downloadSizes = LongArray(labels.size)
     val installSizes = LongArray(labels.size)
     val fileCounts = LongArray(labels.size)
 
-    files.forEach { file ->
+    props.files.forEach { file ->
         val index = file.type.ordinal
         downloadSizes[index] += file.getSize(Measurable.SizeType.DOWNLOAD)
         installSizes[index] += file.getSize(Measurable.SizeType.INSTALL)
         fileCounts[index]++
     }
 
-    chart(
-        id = "file-type-distribution-size-chart",
-        title = "File type distribution (size)",
-        description = "Shows the accumulated app size for each file type.",
+    Chart {
+        id = "file-type-distribution-size-chart"
+        title = "File type distribution (size)"
+        description = "Shows the accumulated app size for each file type."
         config = BarChartConfig(
             chartLabels = labels,
-            chartSeries = arrayOf(seriesOf("Download size", downloadSizes), seriesOf("Install size", installSizes)),
+            chartSeries = arrayOf(
+                seriesOf("Download size", downloadSizes),
+                seriesOf("Install size", installSizes)
+            ),
             chartHeight = 350,
             yAxisFormatter = ::formatSize,
-        ),
-    )
-    chart(
-        id = "file-type-distribution-count-chart",
-        title = "File type distribution (file count)",
-        description = "Shows how many files of a certain type are contained in the app.",
+        )
+    }
+    Chart {
+        id = "file-type-distribution-count-chart"
+        title = "File type distribution (file count)"
+        description = "Shows how many files of a certain type are contained in the app."
         config = BarChartConfig(
             chartLabels = labels,
             chartSeries = arrayOf(seriesOf("Files", fileCounts)),
             chartHeight = 350,
-        ),
-    )
+        )
+    }
 }
 
-@RFunction
-fun RBuilder.componentTypeGraphs(components: List<AppComponent>) {
+external interface ComponentTypeGraphsProps : Props {
+    var components: List<AppComponent>
+}
+
+val ComponentTypeGraphs = FC<ComponentTypeGraphsProps> { props ->
     val labels = arrayOf("Internal", "External")
     val downloadSizes = LongArray(labels.size)
     val installSizes = LongArray(labels.size)
     val fileCounts = LongArray(labels.size)
 
-    components.forEach { component ->
+    props.components.forEach { component ->
         val index = component.type.ordinal
         downloadSizes[index] += component.getSize(Measurable.SizeType.DOWNLOAD)
         installSizes[index] += component.getSize(Measurable.SizeType.INSTALL)
         fileCounts[index]++
     }
 
-    chart(
-        id = "component-type-distribution-size-chart",
-        title = "Component type distribution (size)",
-        description = "Shows the accumulated app size for each component type.",
+    Chart {
+        id = "component-type-distribution-size-chart"
+        title = "Component type distribution (size)"
+        description = "Shows the accumulated app size for each component type."
         config = BarChartConfig(
             chartLabels = labels,
-            chartSeries = arrayOf(seriesOf("Download size", downloadSizes), seriesOf("Install size", installSizes)),
+            chartSeries = arrayOf(
+                seriesOf("Download size", downloadSizes),
+                seriesOf("Install size", installSizes)
+            ),
             chartHeight = 250,
             horizontal = true,
             xAxisFormatter = ::formatSize,
-        ),
-    )
-    chart(
-        id = "component-type-distribution-count-chart",
-        title = "Component type distribution (component count)",
-        description = "Shows how many components of a certain type are contained in the app.",
+        )
+    }
+    Chart {
+        id = "component-type-distribution-count-chart"
+        title = "Component type distribution (component count)"
+        description = "Shows how many components of a certain type are contained in the app."
         config = BarChartConfig(
             chartLabels = labels,
             chartSeries = arrayOf(seriesOf("Components", fileCounts)),
             chartHeight = 250,
             horizontal = true,
-        ),
-    )
+        )
+    }
 }
 
-@RFunction
-fun RBuilder.resourcesTypeGraphs(files: List<AppFile>) {
+external interface ResourcesTypeGraphsProps : Props {
+    var files: List<AppFile>
+}
+
+val ResourcesTypeGraphs = FC<ResourcesTypeGraphsProps> { props ->
     val labels = arrayOf("Drawable", "Layout", "Raw", "Values", "Font", "Other")
     val downloadSizes = LongArray(labels.size)
     val installSizes = LongArray(labels.size)
     val fileCounts = LongArray(labels.size)
 
-    files.filter { it.resourceType != null }.forEach { file ->
+    props.files.filter { it.resourceType != null }.forEach { file ->
         val index = file.resourceType!!.ordinal
         downloadSizes[index] += file.getSize(Measurable.SizeType.DOWNLOAD)
         installSizes[index] += file.getSize(Measurable.SizeType.INSTALL)
         fileCounts[index]++
     }
 
-    chart(
-        id = "resource-type-distribution-size-chart",
-        title = "Resource type distribution (size)",
-        description = "Shows the accumulated app size for each resource type.",
+    Chart {
+        id = "resource-type-distribution-size-chart"
+        title = "Resource type distribution (size)"
+        description = "Shows the accumulated app size for each resource type."
         config = BarChartConfig(
             chartLabels = labels,
-            chartSeries = arrayOf(seriesOf("Download size", downloadSizes), seriesOf("Install size", installSizes)),
+            chartSeries = arrayOf(
+                seriesOf("Download size", downloadSizes),
+                seriesOf("Install size", installSizes)
+            ),
             chartHeight = 350,
             yAxisFormatter = ::formatSize,
-        ),
-    )
-    chart(
-        id = "resource-type-distribution-count-chart",
-        title = "Resource type distribution (file count)",
-        description = "Shows how many files of a certain resource type are contained in the app.",
+        )
+    }
+    Chart {
+        id = "resource-type-distribution-count-chart"
+        title = "Resource type distribution (file count)"
+        description = "Shows how many files of a certain resource type are contained in the app."
         config = BarChartConfig(
             chartLabels = labels,
             chartSeries = arrayOf(seriesOf("Files", fileCounts)),
             chartHeight = 350,
-        ),
-    )
+        )
+    }
 }
 
-@RFunction
-fun RBuilder.chart(id: String, title: String, description: String, config: ChartConfig) {
-    div(classes = "col") {
-        h4 { +title }
-        p(classes = "text-muted") { +description }
+external interface ChartProps : Props {
+   var id: String
+   var title: String
+   var description: String
+   var config: ChartConfig
+}
+
+val Chart = FC<ChartProps> { props ->
+    Column {
+        h4 { +props.title }
+        p {
+            className = ClassName("text-muted")
+            +props.description
+        }
         div {
-            attrs.id = id
+            id = props.id
             useEffect {
-                val chart = ApexCharts(document.getElementById(id), config.getOptions())
+                val chart = ApexCharts(document.getElementById(props.id),props.config.getOptions())
                 chart.render()
                 cleanup {
                     chart.destroy()

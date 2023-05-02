@@ -16,97 +16,161 @@
 
 package com.spotify.ruler.frontend.components
 
-import com.bnorm.react.RFunction
-import com.bnorm.react.RKey
 import com.spotify.ruler.frontend.formatSize
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileContainer
 import com.spotify.ruler.models.Measurable
-import kotlinx.html.id
-import react.RBuilder
-import react.dom.button
-import react.dom.div
-import react.dom.h2
-import react.dom.h4
-import react.dom.span
+import react.FC
+import react.Props
+import react.dom.html.ReactHTML.button
+import react.dom.html.ReactHTML.div
+import react.dom.html.ReactHTML.h2
+import react.dom.html.ReactHTML.h4
+import react.dom.html.ReactHTML.span
+import web.cssom.ClassName
 
-@RFunction
-fun RBuilder.breakdown(components: List<AppComponent>, sizeType: Measurable.SizeType) {
-    h4(classes = "mb-3") { +"Breakdown (${components.size} components)" }
-    div(classes = "row") {
-        containerList(components, sizeType)
-    }
+external interface BreakdownProps : Props {
+    var components: List<AppComponent>
+    var sizeType: Measurable.SizeType
 }
 
-@RFunction
-fun RBuilder.containerList(containers: List<FileContainer>, sizeType: Measurable.SizeType) {
-    div(classes = "accordion") {
-        containers.forEachIndexed { index, container ->
-            containerListItem(index, container, sizeType, container.name)
+val Breakdown = FC<BreakdownProps> { props ->
+    h4 {
+        className = ClassName("mb-3")
+        +"Breakdown (${props.components.size} components)"
+    }
+    Row {
+        ContainerList {
+            containers = props.components
+            sizeType = props.sizeType
         }
     }
 }
 
-@RFunction
-@Suppress("UNUSED_PARAMETER")
-fun RBuilder.containerListItem(id: Int, container: FileContainer, sizeType: Measurable.SizeType, @RKey key: String) {
-    div(classes = "accordion-item") {
-        containerListItemHeader(id, container, sizeType)
-        containerListItemBody(id, container, sizeType)
+external interface ContainerListProps : Props {
+    var containers: List<FileContainer>
+    var sizeType: Measurable.SizeType
+}
+
+val ContainerList = FC<ContainerListProps> { props ->
+    div {
+        className = ClassName("accordion")
+        props.containers.forEachIndexed { index, container ->
+            ContainerListItem {
+                id = index
+                ContainerListItem@this.container = container
+                sizeType = props.sizeType
+                key = container.name
+            }
+        }
     }
 }
 
-@RFunction
-fun RBuilder.containerListItemHeader(id: Int, container: FileContainer, sizeType: Measurable.SizeType) {
-    val containsFiles = container.files != null
-    h2(classes = "accordion-header") {
+external interface ContainerListItemProps: Props {
+   var id: Int
+   var container: FileContainer
+   var sizeType: Measurable.SizeType
+}
+
+val ContainerListItem = FC<ContainerListItemProps> { props ->
+    div {
+        className = ClassName("accordion-item")
+        ContainerListItemHeader {
+            id = props.id
+            container = props.container
+            sizeType = props.sizeType
+        }
+        ContainerListItemBody {
+            id = props.id
+            container = props.container
+            sizeType = props.sizeType
+        }
+    }
+}
+
+val ContainerListItemHeader = FC<ContainerListItemProps> { props ->
+    val containsFiles = props.container.files != null
+    h2 {
+        className = ClassName("accordion-header")
         var classes = "accordion-button collapsed"
         if (!containsFiles) {
             classes = "$classes disabled"
         }
-        button(classes = classes) {
-            attrs["data-bs-toggle"] = "collapse"
-            attrs["data-bs-target"] = "#module-$id-body"
-            span(classes = "font-monospace text-truncate me-3") { +container.name }
-            container.owner?.let { owner -> span(classes = "badge bg-secondary me-3") { +owner } }
+        button {
+            asDynamic()["data-bs-toggle"] = "collapse"
+            asDynamic()["data-bs-target"] = "#module-${props.id}-body"
+
+            className = ClassName(classes)
+
+            span {
+                className = ClassName( "font-monospace text-truncate me-3")
+                +props.container.name
+            }
+            props.container.owner?.let { owner ->
+                span {
+                    className = ClassName( "badge bg-secondary me-3")
+                    +owner
+                }
+            }
             var sizeClasses = "ms-auto text-nowrap"
             if (containsFiles) {
                 sizeClasses = "$sizeClasses me-3"
             }
-            span(classes = sizeClasses) {
-                +formatSize(container, sizeType)
+            span {
+                className = ClassName(sizeClasses)
+                +formatSize(props.container, props.sizeType)
+            }
+        }
+    }}
+
+val ContainerListItemBody = FC<ContainerListItemProps> { props ->
+    div {
+        className = ClassName("accordion-collapse collapse")
+        id = "module-${props.id}-body"
+        div {
+            className = ClassName("accordion-body p-0")
+            FileList {
+                files = props.container.files ?: emptyList()
+                sizeType = props.sizeType
             }
         }
     }
 }
 
-@RFunction
-fun RBuilder.containerListItemBody(id: Int, container: FileContainer, sizeType: Measurable.SizeType) {
-    div(classes = "accordion-collapse collapse") {
-        attrs.id = "module-$id-body"
-        div(classes = "accordion-body p-0") {
-            fileList(container.files ?: emptyList(), sizeType)
+external interface FileListProps : Props {
+    var files: List<AppFile>
+    var sizeType: Measurable.SizeType
+}
+
+val FileList = FC<FileListProps> { props ->
+    div {
+        className = ClassName("list-group list-group-flush")
+        props.files.forEach {
+            FileListItem {
+                file = it
+                sizeType = props.sizeType
+                key = it.name
+            }
         }
     }
 }
 
-@RFunction
-fun RBuilder.fileList(files: List<AppFile>, sizeType: Measurable.SizeType) {
-    div(classes = "list-group list-group-flush") {
-        files.forEach { file ->
-            fileListItem(file, sizeType, file.name)
-        }
-    }
+external interface FileListItemProps: Props {
+    var file: AppFile
+    var sizeType: Measurable.SizeType
 }
 
-@RFunction
-@Suppress("UNUSED_PARAMETER")
-fun RBuilder.fileListItem(file: AppFile, sizeType: Measurable.SizeType, @RKey key: String) {
-    div(classes = "list-group-item d-flex border-0") {
-        span(classes = "font-monospace text-truncate me-2") { +file.name }
-        span(classes = "ms-auto me-custom text-nowrap") {
-            +formatSize(file, sizeType)
+val FileListItem = FC<FileListItemProps> { props ->
+    div {
+        className = ClassName("list-group-item d-flex border-0")
+        span {
+            className = ClassName("font-monospace text-truncate me-2")
+            +props.file.name
+        }
+        span {
+            className = ClassName("ms-auto me-custom text-nowrap")
+            +formatSize(props.file, props.sizeType)
         }
     }
 }

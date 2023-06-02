@@ -102,7 +102,7 @@ class ApkSanitizer(
                 val name = classNameSanitizer.sanitize(classEntry.name)
                 val downloadSize = classEntry.downloadSize * entry.downloadSize / sizeOfAllClasses
                 val installSize = classEntry.installSize * entry.installSize / sizeOfAllClasses
-                AppFile(name, FileType.CLASS, downloadSize, installSize)
+                AppFile(name, FileType.CLASS, downloadSize, installSize, classEntry.downloadSize)
             }
         }
     }
@@ -116,7 +116,7 @@ class ApkSanitizer(
 
         override fun sanitize(): List<AppFile> {
             val entry = entries.maxByOrNull(ApkEntry::installSize) ?: return emptyList()
-            return listOf(AppFile("/AndroidManifest.xml", FileType.OTHER, entry.downloadSize, entry.installSize))
+            return listOf(AppFile("/AndroidManifest.xml", FileType.OTHER, entry.downloadSize, entry.installSize, entry.downloadSize))
         }
     }
 
@@ -145,7 +145,7 @@ class ApkSanitizer(
 
             val downloadSize = entries.sumOf(ApkEntry::downloadSize)
             val installSize = entries.sumOf(ApkEntry::installSize)
-            return listOf(AppFile("/resources.arsc", FileType.OTHER, downloadSize, installSize))
+            return listOf(AppFile("/resources.arsc", FileType.OTHER, downloadSize, installSize, downloadSize))
         }
     }
 
@@ -157,7 +157,7 @@ class ApkSanitizer(
         private fun sanitizeEntry(entry: ApkEntry): AppFile {
             val name = resourceNameSanitizer.sanitize(entry.name)
             val resourceType: ResourceType? = mapNameToResourceType(entry)
-            return AppFile(name, FileType.RESOURCE, entry.downloadSize, entry.installSize, resourceType = resourceType)
+            return AppFile(name, FileType.RESOURCE, entry.downloadSize, entry.installSize, entry.downloadSize,resourceType = resourceType)
         }
     }
 
@@ -174,7 +174,7 @@ class ApkSanitizer(
                 else -> FileType.OTHER
             }
             val resourceType: ResourceType? = mapNameToResourceType(entry)
-            return AppFile(entry.name, type, entry.downloadSize, entry.installSize, resourceType = resourceType)
+            return AppFile(entry.name, type, entry.downloadSize, entry.installSize, entry.downloadSize, resourceType = resourceType)
         }
     }
 

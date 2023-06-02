@@ -57,12 +57,14 @@ class JsonReporter {
             variant = appInfo.variantName,
             downloadSize = components.values.flatten().sumOf(AppFile::downloadSize),
             installSize = components.values.flatten().sumOf(AppFile::installSize),
+            uncompressedSize = components.values.flatten().sumOf(AppFile::uncompressedSize),
             components = components.map { (component, files) ->
                 AppComponent(
                     name = component.name,
                     type = component.type,
                     downloadSize = files.sumOf(AppFile::downloadSize),
                     installSize = files.sumOf(AppFile::installSize),
+                    uncompressedSize = files.sumOf(AppFile::uncompressedSize),
                     owner = ownershipInfo?.getOwner(component.name, component.type),
                     files = if (omitFileBreakdown) {
                         null
@@ -73,6 +75,7 @@ class JsonReporter {
                                 type = file.type,
                                 downloadSize = file.downloadSize,
                                 installSize = file.installSize,
+                                uncompressedSize = file.uncompressedSize,
                                 owner = ownershipInfo?.getOwner(file.name, component.name, component.type),
                                 resourceType = file.resourceType,
                             )
@@ -85,6 +88,7 @@ class JsonReporter {
                     name = feature,
                     downloadSize = files.sumOf(AppFile::downloadSize),
                     installSize = files.sumOf(AppFile::installSize),
+                    uncompressedSize = files.sumOf(AppFile::uncompressedSize),
                     owner = ownershipInfo?.getOwner(feature),
                     files = if (omitFileBreakdown) {
                         null
@@ -95,6 +99,7 @@ class JsonReporter {
                                 type = file.type,
                                 downloadSize = file.downloadSize,
                                 installSize = file.installSize,
+                                uncompressedSize = file.uncompressedSize,
                                 owner = ownershipInfo?.getOwner(file.name, feature),
                                 resourceType = file.resourceType,
                             )

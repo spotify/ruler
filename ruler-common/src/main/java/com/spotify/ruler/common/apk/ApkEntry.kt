@@ -27,6 +27,7 @@ sealed class ApkEntry {
         override val name: String,
         override val downloadSize: Long,
         override val installSize: Long,
+        val uncompressedSize: Long
     ) : ApkEntry()
 
     /** DEX file APK entry containing compiled classes. */

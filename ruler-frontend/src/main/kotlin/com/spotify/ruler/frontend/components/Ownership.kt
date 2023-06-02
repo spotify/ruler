@@ -64,6 +64,7 @@ val ComponentOwnershipOverview = FC<ComponentOwnershipOverviewProps>  { props ->
     val owners = sorted.map { (owner, _) -> owner }
     val downloadSizes = sorted.map { (_, measurable) -> measurable.downloadSize }
     val installSizes = sorted.map { (_, measurable) -> measurable.installSize }
+    val uncompressedSizes = sorted.map { (_, measurable) -> measurable.uncompressedSize }
 
     val pageCount = ceil(owners.size / PAGE_SIZE.toFloat()).toInt()
     var activePage by useState(1)
@@ -86,10 +87,14 @@ val ComponentOwnershipOverview = FC<ComponentOwnershipOverviewProps>  { props ->
                     "Install size",
                     installSizes.subList(pageStartIndex, pageEndIndex).toLongArray()
                 ),
+                seriesOf(
+                    "Uncompressed size",
+                    uncompressedSizes.subList(pageStartIndex, pageEndIndex).toLongArray()
+                ),
             ),
             chartHeight = 400,
             yAxisFormatter = ::formatSize,
-            chartSeriesTotals = longArrayOf(downloadSizes.sum(), installSizes.sum()),
+            chartSeriesTotals = longArrayOf(downloadSizes.sum(), installSizes.sum(), uncompressedSizes.sum()),
         )
     }
 
@@ -134,6 +139,7 @@ val ComponentOwnershipPerTeam = FC<ComponentOwnershipPerTeamProps> { props ->
         component.copy(
             downloadSize = ownedFilesFromComponent.sumOf(AppFile::downloadSize),
             installSize = ownedFilesFromComponent.sumOf(AppFile::installSize),
+            uncompressedSize = ownedFilesFromComponent.sumOf(AppFile::uncompressedSize),
             files = ownedFilesFromComponent,
         )
     }.toMutableList()
@@ -145,6 +151,7 @@ val ComponentOwnershipPerTeam = FC<ComponentOwnershipPerTeamProps> { props ->
             type = ComponentType.INTERNAL,
             downloadSize = remainingOwnedFiles.sumOf(AppFile::downloadSize),
             installSize = remainingOwnedFiles.sumOf(AppFile::installSize),
+            uncompressedSize = remainingOwnedFiles.sumOf(AppFile::uncompressedSize),
             files = remainingOwnedFiles.toList(),
             owner = selectedOwner,
         )
@@ -152,14 +159,18 @@ val ComponentOwnershipPerTeam = FC<ComponentOwnershipPerTeamProps> { props ->
 
     val downloadSize: Long
     val installSize: Long
+    val uncompressedSize: Long
+
     if (ownedFiles == null) {
         // If there is no file-level ownership info, use component-level ownership info
         downloadSize = ownedComponents.sumOf(AppComponent::downloadSize)
         installSize = ownedComponents.sumOf(AppComponent::installSize)
+        uncompressedSize = ownedComponents.sumOf(AppComponent::uncompressedSize)
     } else {
         // Otherwise rely on file-level ownership info
         downloadSize = ownedFiles.sumOf(AppFile::downloadSize)
         installSize = ownedFiles.sumOf(AppFile::installSize)
+        uncompressedSize = ownedFiles.sumOf(AppFile::uncompressedSize)
     }
 
     h4 {
@@ -195,6 +206,11 @@ val ComponentOwnershipPerTeam = FC<ComponentOwnershipPerTeamProps> { props ->
             label =  "Install size"
             formatter = ::formatSize
         }
+        HighlightedValue {
+            value = uncompressedSize
+            label =  "Uncompressed size"
+            formatter = ::formatSize
+        }
     }
 
     ContainerList {
@@ -228,18 +244,20 @@ private fun getSizesByOwner(components: List<AppComponent>): Map<String, Measura
         // If there is no file-level ownership info, use component-level ownership info
         if (component.files == null) {
             val owner = component.owner ?: return@forEach
-            val current = sizes.getOrPut(owner) { Measurable.Mutable(0, 0) }
+            val current = sizes.getOrPut(owner) { Measurable.Mutable(0, 0, 0) }
             current.downloadSize += component.downloadSize
             current.installSize += component.installSize
+            current.uncompressedSize += component.uncompressedSize
             return@forEach
         }
 
         // Otherwise rely on file-level ownership info
         component.files?.forEach fileLevelLoop@ { file ->
             val owner = file.owner ?: return@fileLevelLoop
-            val current = sizes.getOrPut(owner) { Measurable.Mutable(0, 0) }
+            val current = sizes.getOrPut(owner) { Measurable.Mutable(0, 0, 0) }
             current.downloadSize += file.downloadSize
             current.installSize += file.installSize
+            current.uncompressedSize += file.uncompressedSize
         }
     }
 

@@ -20,20 +20,26 @@ package com.spotify.ruler.models
 interface Measurable {
     val downloadSize: Long
     val installSize: Long
+    val uncompressedSize: Long
 
     /**
      * The size of an app can be measured in one of two ways:
      * 1. Download size - the size of a file that has to be downloaded.
      * 2. Install size - the size of a file once it's installed on a device.
      */
-    enum class SizeType { DOWNLOAD, INSTALL }
+    enum class SizeType { DOWNLOAD, INSTALL, UNCOMPRESSED }
 
     /** Retrieves the size in bytes, based on the given [sizeType]. */
-    fun getSize(sizeType: SizeType) = when(sizeType) {
+    fun getSize(sizeType: SizeType) = when (sizeType) {
         SizeType.DOWNLOAD -> downloadSize
         SizeType.INSTALL -> installSize
+        SizeType.UNCOMPRESSED -> uncompressedSize
     }
 
     /** A mutable [Measurable] implementation. */
-    data class Mutable(override var downloadSize: Long, override var installSize: Long) : Measurable
+    data class Mutable(
+        override var downloadSize: Long,
+        override var installSize: Long,
+        override var uncompressedSize: Long
+    ) : Measurable
 }

@@ -47,7 +47,8 @@ class ApkParser {
                     else -> ApkEntry.Default(
                         name.replace("/lib/res/", "/res/"),
                         downloadSize,
-                        installSize
+                        installSize,
+                        downloadSize
                     )
                 }
             }
@@ -59,7 +60,7 @@ class ApkParser {
     private fun parseDexEntry(bytes: ByteArray): List<ApkEntry> {
         val dexFile = DexFiles.getDexFile(bytes)
         return dexFile.classes.map { classDef ->
-            ApkEntry.Default(classDef.type, classDef.size.toLong(), classDef.size.toLong())
+            ApkEntry.Default(classDef.type, classDef.size.toLong(), classDef.size.toLong(), classDef.size.toLong())
         }
     }
 

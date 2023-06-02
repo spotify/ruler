@@ -1,0 +1,6 @@
+com.spotify.ruler.sample.lib.LibActivity
+com.spotify.ruler.sample.dynamic.DynamicActivity
+com.spotify.ruler.sample.app.MainActivity
+com.spotify.ruler.sample.dynamic.DynamicActivity: DynamicActivity()
+com.spotify.ruler.sample.app.MainActivity: MainActivity()
+com.spotify.ruler.sample.lib.LibActivity: LibActivity()

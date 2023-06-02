@@ -71,12 +71,14 @@ val FileTypeGraphs = FC<FileTypeGraphsProps> { props ->
     val labels = arrayOf("Classes", "Resources", "Assets", "Native libraries", "Other")
     val downloadSizes = LongArray(labels.size)
     val installSizes = LongArray(labels.size)
+    val uncompressedSize = LongArray(labels.size)
     val fileCounts = LongArray(labels.size)
 
     props.files.forEach { file ->
         val index = file.type.ordinal
         downloadSizes[index] += file.getSize(Measurable.SizeType.DOWNLOAD)
         installSizes[index] += file.getSize(Measurable.SizeType.INSTALL)
+        uncompressedSize[index] += file.getSize(Measurable.SizeType.UNCOMPRESSED)
         fileCounts[index]++
     }
 
@@ -88,7 +90,8 @@ val FileTypeGraphs = FC<FileTypeGraphsProps> { props ->
             chartLabels = labels,
             chartSeries = arrayOf(
                 seriesOf("Download size", downloadSizes),
-                seriesOf("Install size", installSizes)
+                seriesOf("Install size", installSizes),
+                seriesOf("Uncompressed size", uncompressedSize)
             ),
             chartHeight = 350,
             yAxisFormatter = ::formatSize,
@@ -114,12 +117,14 @@ val ComponentTypeGraphs = FC<ComponentTypeGraphsProps> { props ->
     val labels = arrayOf("Internal", "External")
     val downloadSizes = LongArray(labels.size)
     val installSizes = LongArray(labels.size)
+    val uncompressedSize = LongArray(labels.size)
     val fileCounts = LongArray(labels.size)
 
     props.components.forEach { component ->
         val index = component.type.ordinal
         downloadSizes[index] += component.getSize(Measurable.SizeType.DOWNLOAD)
         installSizes[index] += component.getSize(Measurable.SizeType.INSTALL)
+        uncompressedSize[index] += component.getSize(Measurable.SizeType.UNCOMPRESSED)
         fileCounts[index]++
     }
 
@@ -159,12 +164,14 @@ val ResourcesTypeGraphs = FC<ResourcesTypeGraphsProps> { props ->
     val labels = arrayOf("Drawable", "Layout", "Raw", "Values", "Font", "Other")
     val downloadSizes = LongArray(labels.size)
     val installSizes = LongArray(labels.size)
+    val uncompressedSize = LongArray(labels.size)
     val fileCounts = LongArray(labels.size)
 
     props.files.filter { it.resourceType != null }.forEach { file ->
         val index = file.resourceType!!.ordinal
         downloadSizes[index] += file.getSize(Measurable.SizeType.DOWNLOAD)
         installSizes[index] += file.getSize(Measurable.SizeType.INSTALL)
+        uncompressedSize[index] += file.getSize(Measurable.SizeType.UNCOMPRESSED)
         fileCounts[index]++
     }
 

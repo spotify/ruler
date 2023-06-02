@@ -148,6 +148,10 @@ val Header = FC<ReportProps> { props ->
             size = report.installSize
             label = "Install size"
         }
+        HeaderSizeItem {
+            size = report.uncompressedSize
+            label = "Uncompressed size"
+        }
     }
 }
 
@@ -186,6 +190,7 @@ val Navigation = FC<NavigationProps> { props ->
             val optionMap = mapOf(
                 "Download size" to Measurable.SizeType.DOWNLOAD,
                 "Install size" to Measurable.SizeType.INSTALL,
+                "Uncompressed size" to Measurable.SizeType.UNCOMPRESSED,
             )
             DropDown {
                 options = optionMap.keys

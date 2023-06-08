@@ -94,14 +94,36 @@ class ApkSanitizer(
      */
     private inner class DexFileBucket : SanitizationBucket() {
         override fun isApplicable(entry: ApkEntry) = entry is ApkEntry.Dex
-        override fun sanitize() = entries.flatMap { entry -> sanitizeEntry(entry as ApkEntry.Dex) }
+        override fun sanitize(): List<AppFile> {
+            var sizeOfAllClasses = 0L
+            var downloadSizeOfDex = 0L
+            var installSizeOfDex = 0L
+            entries.forEach {
+                val dex = (it as ApkEntry.Dex)
+                sizeOfAllClasses += dex.classes.sumOf(ApkEntry::installSize)
+                downloadSizeOfDex += dex.downloadSize
+                installSizeOfDex += dex.installSize
+            }
+            return entries.flatMap { entry ->
+                sanitizeEntry(
+                    entry as ApkEntry.Dex,
+                    sizeOfAllClasses,
+                    downloadSizeOfDex,
+                    installSizeOfDex
+                )
+            }
+        }
 
-        private fun sanitizeEntry(entry: ApkEntry.Dex): List<AppFile> {
-            val sizeOfAllClasses = entry.classes.sumOf(ApkEntry::installSize)
+        private fun sanitizeEntry(
+            entry: ApkEntry.Dex,
+            sizeOfAllClasses: Long,
+            dexDownloadSize: Long,
+            dexInstallSize: Long
+        ): List<AppFile> {
             return entry.classes.map { classEntry ->
                 val name = classNameSanitizer.sanitize(classEntry.name)
-                val downloadSize = classEntry.downloadSize * entry.downloadSize / sizeOfAllClasses
-                val installSize = classEntry.installSize * entry.installSize / sizeOfAllClasses
+                val downloadSize = classEntry.downloadSize * dexDownloadSize / sizeOfAllClasses
+                val installSize = classEntry.installSize * dexInstallSize / sizeOfAllClasses
                 AppFile(name, FileType.CLASS, downloadSize, installSize)
             }
         }

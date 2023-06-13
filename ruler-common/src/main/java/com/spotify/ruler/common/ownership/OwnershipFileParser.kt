@@ -20,10 +20,11 @@ import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 
+private const val CODE_POINT_LIMIT = 20 * 1024 * 1024 // 20 MB
+
 /** Responsible for parsing and extracting ownership entries from the ownership file. */
 class OwnershipFileParser {
 
-    private val codePointLimit = 20 * 1024 * 1024 // 20 MB
 
     /**
      * Parses and returns the list of ownership entries contained in the given [ownershipFile].
@@ -32,7 +33,7 @@ class OwnershipFileParser {
      */
     fun parse(ownershipFile: File): List<OwnershipEntry> = try {
         val loaderOptions = LoaderOptions()
-        loaderOptions.codePointLimit = codePointLimit
+        loaderOptions.codePointLimit = CODE_POINT_LIMIT
         val yaml = Yaml(loaderOptions)
 
         val entries: List<Map<String, String>> = ownershipFile.inputStream().use(yaml::load)

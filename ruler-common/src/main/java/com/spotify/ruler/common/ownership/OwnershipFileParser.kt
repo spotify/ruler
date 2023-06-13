@@ -16,11 +16,14 @@
 
 package com.spotify.ruler.common.ownership
 
+import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 
 /** Responsible for parsing and extracting ownership entries from the ownership file. */
 class OwnershipFileParser {
+
+    private val codePointLimit = 20 * 1024 * 1024 // 20 MB
 
     /**
      * Parses and returns the list of ownership entries contained in the given [ownershipFile].
@@ -28,7 +31,10 @@ class OwnershipFileParser {
      * @throws IllegalStateException If the [ownershipFile] could not be parsed.
      */
     fun parse(ownershipFile: File): List<OwnershipEntry> = try {
-        val yaml = Yaml()
+        val loaderOptions = LoaderOptions()
+        loaderOptions.codePointLimit = codePointLimit
+        val yaml = Yaml(loaderOptions)
+
         val entries: List<Map<String, String>> = ownershipFile.inputStream().use(yaml::load)
         entries.map { entry ->
             OwnershipEntry(entry.getValue("identifier"), entry.getValue("owner"))

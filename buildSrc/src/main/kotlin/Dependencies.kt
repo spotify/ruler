@@ -71,7 +71,7 @@ object Dependencies {
         const val ANDROID_TOOLS = "30.0.4" // https://mvnrepository.com/artifact/com.android.tools/common?repo=google
         const val CLIKT = "3.5.1" // https://mvnrepository.com/artifact/com.github.ajalt.clikt/clikt
         const val KOTLINX_SERIALIZATION = "1.3.3" // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core
-        const val SNAKE_YAML = "1.32" // https://mvnrepository.com/artifact/org.yaml/snakeyaml
+        const val SNAKE_YAML = "1.30" // https://mvnrepository.com/artifact/org.yaml/snakeyaml
 
         const val JUNIT = "5.9.0" // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
         const val GOOGLE_TRUTH = "1.1.3" // https://mvnrepository.com/artifact/com.google.truth/truth

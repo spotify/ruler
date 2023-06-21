@@ -30,6 +30,7 @@ object Dependencies {
     const val DEXLIB = "org.smali:dexlib2:${Versions.DEXLIB}"
     const val ANDROID_TOOLS_COMMON = "com.android.tools:common:${Versions.ANDROID_TOOLS}"
     const val ANDROID_TOOLS_SDKLIB = "com.android.tools:sdklib:${Versions.ANDROID_TOOLS}"
+    const val ANDROID_CONSTRAINT_LAYOUT = "androidx.constraintlayout:constraintlayout:${Versions.CONSTRAINT_LAYOUT}"
 
     const val APK_ANALYZER = "com.android.tools.apkparser:apkanalyzer:${Versions.ANDROID_TOOLS}"
     const val CLIKT = "com.github.ajalt.clikt:clikt:${Versions.CLIKT}"
@@ -72,6 +73,7 @@ object Dependencies {
         const val CLIKT = "3.5.1" // https://mvnrepository.com/artifact/com.github.ajalt.clikt/clikt
         const val KOTLINX_SERIALIZATION = "1.3.3" // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core
         const val SNAKE_YAML = "1.30" // https://mvnrepository.com/artifact/org.yaml/snakeyaml
+        const val CONSTRAINT_LAYOUT = "2.1.4" // https://mvnrepository.com/artifact/androidx.constraintlayout/constraintlayout
 
         const val JUNIT = "5.9.0" // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
         const val GOOGLE_TRUTH = "1.1.3" // https://mvnrepository.com/artifact/com.google.truth/truth

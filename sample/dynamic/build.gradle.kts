@@ -24,7 +24,7 @@ android {
     namespace = "com.spotify.ruler.sample.dynamic"
     compileSdk = 33
     defaultConfig {
-        minSdk = 23
+        minSdk = 21
     }
     lint {
         warningsAsErrors = true

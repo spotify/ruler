@@ -24,10 +24,14 @@ android {
     namespace = "com.spotify.ruler.sample.lib"
     compileSdk = 33
     defaultConfig {
-        minSdk = 23
+        minSdk = 21
         targetSdk = 33
     }
     lint {
         warningsAsErrors = true
     }
+}
+
+dependencies {
+    implementation(Dependencies.ANDROID_CONSTRAINT_LAYOUT)
 }

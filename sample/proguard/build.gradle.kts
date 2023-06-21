@@ -29,7 +29,7 @@ android {
     compileSdk = 33
     defaultConfig {
         applicationId = "com.spotify.ruler.sample"
-        minSdk = 23
+        minSdk = 21
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"

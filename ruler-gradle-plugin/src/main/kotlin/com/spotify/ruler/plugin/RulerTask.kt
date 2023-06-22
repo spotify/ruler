@@ -16,6 +16,7 @@
 
 package com.spotify.ruler.plugin
 
+import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.spotify.ruler.plugin.apk.ApkCreator
 import com.spotify.ruler.plugin.dependency.EntryParser
 import com.spotify.ruler.common.BaseRulerTask

@@ -49,6 +49,7 @@ android {
 
 dependencies {
     implementation(project(":sample:lib"))
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }
 
 ruler {

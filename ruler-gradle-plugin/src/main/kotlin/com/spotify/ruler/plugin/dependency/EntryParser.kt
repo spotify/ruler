@@ -16,6 +16,7 @@
 
 package com.spotify.ruler.plugin.dependency
 
+import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.spotify.ruler.common.dependency.ArtifactResult
 import com.spotify.ruler.common.dependency.DependencyEntry
 import com.spotify.ruler.common.dependency.DependencyParser
@@ -33,14 +34,26 @@ class EntryParser {
     fun parse(project: Project, appInfo: AppInfo): List<DependencyEntry> {
         val configuration =
             project.configurations.getByName("${appInfo.variantName}RuntimeClasspath")
+        val dynamicConfigurations =
+            project.extensions.getByType(BaseAppModuleExtension::class.java).dynamicFeatures.map { name ->
+                val dynamicName = name.removePrefix(":${project.parent!!.name}:")
+                project.parent!!.childProjects[dynamicName]!!.configurations
+                    .getByName("${appInfo.variantName}RuntimeClasspath")
+            }
         val entries = mutableListOf<ArtifactResult>()
         val parser = DependencyParser()
         listOf("android-classes").forEach { artifactType ->
             entries += parseFile(configuration, artifactType, true)
+            entries += dynamicConfigurations.flatMap { config ->
+                parseFile(config, artifactType, true)
+            }
         }
 
         listOf("android-res", "android-assets", "android-jni").forEach { artifactType ->
             entries += parseFile(configuration, artifactType, false)
+            entries += dynamicConfigurations.flatMap { config ->
+                parseFile(config, artifactType, false)
+            }
         }
 
         return parser.parse(entries)

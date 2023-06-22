@@ -46,7 +46,7 @@ class JsonReporter {
     fun generateReport(
         appInfo: AppInfo,
         components: Map<DependencyComponent, List<AppFile>>,
-        features: Map<String, List<AppFile>>,
+        features: Map<String, Map<DependencyComponent, List<AppFile>>>,
         ownershipInfo: OwnershipInfo?,
         targetDir: File,
         omitFileBreakdown: Boolean,
@@ -73,35 +73,53 @@ class JsonReporter {
                                 type = file.type,
                                 downloadSize = file.downloadSize,
                                 installSize = file.installSize,
-                                owner = ownershipInfo?.getOwner(file.name, component.name, component.type),
+                                owner = ownershipInfo?.getOwner(
+                                    file.name,
+                                    component.name,
+                                    component.type
+                                ),
                                 resourceType = file.resourceType,
                             )
                         }.sortedWith(comparator.reversed())
                     }
                 )
             }.sortedWith(comparator.reversed()),
-            dynamicFeatures = features.map { (feature, files) ->
+            dynamicFeatures = features.map { (name, dynamicComponents) ->
                 DynamicFeature(
-                    name = feature,
-                    downloadSize = files.sumOf(AppFile::downloadSize),
-                    installSize = files.sumOf(AppFile::installSize),
-                    owner = ownershipInfo?.getOwner(feature),
-                    files = if (omitFileBreakdown) {
-                        null
-                    } else {
-                        files.map { file ->
-                            AppFile(
-                                name = file.name,
-                                type = file.type,
-                                downloadSize = file.downloadSize,
-                                installSize = file.installSize,
-                                owner = ownershipInfo?.getOwner(file.name, feature),
-                                resourceType = file.resourceType,
-                            )
-                        }.sortedWith(comparator.reversed())
-                    }
+                    name = name,
+                    downloadSize = dynamicComponents.values.flatten().sumOf(AppFile::downloadSize),
+                    installSize = dynamicComponents.values.flatten().sumOf(AppFile::installSize),
+                    owner = ownershipInfo?.getOwner(name),
+                    components = dynamicComponents.map { (component, files) ->
+                        AppComponent(
+                            name = component.name,
+                            type = component.type,
+                            downloadSize = files.sumOf(AppFile::downloadSize),
+                            installSize = files.sumOf(AppFile::installSize),
+                            // TODO MAYBE NOT?
+                            owner = ownershipInfo?.getOwner(name),
+                            files = if (omitFileBreakdown) {
+                                null
+                            } else {
+                                files.map { file ->
+                                    AppFile(
+                                        name = file.name,
+                                        type = file.type,
+                                        downloadSize = file.downloadSize,
+                                        installSize = file.installSize,
+                                        owner = ownershipInfo?.getOwner(
+                                            file.name,
+                                            component.name,
+                                            component.type
+                                        ),
+                                        resourceType = file.resourceType,
+                                    )
+                                }.sortedWith(comparator.reversed())
+                            }
+                        )
+                    }.sortedWith(comparator.reversed())
                 )
-            }.sortedWith(comparator.reversed()),
+            }
         )
 
         val format = Json { prettyPrint = false }

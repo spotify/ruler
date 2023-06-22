@@ -66,8 +66,15 @@ interface BaseRulerTask {
             Attributor(defaultComponent)
         val components = attributor.attribute(mainFiles, dependencies)
 
+        val dynamicComponents = mutableMapOf<String, Map<DependencyComponent, List<AppFile>>>()
+        featureFiles.forEach { (name, appFiles) ->
+            val dynamicFeatureAttributor =
+                Attributor(DependencyComponent(name, ComponentType.INTERNAL))
+            dynamicComponents[name] = dynamicFeatureAttributor.attribute(appFiles, dependencies)
+        }
+
         val ownershipInfo = getOwnershipInfo() // Get ownership information for all components
-        generateReports(components, featureFiles, ownershipInfo)
+        generateReports(components, dynamicComponents, ownershipInfo)
     }
 
     private fun getFilesFromBundle(): Map<String, List<AppFile>> {
@@ -92,7 +99,7 @@ interface BaseRulerTask {
 
     private fun generateReports(
         components: Map<DependencyComponent, List<AppFile>>,
-        features: Map<String, List<AppFile>>,
+        features: Map<String, Map<DependencyComponent, List<AppFile>>>,
         ownershipInfo: OwnershipInfo?,
     ) {
         val reportDir = rulerConfig.reportDir

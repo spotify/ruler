@@ -18,11 +18,13 @@ package com.spotify.ruler.sample.dynamic
 
 import android.app.Activity
 import android.os.Bundle
+import timber.log.Timber
 
 class DynamicActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dynamic)
+        Timber.log(1, "Test")
     }
 }

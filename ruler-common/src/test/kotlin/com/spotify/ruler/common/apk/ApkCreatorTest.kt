@@ -14,11 +14,10 @@
 * limitations under the License.
 */
 
-package com.spotify.ruler.plugin
+package com.spotify.ruler.common.apk
 
 import com.google.common.truth.Truth.assertThat
 import com.spotify.ruler.common.models.DeviceSpec
-import com.spotify.ruler.plugin.apk.ApkCreator
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File

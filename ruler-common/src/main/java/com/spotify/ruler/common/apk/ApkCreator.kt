@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package com.spotify.ruler.plugin.apk
+package com.spotify.ruler.common.apk
 
 import com.android.SdkConstants
 import com.android.build.gradle.internal.SdkLocator
@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit
  *
  * @param rootDir Root directory of the Gradle project, needed to look up the path of certain binaries.
  */
-class ApkCreator(private val rootDir: File) {
+open class ApkCreator(private val rootDir: File) {
 
     private val rulerDebugKey = "rulerDebug.keystore"
     private val rulerKeystorePassword = "rulerpassword"
@@ -91,7 +91,7 @@ class ApkCreator(private val rootDir: File) {
     }
 
     /** Finds and returns the location of the aapt2 executable. */
-    private fun getAapt2Location(): Path {
+    open fun getAapt2Location(): Path {
         val sdkLocation = getAndroidSdkLocation()
         val sdkHandler = AndroidSdkHandler.getInstance(AndroidLocationsSingleton, sdkLocation)
         val progressIndicator = object : ProgressIndicatorAdapter() { /* No progress reporting */ }
@@ -132,4 +132,8 @@ class ApkCreator(private val rootDir: File) {
         /** Name of the feature that contains the main app (without any dynamic feature modules). */
         const val BASE_FEATURE_NAME = "base"
     }
+}
+
+class InjectedToolApkCreator(private val aapt2Tool: Path): ApkCreator(File("")) {
+    override fun getAapt2Location(): Path = aapt2Tool
 }

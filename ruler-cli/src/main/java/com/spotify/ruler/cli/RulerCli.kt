@@ -23,6 +23,8 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.file
 import com.spotify.ruler.common.BaseRulerTask
 import com.spotify.ruler.common.FEATURE_NAME
+import com.spotify.ruler.common.apk.ApkCreator
+import com.spotify.ruler.common.apk.InjectedToolApkCreator
 import com.spotify.ruler.common.dependency.ArtifactResult
 import com.spotify.ruler.common.dependency.DependencyComponent
 import com.spotify.ruler.common.dependency.DependencyEntry
@@ -37,14 +39,18 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
+import java.util.logging.Level
+import java.util.logging.Logger
 
 class RulerCli : CliktCommand(), BaseRulerTask {
+    private val logger = Logger.getLogger("Ruler")
     private val dependencyMap by option().file().required()
     private val rulerConfigJson by option().file().required()
     private val apkFile by option().file().required()
     private val reportDir by option().file(canBeDir = true).required()
     private val mappingFile: File? by option().file()
     private val resourceMappingFile: File? by option().file()
+    private val aapt2Tool: File? by option().file()
 
     override fun print(content: String) = echo(content)
 
@@ -58,7 +64,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
         val json = Json.decodeFromStream<JsonRulerConfig>(rulerConfigJson.inputStream())
         RulerConfig(
             projectPath = json.projectPath,
-            apkFilesMap = mapOf(FEATURE_NAME to listOf(apkFile)),
+            apkFilesMap = createApkFile(json.projectPath, json.deviceSpec!!),
             reportDir = reportDir,
             ownershipFile = json.ownershipFile?.let { File(it) },
             appInfo = json.appInfo,
@@ -97,8 +103,40 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     override fun provideDependencies(): Map<String, List<DependencyComponent>> = dependencies
 
     override fun run() {
+        logger.log(Level.INFO,  """
+        ~~~~~ Starting Ruler ~~~~~
+        Using Dependency Map: ${dependencyMap.path}
+        Using Ruler Config: ${rulerConfigJson.path}
+        Using App File: ${apkFile.path}
+        Using Proguard Mapping File: ${mappingFile?.path}
+        Using Resource Mapping File: ${resourceMappingFile?.path}
+        Using AAPT2: ${aapt2Tool?.path}
+        Writing reports to: ${reportDir.path}
+        """.trimIndent())
         super.run()
     }
+
+    private fun createApkFile(projectPath: String, deviceSpec: DeviceSpec): Map<String, List<File>> {
+
+        val apkCreator = if (aapt2Tool != null) {
+            InjectedToolApkCreator(aapt2Tool!!.toPath())
+        } else {
+            ApkCreator(File(config.projectPath))
+        }
+
+        return if (apkFile.extension == "apk") {
+            mapOf(FEATURE_NAME to listOf(apkFile))
+        } else {
+            apkCreator.createSplitApks(
+                apkFile,
+                deviceSpec,
+                File(projectPath).resolve(File("tmp")).apply {
+                    mkdir()
+                }
+            )
+        }
+    }
+
 }
 
 @Serializable

@@ -42,8 +42,10 @@ class ReleaseReportTest {
         val app = report.components.single { component -> component.name == ":sample:app" }
         assertThat(app.type).isEqualTo(ComponentType.INTERNAL)
         assertThat(app.owner).isEqualTo("default-team")
+        // Filters out META-INF stuff coming from androdiX libraries as they are too many.
+        val files = app.files?.filter { !it.name.startsWith("/META-INF/androidx") }
 
-        assertThat(app.files).comparingElementsUsing(Correspondence.file()).containsExactly(
+        assertThat(files).comparingElementsUsing(Correspondence.file()).containsExactly(
             FileMatcher("com.spotify.ruler.sample.app.MainActivity", FileType.CLASS, "main-team"),
             FileMatcher("/res/layout/activity_main.xml", FileType.RESOURCE, "main-team", ResourceType.LAYOUT),
             FileMatcher("/res/drawable/test_drawable.xml", FileType.RESOURCE, "default-team", ResourceType.DRAWABLE),
@@ -63,6 +65,7 @@ class ReleaseReportTest {
             FileMatcher("com.spotify.ruler.sample.lib.LibActivity", FileType.CLASS, "lib-team"),
             FileMatcher("com.spotify.ruler.sample.lib.ClassToObfuscate", FileType.CLASS, "lib-team"),
             FileMatcher("/res/layout/activity_lib.xml", FileType.RESOURCE, "lib-team", ResourceType.LAYOUT),
+            FileMatcher("/res/layout-v22/activity_lib.xml", FileType.RESOURCE, "lib-team", ResourceType.LAYOUT),
             FileMatcher("/assets/asset.txt", FileType.ASSET, "lib-team"),
         )
     }

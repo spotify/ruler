@@ -20,7 +20,6 @@ import com.spotify.ruler.common.dependency.DependencyComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
 
-private val RESOURCE_VERSION_REGEX = "(/res/[a-z][^/])*-(.*?)(?=/)".toRegex()
 private typealias Dependencies = Map<String, List<DependencyComponent>>
 /**
  * Responsible for attributing files to the components they are coming from.
@@ -28,6 +27,8 @@ private typealias Dependencies = Map<String, List<DependencyComponent>>
  * @param defaultComponent Component to which files will be assigned, if they can't be attributed to any other component
  */
 class Attributor(private val defaultComponent: DependencyComponent) {
+
+    private val resourceVersionRegex = "(/res/[a-z][^/])*-(.*?)(?=/)".toRegex()
 
     /**
      * Attributes files contained in the final app to the component that they are coming from.
@@ -105,8 +106,8 @@ class Attributor(private val defaultComponent: DependencyComponent) {
     private fun getComponentForResource(name: String, dependencies: Dependencies): DependencyComponent? {
         var resourceName = name.removePrefix("/res")
         var dependencyComponent =  dependencies[resourceName]?.singleOrNull()
-        if (dependencyComponent == null && name.contains(RESOURCE_VERSION_REGEX)) {
-            resourceName = name.replace(RESOURCE_VERSION_REGEX, "").removePrefix("/res")
+        if (dependencyComponent == null && name.contains(resourceVersionRegex)) {
+            resourceName = name.replace(resourceVersionRegex, "").removePrefix("/res")
             dependencyComponent = dependencies[resourceName]?.singleOrNull()
         }
 

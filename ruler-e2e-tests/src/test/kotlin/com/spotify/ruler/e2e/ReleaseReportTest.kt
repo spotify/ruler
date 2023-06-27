@@ -42,7 +42,7 @@ class ReleaseReportTest {
         val app = report.components.single { component -> component.name == ":sample:app" }
         assertThat(app.type).isEqualTo(ComponentType.INTERNAL)
         assertThat(app.owner).isEqualTo("default-team")
-        // Filters out META-INF stuff coming from androdiX libraries as they are too many.
+        // Filters out META-INF stuff coming from AndroidX libraries as they are too many.
         val files = app.files?.filter { !it.name.startsWith("/META-INF/androidx") }
 
         assertThat(files).comparingElementsUsing(Correspondence.file()).containsExactly(

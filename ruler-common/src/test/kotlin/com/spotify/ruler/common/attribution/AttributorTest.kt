@@ -106,10 +106,21 @@ class AttributorTest {
 
     @Test
     fun `Resources are attributed correctly`() {
-        val files = listOf(AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 100, 200))
-        val dependencies = mapOf("/layout/activity_main.xml" to listOf(
-            DependencyComponent(":lib", ComponentType.INTERNAL),
-        ))
+        val files = listOf(
+            AppFile("/res/layout/activity_main.xml", FileType.RESOURCE, 100, 200),
+            AppFile("/res/layout-v22/activity_main.xml", FileType.RESOURCE, 100, 200),
+            AppFile("/res/drawable-anydpi-v24/complex_vector_drawable.xml", FileType.RESOURCE, 100, 200),
+            AppFile("/res/drawable-anydpi-v24/\$complex_vector_drawable__1.xml", FileType.RESOURCE, 100, 200),
+            AppFile("/res/drawable-anydpi-v24/\$complex_vector_drawable__2.xml", FileType.RESOURCE, 100, 200),
+            AppFile("/res/drawable-anydpi-v24/\$complex_vector_drawable__3.xml", FileType.RESOURCE, 100, 200),
+            )
+        val dependencies = mapOf(
+            "/layout/activity_main.xml" to listOf(
+                DependencyComponent(":lib", ComponentType.INTERNAL),
+            ), "/drawable-anydpi-v24/complex_vector_drawable.xml" to listOf(
+                DependencyComponent(":lib", ComponentType.INTERNAL),
+            )
+        )
         val map = attributor.attribute(files, dependencies)
 
         assertThat(map).containsEntry(DependencyComponent(":lib", ComponentType.INTERNAL), files)

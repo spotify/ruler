@@ -95,9 +95,9 @@ class ApkSanitizer(
     private inner class DexFileBucket : SanitizationBucket() {
         override fun isApplicable(entry: ApkEntry) = entry is ApkEntry.Dex
         override fun sanitize(): List<AppFile> {
-            var sizeOfAllClasses = 0L
-            var downloadSizeOfDex = 0L
-            var installSizeOfDex = 0L
+            var sizeOfAllClasses = 0.0
+            var downloadSizeOfDex = 0.0
+            var installSizeOfDex = 0.0
             entries.forEach {
                 val dex = (it as ApkEntry.Dex)
                 sizeOfAllClasses += dex.classes.sumOf(ApkEntry::installSize)
@@ -116,9 +116,9 @@ class ApkSanitizer(
 
         private fun sanitizeEntry(
             entry: ApkEntry.Dex,
-            sizeOfAllClasses: Long,
-            dexDownloadSize: Long,
-            dexInstallSize: Long
+            sizeOfAllClasses: Double,
+            dexDownloadSize: Double,
+            dexInstallSize: Double
         ): List<AppFile> {
             return entry.classes.map { classEntry ->
                 val name = classNameSanitizer.sanitize(classEntry.name)

@@ -30,7 +30,7 @@ class BarChartConfig(
     private val horizontal: Boolean = false,
     private val xAxisFormatter: NumberFormatter = Number::toString,
     private val yAxisFormatter: NumberFormatter = Number::toString,
-    private val chartSeriesTotals: LongArray? = null,
+    private val chartSeriesTotals: DoubleArray? = null,
 ) : ChartConfig() {
 
     override fun getOptions() = buildOptions {

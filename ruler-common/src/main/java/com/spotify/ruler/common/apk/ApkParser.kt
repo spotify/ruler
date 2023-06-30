@@ -34,8 +34,8 @@ class ApkParser {
         ZipFile(apkFile).use { zipFile ->
             zipFile.entries().iterator().forEach { zipEntry ->
                 val name = "/${zipEntry.name}"
-                val downloadSize = downloadSizePerFile.getValue(name)
-                val installSize = installSizePerFile.getValue(name)
+                val downloadSize = downloadSizePerFile.getValue(name).toDouble()
+                val installSize = installSizePerFile.getValue(name).toDouble()
 
                 apkEntries += when {
                     isDexEntry(name) -> {
@@ -59,7 +59,7 @@ class ApkParser {
     private fun parseDexEntry(bytes: ByteArray): List<ApkEntry> {
         val dexFile = DexFiles.getDexFile(bytes)
         return dexFile.classes.map { classDef ->
-            ApkEntry.Default(classDef.type, classDef.size.toLong(), classDef.size.toLong())
+            ApkEntry.Default(classDef.type, classDef.size.toDouble(), classDef.size.toDouble())
         }
     }
 

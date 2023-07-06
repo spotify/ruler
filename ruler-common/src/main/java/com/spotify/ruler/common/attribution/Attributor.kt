@@ -19,8 +19,16 @@ package com.spotify.ruler.common.attribution
 import com.spotify.ruler.common.dependency.DependencyComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.CoroutineContext
 
 private typealias Dependencies = Map<String, List<DependencyComponent>>
+
 /**
  * Responsible for attributing files to the components they are coming from.
  *
@@ -38,25 +46,41 @@ class Attributor(private val defaultComponent: DependencyComponent) {
      * @param dependencies Map of file names to a list of all components which include this file
      * @return Map of component names to the list of app files attributed to this component
      */
-    fun attribute(files: List<AppFile>, dependencies: Dependencies): Map<DependencyComponent, List<AppFile>> {
-        val components = mutableMapOf<DependencyComponent, MutableList<AppFile>>()
-        files.forEach { file ->
-            val component = when(file.type) {
-                FileType.CLASS -> getComponentForClass(file.name, dependencies)
-                FileType.RESOURCE -> getComponentForResource(file.name, dependencies)
-                FileType.ASSET -> getComponentForAsset(file.name, dependencies)
-                FileType.NATIVE_LIB -> getComponentForNativeLib(file.name, dependencies)
-                FileType.OTHER -> getComponentForFile(file.name, dependencies)
-            } ?: defaultComponent
+    fun attribute(
+        files: List<AppFile>, dependencies: Dependencies
+    ): Map<DependencyComponent, List<AppFile>> {
+        return runBlocking {
+            val jobs = mutableListOf<Job>()
+            val components = ConcurrentHashMap<DependencyComponent, MutableList<AppFile>>()
+            val batchSize = 500
+            println("Total file size: ${files.size}")
+            files.chunked(batchSize).forEach { batch ->
+                jobs.add(launch(Dispatchers.IO) {
+                    batch.forEach { file ->
+                        println("Attributing: $file")
+                        val component = when (file.type) {
+                            FileType.CLASS -> getComponentForClass(file.name, dependencies)
+                            FileType.RESOURCE -> getComponentForResource(file.name, dependencies)
+                            FileType.ASSET -> getComponentForAsset(file.name, dependencies)
+                            FileType.NATIVE_LIB -> getComponentForNativeLib(file.name, dependencies)
+                            FileType.OTHER -> getComponentForFile(file.name, dependencies)
+                        } ?: defaultComponent
 
-            components.getOrPut(component) { ArrayList() }.add(file)
+                        components.getOrPut(component) { ArrayList() }.add(file)
+                    }
+                })
+            }
+            jobs.joinAll()
+            components
         }
-        return components
+
     }
 
     /** Tries to determine the component for a certain class. */
     @Suppress("ReturnCount")
-    private fun getComponentForClass(name: String, dependencies: Dependencies): DependencyComponent? {
+    private fun getComponentForClass(
+        name: String, dependencies: Dependencies
+    ): DependencyComponent? {
         if (dependencies[name]?.size == 1) {
             return dependencies.getValue(name).single()
         }
@@ -84,8 +108,10 @@ class Attributor(private val defaultComponent: DependencyComponent) {
 
         // Attribute external synthetic classes based on their simple class name
         if (name.contains("\$\$ExternalSynthetic")) {
-            val simpleClassName = name.substringBefore("\$\$ExternalSynthetic").substringAfterLast('.')
-            val candidates = dependencies.filter { it.key.substringAfterLast('.') == simpleClassName }.values.flatten()
+            val simpleClassName =
+                name.substringBefore("\$\$ExternalSynthetic").substringAfterLast('.')
+            val candidates =
+                dependencies.filter { it.key.substringAfterLast('.') == simpleClassName }.values.flatten()
             val component = candidates.distinct().singleOrNull()
             if (component != null) {
                 return component
@@ -112,7 +138,9 @@ class Attributor(private val defaultComponent: DependencyComponent) {
      *  /res/drawable-anydpi-v24/$ic_car_mode_onboarding_fallback__3.xml
      *  If no component is found we remove the {$} and the {__X} value.
      * */
-    private fun getComponentForResource(name: String, dependencies: Dependencies): DependencyComponent? {
+    private fun getComponentForResource(
+        name: String, dependencies: Dependencies
+    ): DependencyComponent? {
         var resourceName = name.removePrefix("/res")
         var dependencyComponent = dependencies[resourceName]?.singleOrNull()
 
@@ -130,13 +158,17 @@ class Attributor(private val defaultComponent: DependencyComponent) {
     }
 
     /** Tries to determine the component for a certain asset file. */
-    private fun getComponentForAsset(name: String, dependencies: Dependencies): DependencyComponent? {
+    private fun getComponentForAsset(
+        name: String, dependencies: Dependencies
+    ): DependencyComponent? {
         val assetName = name.removePrefix("/assets")
         return dependencies[assetName]?.singleOrNull()
     }
 
     /** Tries to determine the component for a certain native library. */
-    private fun getComponentForNativeLib(name: String, dependencies: Dependencies): DependencyComponent? {
+    private fun getComponentForNativeLib(
+        name: String, dependencies: Dependencies
+    ): DependencyComponent? {
         val nativeLibName = name.removePrefix("/lib")
         if (dependencies[nativeLibName]?.size == 1) {
             return dependencies.getValue(nativeLibName).single()
@@ -148,13 +180,18 @@ class Attributor(private val defaultComponent: DependencyComponent) {
     }
 
     /** Tries to determine the component for a certain file. */
-    private fun getComponentForFile(name: String, dependencies: Dependencies): DependencyComponent? {
+    private fun getComponentForFile(
+        name: String, dependencies: Dependencies
+    ): DependencyComponent? {
         return dependencies[name]?.singleOrNull()
     }
 
     /** Tries to determine the component for a certain package. */
-    private fun getComponentForPackage(name: String, dependencies: Dependencies): DependencyComponent? {
-        val candidates = dependencies.filter { it.key.substringBeforeLast('.') == name }.values.flatten()
+    private fun getComponentForPackage(
+        name: String, dependencies: Dependencies
+    ): DependencyComponent? {
+        val candidates =
+            dependencies.filter { it.key.substringBeforeLast('.') == name }.values.flatten()
         return candidates.distinct().singleOrNull()
     }
 }

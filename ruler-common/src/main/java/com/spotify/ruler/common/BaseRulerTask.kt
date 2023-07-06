@@ -16,12 +16,14 @@
 
 package com.spotify.ruler.common
 
+import com.spotify.ruler.common.apk.ApkCreator
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.common.apk.ApkParser
 import com.spotify.ruler.common.apk.ApkSanitizer
 import com.spotify.ruler.common.attribution.Attributor
 import com.spotify.ruler.common.dependency.DependencyComponent
+import com.spotify.ruler.common.models.DeviceSpec
 import com.spotify.ruler.common.models.RulerConfig
 import com.spotify.ruler.common.ownership.OwnershipFileParser
 import com.spotify.ruler.common.ownership.OwnershipInfo
@@ -46,11 +48,18 @@ interface BaseRulerTask {
     fun provideDependencies(): Map<String, List<DependencyComponent>>
 
     fun run() {
+        println("Starting Ruler CLI")
+
+        println("Start getFilesFromBundle")
         val files = getFilesFromBundle() // Get all relevant files from the provided bundle
+        println("End getFilesFromBundle")
+
+        println("Start getFilesFromBundle")
         val dependencies = provideDependencies() + mapOf(
             "kotlin" to listOf(DependencyComponent("kotlin", ComponentType.INTERNAL))
         ) // Get all entries from all dependencies
         // Split main APK bundle entries and dynamic feature module entries
+        println("END getFilesFromBundle")
         val mainFiles = files.getValue(FEATURE_NAME)
         val featureFiles = files.filter { (feature, _) -> feature != FEATURE_NAME }
 
@@ -61,12 +70,15 @@ interface BaseRulerTask {
             .firstOrNull { it.name == rulerConfig.projectPath }
             ?: DependencyComponent(rulerConfig.projectPath, ComponentType.INTERNAL)
 
+        println("Start Attributor")
         // Attribute main APK bundle entries and group into components
         val attributor =
             Attributor(defaultComponent)
         val components = attributor.attribute(mainFiles, dependencies)
-
+        println("End Attributor")
+        println("Start Ownership")
         val ownershipInfo = getOwnershipInfo() // Get ownership information for all components
+        println("End Ownership")
         generateReports(components, featureFiles, ownershipInfo)
     }
 
@@ -88,6 +100,21 @@ interface BaseRulerTask {
         val ownershipEntries = ownershipFileParser.parse(ownershipFile)
 
         return OwnershipInfo(ownershipEntries, rulerConfig.defaultOwner)
+    }
+
+    private fun createApkFile(rootDir: File, bundleFile: File, deviceSpec: DeviceSpec): Map<String, List<File>> {
+        val apkCreator = ApkCreator(rootDir)
+
+        val apkFile = bundleFile
+        return if (apkFile.extension == "apk") {
+            mapOf(ApkCreator.BASE_FEATURE_NAME to listOf(apkFile))
+        } else {
+            apkCreator.createSplitApks(
+                apkFile,
+                deviceSpec,
+                rootDir
+            )
+        }
     }
 
     private fun generateReports(

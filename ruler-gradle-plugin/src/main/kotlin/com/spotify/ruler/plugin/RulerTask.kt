@@ -25,6 +25,8 @@ import com.spotify.ruler.common.models.AppInfo
 import com.spotify.ruler.common.models.DeviceSpec
 import com.spotify.ruler.common.models.RulerConfig
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -97,7 +99,14 @@ abstract class RulerTask : DefaultTask(), BaseRulerTask {
 
         val classNameSanitizer = ClassNameSanitizer(provideMappingFile())
         val dependencySanitizer = DependencySanitizer(classNameSanitizer)
-        return dependencySanitizer.sanitize(entries)
+
+        val format = Json { prettyPrint = false }
+        val reportFile = reportDir.asFile.get().resolve("dependencies.json")
+        val sanitazedReport = dependencySanitizer.sanitize(entries)
+        reportFile.writeText(format.encodeToString(sanitazedReport))
+        print("===================================")
+        print("Wrote Dependencies to $reportFile")
+        return sanitazedReport
     }
 
     override fun print(content: String) = project.logger.lifecycle(content)

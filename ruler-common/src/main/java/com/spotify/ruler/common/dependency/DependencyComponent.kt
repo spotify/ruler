@@ -17,8 +17,10 @@
 package com.spotify.ruler.common.dependency
 
 import com.spotify.ruler.models.ComponentType
+import kotlinx.serialization.Serializable
 
 /** Component representing a single dependency. */
+@Serializable
 data class DependencyComponent(
     val name: String,
     val type: ComponentType,

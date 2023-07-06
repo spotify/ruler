@@ -75,29 +75,30 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     }
 
     private val dependencies: Map<String, List<DependencyComponent>> by lazy {
-        val json = Json.decodeFromStream<ModuleMap>(dependencyMap.inputStream())
-        val jarArtifactParser = JarArtifactParser()
-        val jarDependencies = json.jars.distinctBy {
-            it.jar
-        }.flatMap {
-            jarArtifactParser.parseFile(
-                ArtifactResult.JarArtifact(File(it.jar), it.module)
-            )
-        }
-
-        val assets = json.assets.map {
-            DependencyEntry.Default(it.filename, it.module)
-        }
-
-        val resources = json.resources.distinctBy { "${it.module}:${it.filename}" }.map {
-            DependencyEntry.Default(it.filename, it.module)
-        }
-
-        val entries = jarDependencies + assets + resources
-
-        val classNameSanitizer = ClassNameSanitizer(provideMappingFile())
-        val dependencySanitizer = DependencySanitizer(classNameSanitizer)
-        dependencySanitizer.sanitize(entries)
+        Json.decodeFromStream(dependencyMap.inputStream())
+//        val json = Json.decodeFromStream<ModuleMap>(dependencyMap.inputStream())
+//        val jarArtifactParser = JarArtifactParser()
+//        val jarDependencies = json.jars.distinctBy {
+//            it.jar
+//        }.flatMap {
+//            jarArtifactParser.parseFile(
+//                ArtifactResult.JarArtifact(File(it.jar), it.module)
+//            )
+//        }
+//
+//        val assets = json.assets.map {
+//            DependencyEntry.Default(it.filename, it.module)
+//        }
+//
+//        val resources = json.resources.distinctBy { "${it.module}:${it.filename}" }.map {
+//            DependencyEntry.Default(it.filename, it.module)
+//        }
+//
+//        val entries = jarDependencies + assets + resources
+//
+//        val classNameSanitizer = ClassNameSanitizer(provideMappingFile())
+//        val dependencySanitizer = DependencySanitizer(classNameSanitizer)
+//        dependencySanitizer.sanitize(entries)
     }
 
     override fun provideDependencies(): Map<String, List<DependencyComponent>> = dependencies

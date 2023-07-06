@@ -33,10 +33,11 @@ class ApkParser {
         val apkEntries = mutableListOf<ApkEntry>()
         ZipFile(apkFile).use { zipFile ->
             zipFile.entries().iterator().forEach { zipEntry ->
+                println("Reading Entry: name")
                 val name = "/${zipEntry.name}"
                 val downloadSize = downloadSizePerFile.getValue(name).toDouble()
                 val installSize = installSizePerFile.getValue(name).toDouble()
-
+                println("Reading Entry: $name with size: $downloadSize")
                 apkEntries += when {
                     isDexEntry(name) -> {
                         val bytes = zipFile.getInputStream(zipEntry).readBytes()

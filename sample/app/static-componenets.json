@@ -1,0 +1,14 @@
+[
+  {
+    "path": "androidx.appcompat.resources.R$styleable",
+    "id": "core-played-state"
+  },
+  {
+    "path": "/resources.arsc",
+    "id": "core-podcast-paywalls"
+  },
+  {
+    "path": "/META-INF.*",
+    "id": "metadata"
+  }
+]

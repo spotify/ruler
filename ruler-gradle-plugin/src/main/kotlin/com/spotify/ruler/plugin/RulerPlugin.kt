@@ -52,6 +52,8 @@ class RulerPlugin : Plugin<Project> {
                     task.mappingFile.set(getMappingFile(project, variant))
                     task.resourceMappingFile.set(getResourceMappingFile(project, variant))
                     task.ownershipFile.set(rulerExtension.ownershipFile)
+                    task.additionalDependencyComponents.set(rulerExtension.additionalDependencyComponents)
+                    task.unstrappedNativeFiles.set(rulerExtension.unstrappedNativeFiles)
                     task.defaultOwner.set(rulerExtension.defaultOwner)
 
                     task.workingDir.set(project.layout.buildDirectory.dir("intermediates/ruler/${variant.name}"))

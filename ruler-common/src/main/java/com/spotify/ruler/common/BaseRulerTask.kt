@@ -16,12 +16,13 @@
 
 package com.spotify.ruler.common
 
-import com.spotify.ruler.models.AppFile
-import com.spotify.ruler.models.ComponentType
+import com.spotify.ruler.common.apk.ApkCreator
 import com.spotify.ruler.common.apk.ApkParser
 import com.spotify.ruler.common.apk.ApkSanitizer
 import com.spotify.ruler.common.attribution.Attributor
 import com.spotify.ruler.common.dependency.DependencyComponent
+import com.spotify.ruler.common.dependency.AdditionalComponents
+import com.spotify.ruler.common.models.DeviceSpec
 import com.spotify.ruler.common.models.RulerConfig
 import com.spotify.ruler.common.ownership.OwnershipFileParser
 import com.spotify.ruler.common.ownership.OwnershipInfo
@@ -29,6 +30,10 @@ import com.spotify.ruler.common.report.HtmlReporter
 import com.spotify.ruler.common.report.JsonReporter
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
 import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
+import com.spotify.ruler.models.AppFile
+import com.spotify.ruler.models.ComponentType
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.io.File
 
 const val FEATURE_NAME = "base"
@@ -45,12 +50,23 @@ interface BaseRulerTask {
 
     fun provideDependencies(): Map<String, List<DependencyComponent>>
 
+    fun provideUnstrippedLibraryFiles(): List<File>
+
     fun run() {
+        println("Starting Ruler CLI")
+
+        println("Start getFilesFromBundle")
         val files = getFilesFromBundle() // Get all relevant files from the provided bundle
+        println("End getFilesFromBundle")
+
+        println("Start getFilesFromBundle")
         val dependencies = provideDependencies() + mapOf(
             "kotlin" to listOf(DependencyComponent("kotlin", ComponentType.INTERNAL))
-        ) // Get all entries from all dependencies
+        ) + getStaticComponents()
+
+        // Get all entries from all dependencies
         // Split main APK bundle entries and dynamic feature module entries
+        println("END getFilesFromBundle")
         val mainFiles = files.getValue(FEATURE_NAME)
         val featureFiles = files.filter { (feature, _) -> feature != FEATURE_NAME }
 
@@ -61,17 +77,20 @@ interface BaseRulerTask {
             .firstOrNull { it.name == rulerConfig.projectPath }
             ?: DependencyComponent(rulerConfig.projectPath, ComponentType.INTERNAL)
 
+        println("Start Attributor")
         // Attribute main APK bundle entries and group into components
         val attributor =
             Attributor(defaultComponent)
         val components = attributor.attribute(mainFiles, dependencies)
-
+        println("End Attributor")
+        println("Start Ownership")
         val ownershipInfo = getOwnershipInfo() // Get ownership information for all components
+        println("End Ownership")
         generateReports(components, featureFiles, ownershipInfo)
     }
 
     private fun getFilesFromBundle(): Map<String, List<AppFile>> {
-        val apkParser = ApkParser()
+        val apkParser = ApkParser(provideUnstrippedLibraryFiles())
         val classNameSanitizer = ClassNameSanitizer(provideMappingFile())
         val resourceNameSanitizer = ResourceNameSanitizer(provideResourceMappingFile())
         val apkSanitizer = ApkSanitizer(classNameSanitizer, resourceNameSanitizer)
@@ -88,6 +107,30 @@ interface BaseRulerTask {
         val ownershipEntries = ownershipFileParser.parse(ownershipFile)
 
         return OwnershipInfo(ownershipEntries, rulerConfig.defaultOwner)
+    }
+
+    private fun getStaticComponents(): Map<String, List<DependencyComponent>> {
+        val staticComponent = rulerConfig.staticComponentsFile ?: return emptyMap()
+        val jsonString = staticComponent.readText()
+        val itemList = Json.decodeFromString<List<AdditionalComponents>>(jsonString)
+        return itemList.associate {
+            it.path to listOf(DependencyComponent(it.path, ComponentType.INTERNAL))
+        }
+    }
+
+    private fun createApkFile(rootDir: File, bundleFile: File, deviceSpec: DeviceSpec): Map<String, List<File>> {
+        val apkCreator = ApkCreator(rootDir)
+
+        val apkFile = bundleFile
+        return if (apkFile.extension == "apk") {
+            mapOf(ApkCreator.BASE_FEATURE_NAME to listOf(apkFile))
+        } else {
+            apkCreator.createSplitApks(
+                apkFile,
+                deviceSpec,
+                rootDir
+            )
+        }
     }
 
     private fun generateReports(

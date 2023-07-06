@@ -23,8 +23,8 @@ import kotlinx.serialization.Serializable
 data class AppFile(
     val name: String,
     val type: FileType,
-    override val downloadSize: Double,
-    override val installSize: Double,
+    override val downloadSize: Long,
+    override val installSize: Long,
     val owner: String? = null,
     // Only non-null if FileType is Resource.
     val resourceType: ResourceType? = null

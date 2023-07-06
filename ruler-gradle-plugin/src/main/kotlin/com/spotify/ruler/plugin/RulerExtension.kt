@@ -16,8 +16,10 @@
 
 package com.spotify.ruler.plugin
 
+import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 
 open class RulerExtension(objects: ObjectFactory) {
@@ -27,13 +29,18 @@ open class RulerExtension(objects: ObjectFactory) {
     val sdkVersion: Property<Int> = objects.property(Int::class.java)
 
     val ownershipFile: RegularFileProperty = objects.fileProperty()
+    val additionalDependencyComponents: RegularFileProperty = objects.fileProperty()
     val defaultOwner: Property<String> = objects.property(String::class.java)
 
     val omitFileBreakdown: Property<Boolean> = objects.property(Boolean::class.java)
+
+    val unstrappedNativeFiles: ListProperty<RegularFile> =
+        objects.listProperty(RegularFile::class.java)
 
     // Set up default values
     init {
         defaultOwner.convention("unknown")
         omitFileBreakdown.convention(false)
+        unstrappedNativeFiles.set(emptyList())
     }
 }

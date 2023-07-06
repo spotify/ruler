@@ -16,11 +16,11 @@
 
 package com.spotify.ruler.common.apk
 
+import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
+import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
 import com.spotify.ruler.models.ResourceType
-import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
-import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
 
 /**
  * Responsible for sanitizing APK entries, so they can be attributed easier.
@@ -42,6 +42,7 @@ class ApkSanitizer(
      */
     fun sanitize(entries: List<ApkEntry>): List<AppFile> {
         val buckets = listOf(
+            NativeLibAssigningBucket(),
             DexFileBucket(),
             AndroidManifestBucket(),
             BundletoolBucket(),
@@ -95,16 +96,18 @@ class ApkSanitizer(
     private inner class DexFileBucket : SanitizationBucket() {
         override fun isApplicable(entry: ApkEntry) = entry is ApkEntry.Dex
         override fun sanitize(): List<AppFile> {
-            var sizeOfAllClasses = 0.0
-            var downloadSizeOfDex = 0.0
-            var installSizeOfDex = 0.0
+            var sizeOfAllClasses = 0L
+            var downloadSizeOfDex = 0L
+            var installSizeOfDex = 0L
             entries.forEach {
                 val dex = (it as ApkEntry.Dex)
                 sizeOfAllClasses += dex.classes.sumOf(ApkEntry::installSize)
                 downloadSizeOfDex += dex.downloadSize
                 installSizeOfDex += dex.installSize
+
             }
-            return entries.flatMap { entry ->
+
+            val entries = entries.flatMap { entry ->
                 sanitizeEntry(
                     entry as ApkEntry.Dex,
                     sizeOfAllClasses,
@@ -112,14 +115,17 @@ class ApkSanitizer(
                     installSizeOfDex
                 )
             }
+
+            return entries
         }
 
         private fun sanitizeEntry(
             entry: ApkEntry.Dex,
-            sizeOfAllClasses: Double,
-            dexDownloadSize: Double,
-            dexInstallSize: Double
+            sizeOfAllClasses: Long,
+            dexDownloadSize: Long,
+            dexInstallSize: Long
         ): List<AppFile> {
+
             return entry.classes.map { classEntry ->
                 val name = classNameSanitizer.sanitize(classEntry.name)
                 val downloadSize = classEntry.downloadSize * dexDownloadSize / sizeOfAllClasses
@@ -138,7 +144,14 @@ class ApkSanitizer(
 
         override fun sanitize(): List<AppFile> {
             val entry = entries.maxByOrNull(ApkEntry::installSize) ?: return emptyList()
-            return listOf(AppFile("/AndroidManifest.xml", FileType.OTHER, entry.downloadSize, entry.installSize))
+            return listOf(
+                AppFile(
+                    "/AndroidManifest.xml",
+                    FileType.OTHER,
+                    entry.downloadSize,
+                    entry.installSize
+                )
+            )
         }
     }
 
@@ -179,7 +192,13 @@ class ApkSanitizer(
         private fun sanitizeEntry(entry: ApkEntry): AppFile {
             val name = resourceNameSanitizer.sanitize(entry.name)
             val resourceType: ResourceType? = mapNameToResourceType(entry)
-            return AppFile(name, FileType.RESOURCE, entry.downloadSize, entry.installSize, resourceType = resourceType)
+            return AppFile(
+                name,
+                FileType.RESOURCE,
+                entry.downloadSize,
+                entry.installSize,
+                resourceType = resourceType
+            )
         }
     }
 
@@ -196,9 +215,41 @@ class ApkSanitizer(
                 else -> FileType.OTHER
             }
             val resourceType: ResourceType? = mapNameToResourceType(entry)
-            return AppFile(entry.name, type, entry.downloadSize, entry.installSize, resourceType = resourceType)
+            return AppFile(
+                entry.name,
+                type,
+                entry.downloadSize,
+                entry.installSize,
+                resourceType = resourceType
+            )
         }
     }
 
+    private class NativeLibAssigningBucket : SanitizationBucket() {
+        override fun isApplicable(entry: ApkEntry) = entry is ApkEntry.NativeLibrary && entry.classes.isNotEmpty()
 
+        override fun sanitize(): List<AppFile> {
+            return entries.flatMap { entry ->
+                sanitizeEntry(entry as ApkEntry.NativeLibrary)
+            }
+        }
+
+        private fun sanitizeEntry(
+            entry: ApkEntry.NativeLibrary,
+        ): List<AppFile> {
+            val totalClasses = entry.classes.sumOf(ApkEntry::installSize)
+            return entry.classes.map { classEntry ->
+                if (isMetadataFile(classEntry.name)) {
+                    AppFile("${entry.name}/${classEntry.name}", FileType.NATIVE_FILE, classEntry.downloadSize, classEntry.downloadSize)
+                } else {
+                    val name = classEntry.name.substringAfter("spotify-sdk")
+                    val downloadSize = classEntry.downloadSize * entry.downloadSize / totalClasses
+                    val installSize = classEntry.installSize * entry.downloadSize / totalClasses
+                    AppFile(name, FileType.NATIVE_FILE, downloadSize, installSize)
+                }
+            }
+        }
+
+        private fun isMetadataFile(name: String) = name.startsWith("[")
+    }
 }

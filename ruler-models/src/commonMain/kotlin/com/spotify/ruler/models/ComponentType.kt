@@ -16,7 +16,10 @@
 
 package com.spotify.ruler.models
 
+import kotlinx.serialization.Serializable
+
 /** Type of an [AppComponent]. */
+@Serializable
 enum class ComponentType {
     INTERNAL,
     EXTERNAL,

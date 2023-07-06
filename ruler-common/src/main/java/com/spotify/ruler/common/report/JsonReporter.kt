@@ -16,6 +16,8 @@
 
 package com.spotify.ruler.common.report
 
+import com.spotify.ruler.common.apk.ApkParser
+import com.spotify.ruler.common.apk.totalDownloadSize
 import com.spotify.ruler.models.AppComponent
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.AppReport
@@ -55,11 +57,11 @@ class JsonReporter {
             name = appInfo.applicationId,
             version = appInfo.versionName,
             variant = appInfo.variantName,
-            downloadSize = components.values.flatten().sumOf(AppFile::downloadSize),
-            installSize = components.values.flatten().sumOf(AppFile::installSize),
+            downloadSize = totalDownloadSize,
+            installSize = components.values.flatten().sumOf(AppFile::downloadSize),
             components = components.map { (component, files) ->
                 AppComponent(
-                    name = component.name,
+                    name = component.name + " (${files.count()}) ",
                     type = component.type,
                     downloadSize = files.sumOf(AppFile::downloadSize),
                     installSize = files.sumOf(AppFile::installSize),

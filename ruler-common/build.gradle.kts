@@ -45,8 +45,8 @@ dependencies {
     compileOnly(Dependencies.ANDROID_TOOLS_SDKLIB)
     compileOnly(Dependencies.DEXLIB)
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
     implementation(project(":ruler-models"))
-
 
     implementation(Dependencies.APK_ANALYZER) {
         exclude(group = "com.android.tools.lint") // Avoid leaking incompatible Lint versions to consumers

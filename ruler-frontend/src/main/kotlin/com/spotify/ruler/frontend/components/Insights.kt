@@ -69,9 +69,9 @@ external interface FileTypeGraphsProps : Props {
 
 val FileTypeGraphs = FC<FileTypeGraphsProps> { props ->
     val labels = arrayOf("Classes", "Resources", "Assets", "Native libraries", "Other")
-    val downloadSizes = DoubleArray(labels.size)
-    val installSizes = DoubleArray(labels.size)
-    val fileCounts = DoubleArray(labels.size)
+    val downloadSizes = LongArray(labels.size)
+    val installSizes = LongArray(labels.size)
+    val fileCounts = LongArray(labels.size)
 
     props.files.forEach { file ->
         val index = file.type.ordinal
@@ -112,9 +112,9 @@ external interface ComponentTypeGraphsProps : Props {
 
 val ComponentTypeGraphs = FC<ComponentTypeGraphsProps> { props ->
     val labels = arrayOf("Internal", "External")
-    val downloadSizes = DoubleArray(labels.size)
-    val installSizes = DoubleArray(labels.size)
-    val fileCounts = DoubleArray(labels.size)
+    val downloadSizes = LongArray(labels.size)
+    val installSizes = LongArray(labels.size)
+    val fileCounts = LongArray(labels.size)
 
     props.components.forEach { component ->
         val index = component.type.ordinal
@@ -157,9 +157,9 @@ external interface ResourcesTypeGraphsProps : Props {
 
 val ResourcesTypeGraphs = FC<ResourcesTypeGraphsProps> { props ->
     val labels = arrayOf("Drawable", "Layout", "Raw", "Values", "Font", "Other")
-    val downloadSizes = DoubleArray(labels.size)
-    val installSizes = DoubleArray(labels.size)
-    val fileCounts = DoubleArray(labels.size)
+    val downloadSizes = LongArray(labels.size)
+    val installSizes = LongArray(labels.size)
+    val fileCounts = LongArray(labels.size)
 
     props.files.filter { it.resourceType != null }.forEach { file ->
         val index = file.resourceType!!.ordinal

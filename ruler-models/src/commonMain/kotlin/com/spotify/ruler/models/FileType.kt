@@ -22,5 +22,6 @@ enum class FileType {
     RESOURCE,
     ASSET,
     NATIVE_LIB,
+    NATIVE_FILE,
     OTHER,
 }

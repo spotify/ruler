@@ -12,3 +12,9 @@
 
 - identifier: dynamic
   owner: dynamic-team
+
+- identifier: com.spotify.ruler.sample.app.R
+  owner: viktor
+
+- identifier: /META-INF
+  owner: metadata

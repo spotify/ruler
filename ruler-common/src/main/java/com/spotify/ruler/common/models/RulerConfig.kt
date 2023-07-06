@@ -23,6 +23,7 @@ data class RulerConfig(
     val apkFilesMap: Map<String, List<File>>,
     val reportDir: File,
     val ownershipFile: File?,
+    val staticComponentsFile: File?,
     val appInfo: AppInfo,
     val deviceSpec: DeviceSpec?,
     val defaultOwner: String,

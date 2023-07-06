@@ -59,7 +59,18 @@ ruler {
     sdkVersion.set(27)
 
     ownershipFile.set(project.layout.projectDirectory.file("ownership.yaml"))
+    additionalDependencyComponents.set(project.layout.projectDirectory.file("static-componenets.json"))
     defaultOwner.set("default-team")
+    val file = project.layout.projectDirectory.file("liborbit-jni-spotify.unstripped.so")
+    unstrappedNativeFiles.set(listOf(file))
+//    val file = layout.buildDirectory.file("ownership.yaml").get()
+//    unstrappedNativeFiles.set(listOf(file))
+
+//    val list = project.objects.listProperty(RegularFileProperty::class.java)
+////    val fileProvider = project.provider { project.layout.projectDirectory.file("ownership.yaml") }
+//
+//    val file = project.layout.projectDirectory.file("ownership.yaml")
+//    list.set(listOf(file))
 }
 
 // Include Ruler tasks in checks

@@ -80,16 +80,16 @@ val ComponentOwnershipOverview = FC<ComponentOwnershipOverviewProps>  { props ->
             chartSeries = arrayOf(
                 seriesOf(
                     "Download size",
-                    downloadSizes.subList(pageStartIndex, pageEndIndex).toDoubleArray()
+                    downloadSizes.subList(pageStartIndex, pageEndIndex).toLongArray()
                 ),
                 seriesOf(
                     "Install size",
-                    installSizes.subList(pageStartIndex, pageEndIndex).toDoubleArray()
+                    installSizes.subList(pageStartIndex, pageEndIndex).toLongArray()
                 ),
             ),
             chartHeight = 400,
             yAxisFormatter = ::formatSize,
-            chartSeriesTotals = doubleArrayOf(downloadSizes.sum(), installSizes.sum()),
+            chartSeriesTotals = longArrayOf(downloadSizes.sum(), installSizes.sum()),
         )
     }
 
@@ -150,8 +150,8 @@ val ComponentOwnershipPerTeam = FC<ComponentOwnershipPerTeamProps> { props ->
         )
     }
 
-    val downloadSize: Double
-    val installSize: Double
+    val downloadSize: Long
+    val installSize: Long
     if (ownedFiles == null) {
         // If there is no file-level ownership info, use component-level ownership info
         downloadSize = ownedComponents.sumOf(AppComponent::downloadSize)
@@ -228,7 +228,7 @@ private fun getSizesByOwner(components: List<AppComponent>): Map<String, Measura
         // If there is no file-level ownership info, use component-level ownership info
         if (component.files == null) {
             val owner = component.owner ?: return@forEach
-            val current = sizes.getOrPut(owner) { Measurable.Mutable(0.0, 0.0) }
+            val current = sizes.getOrPut(owner) { Measurable.Mutable(0, 0) }
             current.downloadSize += component.downloadSize
             current.installSize += component.installSize
             return@forEach
@@ -237,7 +237,7 @@ private fun getSizesByOwner(components: List<AppComponent>): Map<String, Measura
         // Otherwise rely on file-level ownership info
         component.files?.forEach fileLevelLoop@ { file ->
             val owner = file.owner ?: return@fileLevelLoop
-            val current = sizes.getOrPut(owner) { Measurable.Mutable(0.0, 0.0) }
+            val current = sizes.getOrPut(owner) { Measurable.Mutable(0, 0) }
             current.downloadSize += file.downloadSize
             current.installSize += file.installSize
         }

@@ -21,6 +21,8 @@ import com.spotify.ruler.models.FileType
 import com.spotify.ruler.models.ResourceType
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
 import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
+import java.text.CharacterIterator
+import java.text.StringCharacterIterator
 
 /**
  * Responsible for sanitizing APK entries, so they can be attributed easier.
@@ -95,16 +97,26 @@ class ApkSanitizer(
     private inner class DexFileBucket : SanitizationBucket() {
         override fun isApplicable(entry: ApkEntry) = entry is ApkEntry.Dex
         override fun sanitize(): List<AppFile> {
-            var sizeOfAllClasses = 0.0
-            var downloadSizeOfDex = 0.0
-            var installSizeOfDex = 0.0
+            var sizeOfAllClasses = 0L
+            var downloadSizeOfDex = 0L
+            var installSizeOfDex = 0L
             entries.forEach {
                 val dex = (it as ApkEntry.Dex)
                 sizeOfAllClasses += dex.classes.sumOf(ApkEntry::installSize)
                 downloadSizeOfDex += dex.downloadSize
                 installSizeOfDex += dex.installSize
+
+                println("-------------------")
+                println("Dex Size for ${dex.name}")
+                println("Dex size DownloadSize: ${humanReadableByteCountBin(dex.downloadSize)}")
+                println("-------------------")
             }
-            return entries.flatMap { entry ->
+
+            println("-------------------")
+            println("Total size of Dex is:")
+            println("Dex size DownloadSize: ${humanReadableByteCountBin(downloadSizeOfDex)}")
+            println("-------------------")
+            val entries =  entries.flatMap { entry ->
                 sanitizeEntry(
                     entry as ApkEntry.Dex,
                     sizeOfAllClasses,
@@ -112,14 +124,38 @@ class ApkSanitizer(
                     installSizeOfDex
                 )
             }
+
+            println("-------------------")
+            println("Total size of all Classes is:")
+            println("Size of All Classes is: ${humanReadableByteCountBin(entries.map { it.downloadSize }.sum())}")
+            println("-------------------")
+            return entries
         }
 
+
+        fun humanReadableByteCountBin(bytes: Long): String? {
+            val absB = if (bytes == Long.MIN_VALUE) Long.MAX_VALUE else Math.abs(bytes)
+            if (absB < 1024) {
+                return "$bytes B"
+            }
+            var value = absB
+            val ci: CharacterIterator = StringCharacterIterator("KMGTPE")
+            var i = 40
+            while (i >= 0 && absB > 0xfffccccccccccccL shr i) {
+                value = value shr 10
+                ci.next()
+                i -= 10
+            }
+            value *= java.lang.Long.signum(bytes).toLong()
+            return java.lang.String.format("%.1f %ciB", value / 1024.0, ci.current())
+        }
         private fun sanitizeEntry(
             entry: ApkEntry.Dex,
-            sizeOfAllClasses: Double,
-            dexDownloadSize: Double,
-            dexInstallSize: Double
+            sizeOfAllClasses: Long,
+            dexDownloadSize: Long,
+            dexInstallSize: Long
         ): List<AppFile> {
+
             return entry.classes.map { classEntry ->
                 val name = classNameSanitizer.sanitize(classEntry.name)
                 val downloadSize = classEntry.downloadSize * dexDownloadSize / sizeOfAllClasses
@@ -199,6 +235,4 @@ class ApkSanitizer(
             return AppFile(entry.name, type, entry.downloadSize, entry.installSize, resourceType = resourceType)
         }
     }
-
-
 }

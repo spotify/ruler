@@ -53,11 +53,10 @@ class Attributor(private val defaultComponent: DependencyComponent) {
             val jobs = mutableListOf<Job>()
             val components = ConcurrentHashMap<DependencyComponent, MutableList<AppFile>>()
             val batchSize = 500
-            println("Total file size: ${files.size}")
             files.chunked(batchSize).forEach { batch ->
                 jobs.add(launch(Dispatchers.IO) {
                     batch.forEach { file ->
-                        println("Attributing: $file")
+                        // println("Attributing: $file")
                         val component = when (file.type) {
                             FileType.CLASS -> getComponentForClass(file.name, dependencies)
                             FileType.RESOURCE -> getComponentForResource(file.name, dependencies)
@@ -154,6 +153,13 @@ class Attributor(private val defaultComponent: DependencyComponent) {
             dependencyComponent = dependencies[resourceName]?.singleOrNull()
         }
 
+        if(name.contains("picker_device_icon_selector")) {
+            print("Printing dependencies for Resource: $resourceName")
+            println(dependencies[resourceName])
+        }
+
+        if (dependencyComponent == null)
+            dependencyComponent = dependencies[resourceName]?.firstOrNull()
         return dependencyComponent
     }
 

@@ -23,8 +23,8 @@ import kotlinx.serialization.Serializable
 data class AppComponent(
     override val name: String,
     val type: ComponentType,
-    override val downloadSize: Double,
-    override val installSize: Double,
+    override val downloadSize: Long,
+    override val installSize: Long,
     override val files: List<AppFile>?,
     override val owner: String? = null,
 ) : FileContainer

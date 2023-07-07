@@ -18,8 +18,8 @@ package com.spotify.ruler.models
 
 /** Piece of an app whose size can be measured. */
 interface Measurable {
-    val downloadSize: Double
-    val installSize: Double
+    val downloadSize: Long
+    val installSize: Long
 
     /**
      * The size of an app can be measured in one of two ways:
@@ -35,5 +35,5 @@ interface Measurable {
     }
 
     /** A mutable [Measurable] implementation. */
-    data class Mutable(override var downloadSize: Double, override var installSize: Double) : Measurable
+    data class Mutable(override var downloadSize: Long, override var installSize: Long) : Measurable
 }

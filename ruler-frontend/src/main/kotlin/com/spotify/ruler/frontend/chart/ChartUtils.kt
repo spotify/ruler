@@ -19,7 +19,7 @@ package com.spotify.ruler.frontend.chart
 import com.spotify.ruler.frontend.binding.Series
 import js.core.jso
 
-fun seriesOf(name: String, data: DoubleArray): Series = jso {
+fun seriesOf(name: String, data: LongArray): Series = jso {
     this.name = name
-    this.data = data.map(Double::toInt).toTypedArray()
+    this.data = data.map(Long::toInt).toTypedArray()
 }

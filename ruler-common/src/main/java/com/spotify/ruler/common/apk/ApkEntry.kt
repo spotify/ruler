@@ -19,21 +19,21 @@ package com.spotify.ruler.common.apk
 /** Single entry of an APK. */
 sealed class ApkEntry {
     abstract val name: String
-    abstract val downloadSize: Double
-    abstract val installSize: Double
+    abstract val downloadSize: Long
+    abstract val installSize: Long
 
     /** Default APK entry. If an entry has no special type, it is considered to be a default entry. */
     data class Default(
         override val name: String,
-        override val downloadSize: Double,
-        override val installSize: Double,
+        override val downloadSize: Long,
+        override val installSize: Long,
     ) : ApkEntry()
 
     /** DEX file APK entry containing compiled classes. */
     data class Dex(
         override val name: String,
-        override val downloadSize: Double,
-        override val installSize: Double,
+        override val downloadSize: Long,
+        override val installSize: Long,
         val classes: List<ApkEntry>,
     ) : ApkEntry()
 }

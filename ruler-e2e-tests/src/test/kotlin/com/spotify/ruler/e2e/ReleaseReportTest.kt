@@ -43,7 +43,15 @@ class ReleaseReportTest {
         assertThat(app.type).isEqualTo(ComponentType.INTERNAL)
         assertThat(app.owner).isEqualTo("default-team")
         // Filters out META-INF stuff coming from AndroidX libraries as they are too many.
-        val files = app.files?.filter { !it.name.startsWith("/META-INF/androidx") }
+        var files = app.files?.filter { !it.name.startsWith("/META-INF/androidx") }
+
+        // There are multiple BNDLTOOL.RSA and .SF files feels cleaner to check them separately.
+        assertThat(files).comparingElementsUsing(Correspondence.file()).containsAtLeast(
+            FileMatcher("/META-INF/BNDLTOOL.RSA", FileType.OTHER, "default-team"),
+            FileMatcher("/META-INF/BNDLTOOL.SF", FileType.OTHER, "default-team"),
+        )
+
+        files = files?.filter { !it.name.startsWith("/META-INF/BNDLTOOL") }
 
         assertThat(files).comparingElementsUsing(Correspondence.file()).containsExactly(
             FileMatcher("com.spotify.ruler.sample.app.MainActivity", FileType.CLASS, "main-team"),
@@ -75,7 +83,14 @@ class ReleaseReportTest {
         val dynamic = report.dynamicFeatures.single { feature -> feature.name == "dynamic" }
         assertThat(dynamic.owner).isEqualTo("dynamic-team")
 
-        assertThat(dynamic.files).comparingElementsUsing(Correspondence.file()).containsExactly(
+        // There are multiple BNDLTOOL.RSA and .SF files feels cleaner to check them separately.
+        assertThat(dynamic.files).comparingElementsUsing(Correspondence.file()).containsAtLeast(
+            FileMatcher("/META-INF/BNDLTOOL.RSA", FileType.OTHER, "dynamic-team"),
+            FileMatcher("/META-INF/BNDLTOOL.SF", FileType.OTHER, "dynamic-team"),
+        )
+        val files = dynamic.files?.filter { !it.name.startsWith("/META-INF/BNDLTOOL") }
+
+        assertThat(files).comparingElementsUsing(Correspondence.file()).containsExactly(
             FileMatcher("/AndroidManifest.xml", FileType.OTHER, "dynamic-team"),
             FileMatcher("/resources.arsc", FileType.OTHER, "dynamic-team"),
             FileMatcher("com.spotify.ruler.sample.dynamic.DynamicActivity", FileType.CLASS, "dynamic-team"),

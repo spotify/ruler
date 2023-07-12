@@ -27,13 +27,20 @@ import com.android.sdklib.repository.AndroidSdkHandler
 import com.android.tools.build.bundletool.androidtools.Aapt2Command
 import com.android.tools.build.bundletool.commands.BuildApksCommand
 import com.android.tools.build.bundletool.device.DeviceSpecParser
+import com.android.tools.build.bundletool.model.Password
+import com.android.tools.build.bundletool.model.SigningConfiguration
 import com.android.utils.StdLogger
 import com.spotify.ruler.common.models.DeviceSpec
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.BufferedReader
 import java.io.File
+import java.io.IOException
+import java.io.InputStreamReader
 import java.io.StringReader
 import java.nio.file.Path
+import java.util.Optional
+import java.util.concurrent.TimeUnit
 
 /**
  * Responsible for creating APKs based on provided app bundle (AAB) files.
@@ -41,6 +48,10 @@ import java.nio.file.Path
  * @param rootDir Root directory of the Gradle project, needed to look up the path of certain binaries.
  */
 class ApkCreator(private val rootDir: File) {
+
+    private val rulerDebugKey = "rulerDebug.keystore"
+    private val rulerKeystorePassword = "rulerpassword"
+    private val rulerKeyAlias = "rulerdebugkey"
 
     /**
      * Creates APKs based on a bundle file using the logic provided by Googles bundletool.
@@ -59,6 +70,7 @@ class ApkCreator(private val rootDir: File) {
             .setDeviceSpec(parseDeviceSpec(deviceSpec))
             .setAapt2Command(Aapt2Command.createFromExecutablePath(getAapt2Location()))
             .setOutputFormat(BuildApksCommand.OutputFormat.DIRECTORY)
+            .setSigningConfiguration(getAndroidDebugKey())
             .build()
             .execute()
 
@@ -92,6 +104,27 @@ class ApkCreator(private val rootDir: File) {
         val logger = StdLogger(StdLogger.Level.WARNING)
         val issueReporter = DefaultIssueReporter(logger)
         return SdkLocator.getSdkDirectory(rootDir, issueReporter).toPath()
+    }
+
+    /**
+     * Gets Ruler debug signing key from resource to sign the split apks.
+     * Doing this step makes sure the corresponding /META-INF/BNDLTOOL.SF and *.RSA files are created in the apks.
+     **/
+    private fun getAndroidDebugKey(): SigningConfiguration {
+        val keystoreFile = ApkCreator::class.java.classLoader!!.getResourceAsStream(rulerDebugKey)
+            ?: throw java.lang.RuntimeException("Unable to load $rulerDebugKey file.")
+
+        val debugKeyFile = File.createTempFile("debugKey", ".keystore")
+        debugKeyFile.deleteOnExit()
+        debugKeyFile.outputStream().use { outputStream ->
+            keystoreFile.copyTo(outputStream)
+        }
+        return SigningConfiguration.extractFromKeystore(
+            debugKeyFile.toPath(),
+            rulerKeyAlias,
+            Optional.of(Password.createFromStringValue("pass:$rulerKeystorePassword")),
+            Optional.empty()
+        )
     }
 
     companion object {

@@ -36,4 +36,11 @@ sealed class ApkEntry {
         override val installSize: Long,
         val classes: List<ApkEntry>,
     ) : ApkEntry()
+
+    data class NativeLibrary(
+        override val name: String,
+        override val downloadSize: Long,
+        override val installSize: Long,
+        val classes: List<ApkEntry>,
+    ): ApkEntry()
 }

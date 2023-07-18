@@ -16,15 +16,15 @@
 
 package com.spotify.ruler.plugin
 
-import com.spotify.ruler.common.apk.ApkCreator
-import com.spotify.ruler.plugin.dependency.EntryParser
 import com.spotify.ruler.common.BaseRulerTask
+import com.spotify.ruler.common.apk.ApkCreator
 import com.spotify.ruler.common.dependency.DependencyComponent
 import com.spotify.ruler.common.dependency.DependencySanitizer
 import com.spotify.ruler.common.models.AppInfo
 import com.spotify.ruler.common.models.DeviceSpec
 import com.spotify.ruler.common.models.RulerConfig
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
+import com.spotify.ruler.plugin.dependency.EntryParser
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
@@ -112,6 +112,7 @@ abstract class RulerTask : DefaultTask(), BaseRulerTask {
     override fun print(content: String) = project.logger.lifecycle(content)
     override fun provideMappingFile(): File? = mappingFile.asFile.orNull
     override fun provideResourceMappingFile(): File? = resourceMappingFile.asFile.orNull
+    override fun provideUnstrippedLibraryFiles(): List<File> = emptyList()
 
     private fun createApkFile(): Map<String, List<File>> {
         val apkCreator = ApkCreator(project.rootDir)

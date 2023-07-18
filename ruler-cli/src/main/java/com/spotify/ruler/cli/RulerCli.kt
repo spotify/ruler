@@ -18,6 +18,7 @@
 package com.spotify.ruler.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.file
@@ -25,15 +26,10 @@ import com.spotify.ruler.common.BaseRulerTask
 import com.spotify.ruler.common.FEATURE_NAME
 import com.spotify.ruler.common.apk.ApkCreator
 import com.spotify.ruler.common.apk.InjectedToolApkCreator
-import com.spotify.ruler.common.dependency.ArtifactResult
 import com.spotify.ruler.common.dependency.DependencyComponent
-import com.spotify.ruler.common.dependency.DependencyEntry
-import com.spotify.ruler.common.dependency.DependencySanitizer
-import com.spotify.ruler.common.dependency.JarArtifactParser
 import com.spotify.ruler.common.models.AppInfo
 import com.spotify.ruler.common.models.DeviceSpec
 import com.spotify.ruler.common.models.RulerConfig
-import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -51,6 +47,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     private val mappingFile: File? by option().file()
     private val resourceMappingFile: File? by option().file()
     private val aapt2Tool: File? by option().file()
+    private val debugSO: List<File> by option().file().multiple()
 
     override fun print(content: String) = echo(content)
 
@@ -103,6 +100,8 @@ class RulerCli : CliktCommand(), BaseRulerTask {
 
     override fun provideDependencies(): Map<String, List<DependencyComponent>> = dependencies
 
+    override fun provideUnstrippedLibraryFiles(): List<File> = debugSO
+
     override fun run() {
         logger.log(Level.INFO,  """
         ~~~~~ Starting Ruler ~~~~~
@@ -112,6 +111,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
         Using Proguard Mapping File: ${mappingFile?.path}
         Using Resource Mapping File: ${resourceMappingFile?.path}
         Using AAPT2: ${aapt2Tool?.path}
+        Using Debug SO Files: ${debugSO.joinToString(", ") { it.path }}
         Writing reports to: ${reportDir.path}
         """.trimIndent())
         super.run()

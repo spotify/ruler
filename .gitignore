@@ -10,3 +10,7 @@
 local.properties
 /kotlin-js-store
 ruler-common/build
+
+# Generated files
+bin/
+gen/

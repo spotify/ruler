@@ -16,11 +16,11 @@
 
 package com.spotify.ruler.common.apk
 
+import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
+import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
 import com.spotify.ruler.models.ResourceType
-import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
-import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
 import java.text.CharacterIterator
 import java.text.StringCharacterIterator
 
@@ -106,16 +106,8 @@ class ApkSanitizer(
                 downloadSizeOfDex += dex.downloadSize
                 installSizeOfDex += dex.installSize
 
-                println("-------------------")
-                println("Dex Size for ${dex.name}")
-                println("Dex size DownloadSize: ${humanReadableByteCountBin(dex.downloadSize)}")
-                println("-------------------")
             }
 
-            println("-------------------")
-            println("Total size of Dex is:")
-            println("Dex size DownloadSize: ${humanReadableByteCountBin(downloadSizeOfDex)}")
-            println("-------------------")
             val entries =  entries.flatMap { entry ->
                 sanitizeEntry(
                     entry as ApkEntry.Dex,
@@ -125,10 +117,6 @@ class ApkSanitizer(
                 )
             }
 
-            println("-------------------")
-            println("Total size of all Classes is:")
-            println("Size of All Classes is: ${humanReadableByteCountBin(entries.map { it.downloadSize }.sum())}")
-            println("-------------------")
             return entries
         }
 

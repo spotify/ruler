@@ -22,7 +22,6 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
-import java.lang.Exception
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipFile
 
@@ -54,7 +53,7 @@ class ApkParser(private val unstrippedNativeLibraryPaths: List<File> = emptyList
         val apkEntries = mutableListOf<ApkEntry>()
         ZipFile(apkFile).use { zipFile ->
             zipFile.entries().iterator().forEach { zipEntry ->
-                // println("Reading Entry: name")
+
                 val name = "/${zipEntry.name}"
                 val downloadSize = downloadSizePerFile.getValue(name)
                 val installSize = installSizePerFile.getValue(name)
@@ -75,7 +74,6 @@ class ApkParser(private val unstrippedNativeLibraryPaths: List<File> = emptyList
                                 debugFileForNativeLibrary(entryName = name)
                             )
                         )
-                        println(native)
                         native
                     }
                     // When build from bazel resources coming from
@@ -109,7 +107,6 @@ class ApkParser(private val unstrippedNativeLibraryPaths: List<File> = emptyList
             writeBytes(bytes)
         }
         val command = "$bloatyPath --debug-file=${debugFile.absolutePath} ${tmpFile.absolutePath} -d compileunits  -n 0 --csv"
-        println(command)
         val process = Runtime.getRuntime().exec(command)
         val reader = BufferedReader(InputStreamReader(process.inputStream))
         val rows = mutableListOf<ApkEntry.Default>()
@@ -118,17 +115,16 @@ class ApkParser(private val unstrippedNativeLibraryPaths: List<File> = emptyList
         while (reader.readLine().also { line = it } != null) {
             val cols = line?.split(",")
             if (cols?.count() == 3) {
+                val size = cols.last().toLongOrNull() ?: 1
                 val entry = ApkEntry.Default(
                     cols.first().substringAfter("../.."),
-                    cols.last().toLong(),
-                    cols.last().toLong()
+                    size,
+                    size
                 )
-                println(entry)
                 rows.add(entry)
             }
         }
         process.waitFor()
-        println("Rows size: ${rows.size}")
         return rows
     }
 
@@ -144,9 +140,6 @@ class ApkParser(private val unstrippedNativeLibraryPaths: List<File> = emptyList
 
     private fun debugFileForNativeLibrary(entryName: String): File? {
         val entryFileName = File(entryName).nameWithoutExtension
-        println("Print Unstripped Native Paths for entryFile name: $entryFileName")
-        println(unstrippedNativeLibraryPaths)
-        println("==========")
         return unstrippedNativeLibraryPaths.find {
             it.name.contains(entryFileName)
         }

@@ -21,8 +21,6 @@ import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
 import com.spotify.ruler.models.ResourceType
-import java.text.CharacterIterator
-import java.text.StringCharacterIterator
 
 /**
  * Responsible for sanitizing APK entries, so they can be attributed easier.
@@ -146,7 +144,14 @@ class ApkSanitizer(
 
         override fun sanitize(): List<AppFile> {
             val entry = entries.maxByOrNull(ApkEntry::installSize) ?: return emptyList()
-            return listOf(AppFile("/AndroidManifest.xml", FileType.OTHER, entry.downloadSize, entry.installSize))
+            return listOf(
+                AppFile(
+                    "/AndroidManifest.xml",
+                    FileType.OTHER,
+                    entry.downloadSize,
+                    entry.installSize
+                )
+            )
         }
     }
 
@@ -187,7 +192,13 @@ class ApkSanitizer(
         private fun sanitizeEntry(entry: ApkEntry): AppFile {
             val name = resourceNameSanitizer.sanitize(entry.name)
             val resourceType: ResourceType? = mapNameToResourceType(entry)
-            return AppFile(name, FileType.RESOURCE, entry.downloadSize, entry.installSize, resourceType = resourceType)
+            return AppFile(
+                name,
+                FileType.RESOURCE,
+                entry.downloadSize,
+                entry.installSize,
+                resourceType = resourceType
+            )
         }
     }
 
@@ -215,27 +226,32 @@ class ApkSanitizer(
     }
 
     private class NativeLibAssigningBucket : SanitizationBucket() {
-        override fun isApplicable(entry: ApkEntry) = entry is ApkEntry.NativeLibrary
+        override fun isApplicable(entry: ApkEntry) = entry is ApkEntry.NativeLibrary && entry.classes.isNotEmpty()
 
         override fun sanitize(): List<AppFile> {
             val entries = entries.flatMap { entry ->
-                sanitizeEntry(
-                    entry as ApkEntry.NativeLibrary,
-                )
+                sanitizeEntry(entry as ApkEntry.NativeLibrary)
             }
+
             return entries
         }
 
         private fun sanitizeEntry(
             entry: ApkEntry.NativeLibrary,
         ): List<AppFile> {
-
+            val totalClasses = entry.classes.sumOf(ApkEntry::installSize)
             return entry.classes.map { classEntry ->
-                val name = classEntry.name
-                val downloadSize = classEntry.downloadSize
-                val installSize = classEntry.installSize
-                AppFile(name, FileType.CLASS, downloadSize, installSize)
+                if (isMetadataFile(classEntry.name)) {
+                    AppFile(classEntry.name, FileType.CLASS, classEntry.downloadSize, classEntry.downloadSize)
+                } else {
+                    val name = classEntry.name
+                    val downloadSize = classEntry.downloadSize * entry.downloadSize / totalClasses
+                    val installSize = classEntry.installSize * entry.downloadSize / totalClasses
+                    AppFile(name, FileType.CLASS, downloadSize, installSize)
+                }
             }
         }
+
+        private fun isMetadataFile(name: String) = name.startsWith("[section ")
     }
 }

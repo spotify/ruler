@@ -44,6 +44,7 @@ class ApkSanitizer(
      */
     fun sanitize(entries: List<ApkEntry>): List<AppFile> {
         val buckets = listOf(
+            NativeLibAssigningBucket(),
             DexFileBucket(),
             AndroidManifestBucket(),
             BundletoolBucket(),
@@ -108,7 +109,7 @@ class ApkSanitizer(
 
             }
 
-            val entries =  entries.flatMap { entry ->
+            val entries = entries.flatMap { entry ->
                 sanitizeEntry(
                     entry as ApkEntry.Dex,
                     sizeOfAllClasses,
@@ -120,23 +121,6 @@ class ApkSanitizer(
             return entries
         }
 
-
-        fun humanReadableByteCountBin(bytes: Long): String? {
-            val absB = if (bytes == Long.MIN_VALUE) Long.MAX_VALUE else Math.abs(bytes)
-            if (absB < 1024) {
-                return "$bytes B"
-            }
-            var value = absB
-            val ci: CharacterIterator = StringCharacterIterator("KMGTPE")
-            var i = 40
-            while (i >= 0 && absB > 0xfffccccccccccccL shr i) {
-                value = value shr 10
-                ci.next()
-                i -= 10
-            }
-            value *= java.lang.Long.signum(bytes).toLong()
-            return java.lang.String.format("%.1f %ciB", value / 1024.0, ci.current())
-        }
         private fun sanitizeEntry(
             entry: ApkEntry.Dex,
             sizeOfAllClasses: Long,
@@ -220,7 +204,38 @@ class ApkSanitizer(
                 else -> FileType.OTHER
             }
             val resourceType: ResourceType? = mapNameToResourceType(entry)
-            return AppFile(entry.name, type, entry.downloadSize, entry.installSize, resourceType = resourceType)
+            return AppFile(
+                entry.name,
+                type,
+                entry.downloadSize,
+                entry.installSize,
+                resourceType = resourceType
+            )
+        }
+    }
+
+    private class NativeLibAssigningBucket : SanitizationBucket() {
+        override fun isApplicable(entry: ApkEntry) = entry is ApkEntry.NativeLibrary
+
+        override fun sanitize(): List<AppFile> {
+            val entries = entries.flatMap { entry ->
+                sanitizeEntry(
+                    entry as ApkEntry.NativeLibrary,
+                )
+            }
+            return entries
+        }
+
+        private fun sanitizeEntry(
+            entry: ApkEntry.NativeLibrary,
+        ): List<AppFile> {
+
+            return entry.classes.map { classEntry ->
+                val name = classEntry.name
+                val downloadSize = classEntry.downloadSize
+                val installSize = classEntry.installSize
+                AppFile(name, FileType.CLASS, downloadSize, installSize)
+            }
         }
     }
 }

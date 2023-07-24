@@ -46,7 +46,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.spotify.ruler.cli.RulerCliKt")
+    mainClass.set("com.spotify.ruler.cli.RulerCompareCliKt")
 }
 
 tasks.withType<Test> {

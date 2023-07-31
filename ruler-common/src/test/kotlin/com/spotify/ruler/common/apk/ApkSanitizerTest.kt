@@ -16,6 +16,7 @@
 
 package com.spotify.ruler.common.apk
 
+import com.android.tools.profgen.Apk
 import com.google.common.truth.Truth.assertThat
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
 import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
@@ -118,6 +119,24 @@ class ApkSanitizerTest {
         val clean = sanitizer.sanitize(listOf(dirty)).single()
 
         assertThat(clean.type).isEqualTo(FileType.NATIVE_LIB)
+    }
+
+    @Test
+    fun `Native files are assigned the correct type`() {
+        val dirty = ApkEntry.NativeLibrary("native-library.so", 1500, 3000, classes = listOf(
+            ApkEntry.Default("[section .rela.dyn]", 1000, 1000),
+            ApkEntry.Default("/buildbot/src/android/ndk-release-r21/external/libcxx/src/locale.cpp", 1000, 1000),
+            ApkEntry.Default("/external/libcxxabi/src/cxa_demangle.cpp", 1000, 1000),
+        ))
+        val clean = sanitizer.sanitize(listOf(dirty))
+
+        assertThat(clean).containsExactly(
+            AppFile("native-library.so/[section .rela.dyn]",
+                FileType.NATIVE_FILE, 500, 1000),
+            AppFile("/buildbot/src/android/ndk-release-r21/external/libcxx/src/locale.cpp",
+                FileType.NATIVE_FILE, 500, 1000),
+            AppFile("/external/libcxxabi/src/cxa_demangle.cpp", FileType.NATIVE_FILE, 500, 1000),
+        )
     }
 
     @Test

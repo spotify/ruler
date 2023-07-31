@@ -16,8 +16,6 @@
 
 package com.spotify.ruler.common
 
-import com.spotify.ruler.models.AppFile
-import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.common.apk.ApkParser
 import com.spotify.ruler.common.apk.ApkSanitizer
 import com.spotify.ruler.common.attribution.Attributor
@@ -29,6 +27,8 @@ import com.spotify.ruler.common.report.HtmlReporter
 import com.spotify.ruler.common.report.JsonReporter
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
 import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
+import com.spotify.ruler.models.AppFile
+import com.spotify.ruler.models.ComponentType
 import java.io.File
 
 const val FEATURE_NAME = "base"
@@ -71,7 +71,7 @@ interface BaseRulerTask {
     }
 
     private fun getFilesFromBundle(): Map<String, List<AppFile>> {
-        val apkParser = ApkParser()
+        val apkParser = ApkParser(provideUnstrippedLibraryFiles())
         val classNameSanitizer = ClassNameSanitizer(provideMappingFile())
         val resourceNameSanitizer = ResourceNameSanitizer(provideResourceMappingFile())
         val apkSanitizer = ApkSanitizer(classNameSanitizer, resourceNameSanitizer)

@@ -27,10 +27,13 @@ import com.spotify.ruler.common.models.RulerConfig
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -64,6 +67,10 @@ abstract class RulerTask : DefaultTask(), BaseRulerTask {
 
     @get:Input
     abstract val omitFileBreakdown: Property<Boolean>
+
+    @get:Optional
+    @get:InputFiles
+    abstract val unstrippedNativeFiles: ListProperty<RegularFile>
 
     @get:OutputDirectory
     abstract val workingDir: DirectoryProperty
@@ -103,7 +110,9 @@ abstract class RulerTask : DefaultTask(), BaseRulerTask {
     override fun print(content: String) = project.logger.lifecycle(content)
     override fun provideMappingFile(): File? = mappingFile.asFile.orNull
     override fun provideResourceMappingFile(): File? = resourceMappingFile.asFile.orNull
-
+    override fun provideUnstrippedLibraryFiles(): List<File> = unstrippedNativeFiles.get().map {
+        it.asFile
+    }
     private fun createApkFile(): Map<String, List<File>> {
         val apkCreator = ApkCreator(project.rootDir)
 

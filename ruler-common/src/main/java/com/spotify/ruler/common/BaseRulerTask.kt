@@ -39,7 +39,7 @@ interface BaseRulerTask {
     fun provideMappingFile(): File?
     fun provideResourceMappingFile(): File?
     fun rulerConfig(): RulerConfig
-
+    fun provideUnstrippedLibraryFiles(): List<File>
     private val rulerConfig: RulerConfig
         get() = rulerConfig()
 

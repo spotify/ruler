@@ -18,6 +18,7 @@
 package com.spotify.ruler.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.file
@@ -45,7 +46,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     private val reportDir by option().file(canBeDir = true).required()
     private val mappingFile: File? by option().file()
     private val resourceMappingFile: File? by option().file()
-
+    private val unstrippedNativeFiles: List<File> by option().file().multiple()
     override fun print(content: String) = echo(content)
 
     override fun provideMappingFile() = mappingFile
@@ -53,6 +54,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     override fun provideResourceMappingFile(): File? = resourceMappingFile
 
     override fun rulerConfig(): RulerConfig = config
+    override fun provideUnstrippedLibraryFiles() = unstrippedNativeFiles
 
     private val config: RulerConfig by lazy {
         val json = Json.decodeFromStream<JsonRulerConfig>(rulerConfigJson.inputStream())

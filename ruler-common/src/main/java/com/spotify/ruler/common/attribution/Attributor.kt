@@ -46,6 +46,7 @@ class Attributor(private val defaultComponent: DependencyComponent) {
                 FileType.RESOURCE -> getComponentForResource(file.name, dependencies)
                 FileType.ASSET -> getComponentForAsset(file.name, dependencies)
                 FileType.NATIVE_LIB -> getComponentForNativeLib(file.name, dependencies)
+                FileType.NATIVE_FILE -> getComponentForClass(file.name, dependencies)
                 FileType.OTHER -> getComponentForFile(file.name, dependencies)
             } ?: defaultComponent
 

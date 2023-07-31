@@ -42,6 +42,7 @@ class ApkSanitizer(
      */
     fun sanitize(entries: List<ApkEntry>): List<AppFile> {
         val buckets = listOf(
+            NativeLibAssigningBucket(),
             DexFileBucket(),
             AndroidManifestBucket(),
             BundletoolBucket(),
@@ -200,5 +201,40 @@ class ApkSanitizer(
         }
     }
 
+    /**
+     * A sanitization bucket for parsing native library entries in the APK.
+     */
+    private class NativeLibAssigningBucket : SanitizationBucket() {
 
+        private val metadataRegex = Regex("\\[section.*?\\]")
+        override fun isApplicable(entry: ApkEntry) =
+            entry is ApkEntry.NativeLibrary && entry.classes.isNotEmpty()
+
+        override fun sanitize(): List<AppFile> {
+            return entries.flatMap { entry ->
+                sanitizeEntry(entry as ApkEntry.NativeLibrary)
+            }
+        }
+
+        private fun sanitizeEntry(
+            entry: ApkEntry.NativeLibrary,
+        ): List<AppFile> {
+            val totalClasses = entry.classes.sumOf(ApkEntry::installSize)
+            return entry.classes.map { classEntry ->
+                val fileName = if (isMetadataFile(classEntry.name)) {
+                    "${entry.name}/${classEntry.name}"
+                } else {
+                    classEntry.name
+                }
+                AppFile(
+                    fileName,
+                    FileType.NATIVE_FILE,
+                    classEntry.downloadSize * entry.downloadSize / totalClasses,
+                    classEntry.installSize * entry.installSize / totalClasses
+                )
+            }
+        }
+
+        private fun isMetadataFile(name: String) = metadataRegex.matches(name)
+    }
 }

@@ -58,6 +58,7 @@ class RulerPlugin : Plugin<Project> {
                     task.reportDir.set(project.layout.buildDirectory.dir("reports/ruler/${variant.name}"))
 
                     task.omitFileBreakdown.set(rulerExtension.omitFileBreakdown)
+                    task.unstrippedNativeFiles.set(rulerExtension.unstrippedNativeFiles)
 
                     // Add explicit dependency to support DexGuard
                     task.dependsOn("bundle$variantName")

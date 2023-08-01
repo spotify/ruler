@@ -45,14 +45,14 @@ class Attributor(
     fun attribute(files: List<AppFile>, dependencies: Dependencies): Map<DependencyComponent, List<AppFile>> {
         val components = mutableMapOf<DependencyComponent, MutableList<AppFile>>()
         files.forEach { file ->
-            val component = when(file.type) {
+            val component = when (file.type) {
                 FileType.CLASS -> getComponentForClass(file.name, dependencies)
                 FileType.RESOURCE -> getComponentForResource(file.name, dependencies)
                 FileType.ASSET -> getComponentForAsset(file.name, dependencies)
                 FileType.NATIVE_LIB -> getComponentForNativeLib(file.name, dependencies)
                 FileType.NATIVE_FILE -> getComponentFromStaticDependenciesMap(file.name)
                 FileType.OTHER -> getComponentForFile(file.name, dependencies)
-            } ?: defaultComponent
+            } ?: getComponentFromStaticDependenciesMap(file.name) ?: defaultComponent
 
             components.getOrPut(component) { ArrayList() }.add(file)
         }

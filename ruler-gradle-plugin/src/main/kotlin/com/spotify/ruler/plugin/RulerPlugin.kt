@@ -57,6 +57,7 @@ class RulerPlugin : Plugin<Project> {
                     task.workingDir.set(project.layout.buildDirectory.dir("intermediates/ruler/${variant.name}"))
                     task.reportDir.set(project.layout.buildDirectory.dir("reports/ruler/${variant.name}"))
 
+                    task.staticDependenciesFile.set(rulerExtension.staticDependenciesFile)
                     task.omitFileBreakdown.set(rulerExtension.omitFileBreakdown)
                     task.unstrippedNativeFiles.set(rulerExtension.unstrippedNativeFiles)
 

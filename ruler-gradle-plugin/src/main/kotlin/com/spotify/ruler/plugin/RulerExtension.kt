@@ -30,6 +30,7 @@ open class RulerExtension(objects: ObjectFactory) {
 
     val ownershipFile: RegularFileProperty = objects.fileProperty()
     val defaultOwner: Property<String> = objects.property(String::class.java)
+    val staticDependenciesFile: RegularFileProperty = objects.fileProperty()
 
     val omitFileBreakdown: Property<Boolean> = objects.property(Boolean::class.java)
     val unstrippedNativeFiles: ListProperty<RegularFile> = objects.listProperty(RegularFile::class.java)

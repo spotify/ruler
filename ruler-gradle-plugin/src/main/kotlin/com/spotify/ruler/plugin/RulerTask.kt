@@ -72,6 +72,10 @@ abstract class RulerTask : DefaultTask(), BaseRulerTask {
     @get:InputFiles
     abstract val unstrippedNativeFiles: ListProperty<RegularFile>
 
+    @get:Optional
+    @get:InputFile
+    abstract val staticDependenciesFile: RegularFileProperty
+
     @get:OutputDirectory
     abstract val workingDir: DirectoryProperty
 
@@ -89,6 +93,7 @@ abstract class RulerTask : DefaultTask(), BaseRulerTask {
             apkFilesMap = createApkFile(),
             reportDir = reportDir.asFile.get(),
             ownershipFile = ownershipFile.asFile.orNull,
+            staticDependenciesFile = staticDependenciesFile.asFile.orNull,
             appInfo = appInfo.get(),
             deviceSpec = deviceSpec.get(),
             defaultOwner = defaultOwner.get(),

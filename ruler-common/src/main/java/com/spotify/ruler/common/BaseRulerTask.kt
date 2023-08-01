@@ -37,6 +37,7 @@ import java.io.File
 
 const val FEATURE_NAME = "base"
 
+@Suppress("TooManyFunctions")
 interface BaseRulerTask {
 
     fun print(content: String)

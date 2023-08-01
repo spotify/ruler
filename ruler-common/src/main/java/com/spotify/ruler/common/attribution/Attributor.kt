@@ -21,12 +21,16 @@ import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
 
 private typealias Dependencies = Map<String, List<DependencyComponent>>
+private typealias StaticRegexDependencies = Map<Regex, List<DependencyComponent>>
 /**
  * Responsible for attributing files to the components they are coming from.
  *
  * @param defaultComponent Component to which files will be assigned, if they can't be attributed to any other component
  */
-class Attributor(private val defaultComponent: DependencyComponent) {
+class Attributor(
+    private val defaultComponent: DependencyComponent,
+    private val staticDependencies: StaticRegexDependencies = emptyMap()
+) {
 
     private val resourceVersionRegex = "(/res/[a-z][^/])*-(.*?)(?=/)".toRegex()
     private val resourceMultipleVectorRegex = "\\\$(\\D+)__\\d+\\.xml\$".toRegex()
@@ -46,7 +50,7 @@ class Attributor(private val defaultComponent: DependencyComponent) {
                 FileType.RESOURCE -> getComponentForResource(file.name, dependencies)
                 FileType.ASSET -> getComponentForAsset(file.name, dependencies)
                 FileType.NATIVE_LIB -> getComponentForNativeLib(file.name, dependencies)
-                FileType.NATIVE_FILE -> getComponentForClass(file.name, dependencies)
+                FileType.NATIVE_FILE -> getComponentFromStaticDependenciesMap(file.name)
                 FileType.OTHER -> getComponentForFile(file.name, dependencies)
             } ?: defaultComponent
 
@@ -157,5 +161,11 @@ class Attributor(private val defaultComponent: DependencyComponent) {
     private fun getComponentForPackage(name: String, dependencies: Dependencies): DependencyComponent? {
         val candidates = dependencies.filter { it.key.substringBeforeLast('.') == name }.values.flatten()
         return candidates.distinct().singleOrNull()
+    }
+
+    private fun getComponentFromStaticDependenciesMap(
+        name: String
+    ): DependencyComponent? {
+        return staticDependencies[staticDependencies.keys.find { it.containsMatchIn(name) }]?.firstOrNull()
     }
 }

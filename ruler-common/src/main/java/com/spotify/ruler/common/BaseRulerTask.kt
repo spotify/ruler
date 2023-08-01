@@ -20,6 +20,7 @@ import com.spotify.ruler.common.apk.ApkParser
 import com.spotify.ruler.common.apk.ApkSanitizer
 import com.spotify.ruler.common.attribution.Attributor
 import com.spotify.ruler.common.dependency.DependencyComponent
+import com.spotify.ruler.common.dependency.StaticComponent
 import com.spotify.ruler.common.models.RulerConfig
 import com.spotify.ruler.common.ownership.OwnershipFileParser
 import com.spotify.ruler.common.ownership.OwnershipInfo
@@ -27,8 +28,11 @@ import com.spotify.ruler.common.report.HtmlReporter
 import com.spotify.ruler.common.report.JsonReporter
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
 import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
+import com.spotify.ruler.common.util.toEscapeCharRegex
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.ComponentType
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.io.File
 
 const val FEATURE_NAME = "base"
@@ -44,6 +48,15 @@ interface BaseRulerTask {
         get() = rulerConfig()
 
     fun provideDependencies(): Map<String, List<DependencyComponent>>
+
+    fun provideStaticDependencies(): Map<Regex, List<DependencyComponent>> {
+        val staticComponent = rulerConfig.staticDependenciesFile ?: return emptyMap()
+        val jsonString = staticComponent.readText()
+        val itemList = Json.decodeFromString<List<StaticComponent>>(jsonString)
+        return itemList.associate {
+            it.path.toEscapeCharRegex() to listOf(DependencyComponent(it.id, ComponentType.INTERNAL))
+        }
+    }
 
     fun run() {
         val files = getFilesFromBundle() // Get all relevant files from the provided bundle
@@ -63,7 +76,7 @@ interface BaseRulerTask {
 
         // Attribute main APK bundle entries and group into components
         val attributor =
-            Attributor(defaultComponent)
+            Attributor(defaultComponent, provideStaticDependencies())
         val components = attributor.attribute(mainFiles, dependencies)
 
         val ownershipInfo = getOwnershipInfo() // Get ownership information for all components

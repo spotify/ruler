@@ -24,7 +24,15 @@ import com.spotify.ruler.models.FileType
 import org.junit.jupiter.api.Test
 
 class AttributorTest {
-    private val attributor = Attributor(DependencyComponent(":default", ComponentType.INTERNAL))
+
+    private val staticDependencies = mapOf(
+        Regex("ComponentA") to listOf(DependencyComponent("Component A", ComponentType.INTERNAL)),
+        Regex("test/componentB") to listOf(
+            DependencyComponent("Component B", ComponentType.INTERNAL)
+        )
+    )
+
+    private val attributor = Attributor(DependencyComponent(":default", ComponentType.INTERNAL), staticDependencies)
 
     @Test
     fun `Class files are attributed correctly`() {
@@ -188,5 +196,13 @@ class AttributorTest {
         val map = attributor.attribute(files, emptyMap())
 
         assertThat(map).containsEntry(DependencyComponent(":default", ComponentType.INTERNAL), files)
+    }
+
+    @Test
+    fun `test getComponentFromStaticDependenciesMap with valid name`() {
+        val files = listOf(AppFile("com.spotify.ComponentA", FileType.NATIVE_FILE, 100, 200))
+        val map = attributor.attribute(files, emptyMap())
+
+        assertThat(map).containsEntry(DependencyComponent("Component A", ComponentType.INTERNAL), files)
     }
 }

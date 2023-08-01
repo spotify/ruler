@@ -63,6 +63,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
             apkFilesMap = mapOf(FEATURE_NAME to listOf(apkFile)),
             reportDir = reportDir,
             ownershipFile = json.ownershipFile?.let { File(it) },
+            staticDependenciesFile = json.staticComponentsPath?.let { File(it) },
             appInfo = json.appInfo,
             deviceSpec = json.deviceSpec,
             defaultOwner = json.defaultOwner,
@@ -107,6 +108,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
 data class JsonRulerConfig(
     val projectPath: String,
     val ownershipFile: String? = null,
+    val staticComponentsPath: String? = null,
     val appInfo: AppInfo,
     val deviceSpec: DeviceSpec? = null,
     val defaultOwner: String,

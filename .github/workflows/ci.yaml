@@ -32,7 +32,7 @@ jobs:
       - name: Run checks
         env:
           ANDROID_GRADLE_PLUGIN_VERSION: ${{ matrix.android-gradle-plugin }}
-        run: ./gradlew check --no-daemon --stacktrace "-Dorg.gradle.jvmargs=-XX:+UseContainerSupport"
+        run: ./gradlew check --no-daemon --stacktrace "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=2048m"
 
       - name: Archive sample HTML report
         uses: actions/upload-artifact@v2

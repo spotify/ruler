@@ -25,6 +25,7 @@ import com.spotify.ruler.common.BaseRulerTask
 import com.spotify.ruler.common.FEATURE_NAME
 import com.spotify.ruler.common.apk.ApkCreator
 import com.spotify.ruler.common.apk.InjectedToolApkCreator
+import com.spotify.ruler.common.dependency.AarArtifactParser
 import com.spotify.ruler.common.dependency.ArtifactResult
 import com.spotify.ruler.common.dependency.DependencyComponent
 import com.spotify.ruler.common.dependency.DependencyEntry
@@ -77,12 +78,20 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     private val dependencies: Map<String, List<DependencyComponent>> by lazy {
         val json = Json.decodeFromStream<ModuleMap>(dependencyMap.inputStream())
         val jarArtifactParser = JarArtifactParser()
+        val aarArtifactParser = AarArtifactParser()
         val jarDependencies = json.jars.distinctBy {
             it.jar
         }.flatMap {
-            jarArtifactParser.parseFile(
-                ArtifactResult.JarArtifact(File(it.jar), it.module)
-            )
+            val file = File(it.jar)
+            when(file.extension) {
+                "jar" -> jarArtifactParser.parseFile(
+                    ArtifactResult.JarArtifact(File(it.jar), it.module)
+                )
+                "aar" -> aarArtifactParser.parseFile(
+                    ArtifactResult.AarArtifact(file, it.module)
+                )
+                else -> emptyList()
+            }
         }
 
         val assets = json.assets.map {

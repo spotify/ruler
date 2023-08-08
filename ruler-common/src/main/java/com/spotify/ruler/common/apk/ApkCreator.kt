@@ -33,14 +33,10 @@ import com.android.utils.StdLogger
 import com.spotify.ruler.common.models.DeviceSpec
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.BufferedReader
 import java.io.File
-import java.io.IOException
-import java.io.InputStreamReader
 import java.io.StringReader
 import java.nio.file.Path
 import java.util.Optional
-import java.util.concurrent.TimeUnit
 
 /**
  * Responsible for creating APKs based on provided app bundle (AAB) files.
@@ -63,7 +59,6 @@ open class ApkCreator(private val rootDir: File) {
      */
     fun createSplitApks(bundleFile: File, deviceSpec: DeviceSpec, targetDir: File): Map<String, List<File>> {
         targetDir.listFiles()?.forEach(File::deleteRecursively) // Overwrite existing files
-
         BuildApksCommand.builder()
             .setBundlePath(bundleFile.toPath())
             .setOutputFile(targetDir.toPath())

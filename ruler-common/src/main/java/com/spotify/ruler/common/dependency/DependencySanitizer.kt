@@ -61,6 +61,6 @@ class DependencySanitizer(private val classNameSanitizer: ClassNameSanitizer) {
     /** Determines the correct component type for a given [entry]. */
     private fun getComponentType(entry: DependencyEntry): ComponentType = when {
         entry.component.startsWith(':') -> ComponentType.INTERNAL
-        else -> ComponentType.EXTERNAL
+        else -> ComponentType.INTERNAL
     }
 }

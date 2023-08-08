@@ -10,3 +10,7 @@
 local.properties
 /kotlin-js-store
 ruler-common/build
+ruler-cli/bin
+ruler-common/bin
+ruler-gradle-plugin/bin
+ruler-e2e-tests/bin

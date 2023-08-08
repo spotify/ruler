@@ -26,6 +26,7 @@ class DependencyParser {
         val jarArtifactParser = JarArtifactParser()
         val defaultArtifactParser = DefaultArtifactParser()
         val classArtifactParser = ClassArtifactParser()
+        val aarArtifactParser = AarArtifactParser()
         entries.forEach {
             result += when (it) {
                 is ArtifactResult.DefaultArtifact -> {
@@ -36,6 +37,10 @@ class DependencyParser {
                 }
                 is ArtifactResult.JarArtifact -> {
                     jarArtifactParser.parseFile(it)
+                }
+
+                is ArtifactResult.AarArtifact -> {
+                    aarArtifactParser.parseFile(it)
                 }
             }
         }

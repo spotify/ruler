@@ -19,6 +19,7 @@ package com.spotify.ruler.common.dependency
 import java.io.File
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
+import java.util.zip.ZipEntry
 
 interface ArtifactParser<in T> {
     fun parseFile(artifactResult: T): List<DependencyEntry>
@@ -48,19 +49,54 @@ class JarArtifactParser : ArtifactParser<ArtifactResult.JarArtifact> {
 
     override fun parseFile(artifactResult: ArtifactResult.JarArtifact): List<DependencyEntry> {
         val component = artifactResult.component
-        return JarFile(artifactResult.file).use { jarFile ->
-            jarFile.entries().asSequence().filterNot(JarEntry::isDirectory).map { entry ->
-                when {
-                    isClassEntry(entry.name) -> DependencyEntry.Class(entry.name, component)
-                    else -> DependencyEntry.Default(entry.name, component)
-                }
-            }.toList()
+        val log = component == "com.google.firebase:firebase-crashlytics-ndk:18.3.6-fixed"
+        val result = JarFile(artifactResult.file).use { jarFile ->
+                jarFile.entries().asSequence().filterNot(JarEntry::isDirectory).map { entry ->
+                    if (log) {
+                        println(entry.name)
+                    }
+                    when {
+                        isClassEntry(entry.name) -> DependencyEntry.Class(entry.name, component)
+                        else -> DependencyEntry.Default(entry.name, component)
+                    }
+                }.toList()
+            }
+        if (log) {
+            println("Here's the results::::")
+            result.forEach {
+                println(it)
+            }
         }
+        return result
     }
 
     private fun isClassEntry(entryName: String): Boolean {
         return entryName.endsWith(".class", ignoreCase = true)
     }
+
+}
+
+class AarArtifactParser: ArtifactParser<ArtifactResult.AarArtifact> {
+    private val jarArtifactParser = JarArtifactParser()
+    override fun parseFile(artifactResult: ArtifactResult.AarArtifact): List<DependencyEntry> {
+        val component = artifactResult.component
+
+        return AarFile(artifactResult.file).use { jarFile ->
+            jarFile.entries().asSequence().filterNot(ZipEntry::isDirectory).map { entry ->
+                when {
+                    isJarEntry(entry.name) -> jarArtifactParser.parseFile(
+                        ArtifactResult.JarArtifact(jarFile.jarFile!!, component)
+                    )
+                    isSoEntry(entry.name) -> listOf(DependencyEntry.Default(entry.name.removePrefix("jni"), component))
+                    else -> emptyList()
+                }
+            }.toList().flatten()
+        }
+    }
+    private fun isJarEntry(entryName: String): Boolean =
+        entryName == "classes.jar"
+    private fun isSoEntry(entryName: String): Boolean =
+        entryName.endsWith(".so", ignoreCase = true)
 }
 
 sealed interface ArtifactResult {
@@ -71,6 +107,8 @@ sealed interface ArtifactResult {
     ) : ArtifactResult
 
     data class JarArtifact(val file: File, val component: String) : ArtifactResult
+
+    data class AarArtifact(val file: File, val component: String) : ArtifactResult
 
     data class ClassArtifact(val file: File, val resolvedArtifactFile: File, val component: String) : ArtifactResult
 }

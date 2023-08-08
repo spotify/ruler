@@ -16,8 +16,6 @@
 
 package com.spotify.ruler.common
 
-import com.spotify.ruler.models.AppFile
-import com.spotify.ruler.models.ComponentType
 import com.spotify.ruler.common.apk.ApkParser
 import com.spotify.ruler.common.apk.ApkSanitizer
 import com.spotify.ruler.common.attribution.Attributor
@@ -29,6 +27,8 @@ import com.spotify.ruler.common.report.HtmlReporter
 import com.spotify.ruler.common.report.JsonReporter
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
 import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
+import com.spotify.ruler.models.AppFile
+import com.spotify.ruler.models.ComponentType
 import java.io.File
 
 const val FEATURE_NAME = "base"
@@ -53,7 +53,12 @@ interface BaseRulerTask {
         // Split main APK bundle entries and dynamic feature module entries
         val mainFiles = files.getValue(FEATURE_NAME)
         val featureFiles = files.filter { (feature, _) -> feature != FEATURE_NAME }
-
+        featureFiles.entries.forEach {
+            println("------- ${it.key} ------")
+            it.value.forEach {
+                println("    ${it.name}")
+            }
+        }
         // The default component in Gradle is a "fake" application component.
         // In Bazel we already have an application component based on the target name of the app,
         // which we can reuse
@@ -75,7 +80,7 @@ interface BaseRulerTask {
         val classNameSanitizer = ClassNameSanitizer(provideMappingFile())
         val resourceNameSanitizer = ResourceNameSanitizer(provideResourceMappingFile())
         val apkSanitizer = ApkSanitizer(classNameSanitizer, resourceNameSanitizer)
-
+        println(rulerConfig.apkFilesMap)
         return rulerConfig().apkFilesMap.mapValues { (_, apks) ->
             val entries = apks.flatMap(apkParser::parse)
             apkSanitizer.sanitize(entries)
@@ -86,7 +91,6 @@ interface BaseRulerTask {
         val ownershipFile = rulerConfig.ownershipFile ?: return null
         val ownershipFileParser = OwnershipFileParser()
         val ownershipEntries = ownershipFileParser.parse(ownershipFile)
-
         return OwnershipInfo(ownershipEntries, rulerConfig.defaultOwner)
     }
 

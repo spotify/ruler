@@ -57,19 +57,33 @@ class Attributor(private val defaultComponent: DependencyComponent) {
     /** Tries to determine the component for a certain class. */
     @Suppress("ReturnCount")
     private fun getComponentForClass(name: String, dependencies: Dependencies): DependencyComponent? {
+//        println("Attributing: $name")
+        val log = name.contains("CrashpadController")
+        if (log) {
+            println("found ${name}")
+        }
         if (dependencies[name]?.size == 1) {
+            if (log) {
+                println("return 1")
+            }
             return dependencies.getValue(name).single()
         }
 
         // Attribute Dagger factories like the type they produce
         val daggerFactoryName = name.removeSuffix("_Factory")
         if (dependencies[daggerFactoryName]?.size == 1) {
+            if (log) {
+                println("return 2")
+            }
             return dependencies.getValue(daggerFactoryName).single()
         }
 
         // Attribute Dagger modules like their abstract class/interface
         val daggerModuleName = name.substringBefore("_Provide")
         if (dependencies[daggerModuleName]?.size == 1) {
+            if (log) {
+                println("return 3")
+            }
             return dependencies.getValue(daggerModuleName).single()
         }
 
@@ -78,6 +92,9 @@ class Attributor(private val defaultComponent: DependencyComponent) {
             val packageName = name.substringBefore(".-\$\$Lambda\$")
             val component = getComponentForPackage(packageName, dependencies)
             if (component != null) {
+                if (log) {
+                    println("return 4")
+                }
                 return component
             }
         }
@@ -88,12 +105,19 @@ class Attributor(private val defaultComponent: DependencyComponent) {
             val candidates = dependencies.filter { it.key.substringAfterLast('.') == simpleClassName }.values.flatten()
             val component = candidates.distinct().singleOrNull()
             if (component != null) {
+                if (log) {
+                    println("return 5")
+                }
                 return component
             }
         }
 
         // If everything else fails, try matching based on package name
         val packageName = name.substringBeforeLast('.')
+        if (log) {
+            println("return 6")
+        }
+
         return getComponentForPackage(packageName, dependencies)
     }
 

@@ -40,6 +40,7 @@ class ApkParser {
                 apkEntries += when {
                     isDexEntry(name) -> {
                         val bytes = zipFile.getInputStream(zipEntry).readBytes()
+                        println("!!!!! Parsing Dex File $name !!!!!")
                         ApkEntry.Dex(name, downloadSize, installSize, parseDexEntry(bytes))
                     }
                     // When build from bazel resources coming from

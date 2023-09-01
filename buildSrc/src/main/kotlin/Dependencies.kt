@@ -83,8 +83,8 @@ object Dependencies {
         const val KOTLIN_REACT_ROUTER = "6.11.0-pre.545" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react-router-dom
         const val KOTLIN_JS_EXTENSIONS = "1.0.1-pre.545" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-extensions
 
-        const val SELENIUM_WEBDRIVER = "4.8.1" // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
-        const val SELENIUM_WEBDRIVER_MANAGER = "5.3.2" // https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager
+        const val SELENIUM_WEBDRIVER = "4.11.0" // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+        const val SELENIUM_WEBDRIVER_MANAGER = "5.5.2" // https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager
 
         const val REACT = "18.2.0" // https://www.npmjs.com/package/react
         const val BOOTSTRAP = "5.2.1" // https://www.npmjs.com/package/bootstrap

@@ -4,9 +4,6 @@ import com.spotify.ruler.common.apk.ApkEntry
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.util.logging.Level.INFO
-import java.util.logging.Level.WARNING
-import java.util.logging.Logger
 
 private const val COLUMN_SIZE = 3
 /**
@@ -22,15 +19,14 @@ private const val COLUMN_SIZE = 3
 object Bloaty {
 
     private val bloatyPath: String? by lazy { findBloatyPath() }
-    private val logger = Logger.getLogger("Ruler")
 
     private fun findBloatyPath(): String? {
         val path = executeCommandAndGetOutput("which bloaty").singleOrNull()
         return if (path.isNullOrEmpty()) {
-            logger.log(WARNING, "Could not find Bloaty. Install Bloaty for more information about native libraries.")
+            println("Could not find Bloaty. Install Bloaty for more information about native libraries.")
             null
         } else {
-            logger.log(INFO, "Bloaty detected at: $path")
+            println( "Bloaty detected at: $path")
             path
         }
     }
@@ -61,9 +57,9 @@ object Bloaty {
      * @return A list of [ApkEntry.Default] representing the compiled units in the native library.
      */
     fun parseNativeLibraryEntry(bytes: ByteArray, debugFile: File?): List<ApkEntry.Default> {
-        logger.log(INFO, "Parsing unstripped library at: $debugFile")
+        println("Parsing unstripped library at: $debugFile")
         if (bloatyPath == null || debugFile == null) {
-            logger.log(INFO, "Unable to parse library")
+            println("Unable to parse library")
             return emptyList()
         }
 
@@ -77,8 +73,8 @@ object Bloaty {
         val command =
             "$bloatyPath --debug-file=${debugFile.absolutePath} ${tmpFile.absolutePath} -d compileunits -n 0 --csv"
 
-        logger.log(INFO, "Running bloaty command:")
-        logger.log(INFO, command)
+        println("Running bloaty command:")
+        println(command)
 
         return parseBloatyOutputToApkEntry(command)
     }
@@ -106,7 +102,7 @@ object Bloaty {
                 rows.add(entry)
             }
         }
-        logger.log(INFO, "Parsed ${rows.count()} APK entries")
+        println("Parsed ${rows.count()} APK entries")
         return rows
     }
 

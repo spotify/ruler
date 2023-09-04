@@ -20,18 +20,16 @@ import com.android.tools.apk.analyzer.ApkSizeCalculator
 import com.android.tools.apk.analyzer.dex.DexFiles
 import com.spotify.ruler.common.bloaty.Bloaty
 import java.io.File
-import java.util.logging.Level
-import java.util.logging.Logger
 import java.util.zip.ZipFile
 
 /** Responsible for parsing and extracting entries from APK files. */
-class ApkParser(private val unstrippedNativeLibraryPaths: List<File> = emptyList(),
-                private val logger: Logger = Logger.getLogger("Ruler")
+class ApkParser(
+    private val unstrippedNativeLibraryPaths: List<File> = emptyList()
 ) {
 
     /** Parses and returns the list of entries contained in the given [apkFile]. */
     fun parse(apkFile: File) : List<ApkEntry> {
-        logger.log(Level.INFO, unstrippedNativeLibraryPaths.map { it.path }.joinToString { ", " })
+        println(unstrippedNativeLibraryPaths.map { it.path }.joinToString { ", " })
         val sizeCalculator = ApkSizeCalculator.getDefault()
         val downloadSizePerFile = sizeCalculator.getDownloadSizePerFile(apkFile.toPath())
         val installSizePerFile = sizeCalculator.getRawSizePerFile(apkFile.toPath())
@@ -98,7 +96,7 @@ class ApkParser(private val unstrippedNativeLibraryPaths: List<File> = emptyList
         val result = unstrippedNativeLibraryPaths.find {
             it.name.contains(entryFileName)
         }
-        logger.info("Looking for unstripped file for $entryName. Matched: $result")
+        println("Looking for unstripped file for $entryName. Matched: $result")
         return result
     }
 }

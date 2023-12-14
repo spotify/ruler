@@ -16,7 +16,7 @@
 
 package com.spotify.ruler.plugin
 
-import com.spotify.ruler.plugin.apk.ApkCreator
+import com.spotify.ruler.common.apk.ApkCreator
 import com.spotify.ruler.plugin.dependency.EntryParser
 import com.spotify.ruler.common.BaseRulerTask
 import com.spotify.ruler.common.dependency.DependencyComponent

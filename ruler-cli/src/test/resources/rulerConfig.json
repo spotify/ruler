@@ -4,6 +4,12 @@
     "variantName": "release",
     "versionName": "1.0.0"
   },
+  "deviceSpec": {
+    "supportedAbis": ["arm64-v8a"],
+    "supportedLocales": ["en"],
+    "screenDensity": 480,
+    "sdkVersion": 27
+  },
   "defaultOwner": "main_activity",
   "omitFileBreakdown": false,
   "ownershipFile": "src/test/resources/test_ownership.yaml",

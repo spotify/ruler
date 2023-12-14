@@ -125,7 +125,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
         val apkCreator = if (aapt2Tool != null) {
             InjectedToolApkCreator(aapt2Tool!!.toPath())
         } else {
-            ApkCreator(File(config.projectPath))
+            ApkCreator(File(projectPath))
         }
 
         return if (apkFile.extension == "apk") {

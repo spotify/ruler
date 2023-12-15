@@ -58,9 +58,14 @@ class DependencySanitizer(private val classNameSanitizer: ClassNameSanitizer) {
         }
     }
 
-    /** Determines the correct component type for a given [entry]. */
+    private val versionRegex = Regex("^\\d+\\.\\d+\\.\\d.*")
+
+    /**
+     * Determines the correct component type for a given [entry].
+     * Assuming that all external dependencies do have a version number in the format XX.XX.XX
+     * */
     private fun getComponentType(entry: DependencyEntry): ComponentType = when {
-        entry.component.startsWith(':') -> ComponentType.INTERNAL
-        else -> ComponentType.EXTERNAL
+        versionRegex.containsMatchIn(entry.component.substringAfterLast(":","")) -> ComponentType.EXTERNAL
+        else -> ComponentType.INTERNAL
     }
 }

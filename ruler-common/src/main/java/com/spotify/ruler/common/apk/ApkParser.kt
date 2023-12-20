@@ -24,7 +24,8 @@ import java.util.zip.ZipFile
 
 /** Responsible for parsing and extracting entries from APK files. */
 class ApkParser(
-    private val unstrippedNativeLibraryPaths: List<File> = emptyList()
+    private val unstrippedNativeLibraryPaths: List<File> = emptyList(),
+    private val bloatyPath: String? = null
 ) {
 
     /** Parses and returns the list of entries contained in the given [apkFile]. */
@@ -33,7 +34,7 @@ class ApkParser(
         val sizeCalculator = ApkSizeCalculator.getDefault()
         val downloadSizePerFile = sizeCalculator.getDownloadSizePerFile(apkFile.toPath())
         val installSizePerFile = sizeCalculator.getRawSizePerFile(apkFile.toPath())
-
+        val bloaty = Bloaty(bloatyPath)
         val apkEntries = mutableListOf<ApkEntry>()
         ZipFile(apkFile).use { zipFile ->
             zipFile.entries().iterator().forEach { zipEntry ->
@@ -52,7 +53,7 @@ class ApkParser(
                             name,
                             downloadSize,
                             installSize,
-                            Bloaty.parseNativeLibraryEntry(
+                            bloaty.parseNativeLibraryEntry(
                                 bytes,
                                 debugFileForNativeLibrary(entryName = name)
                             )

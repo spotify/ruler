@@ -16,12 +16,12 @@ private const val COLUMN_SIZE = 3
  *
  * Bloaty Source Code Repository: [https://github.com/google/bloaty](https://github.com/google/bloaty)
  */
-object Bloaty {
+class Bloaty(val path: String? = null) {
 
     private val bloatyPath: String? by lazy { findBloatyPath() }
 
     private fun findBloatyPath(): String? {
-        val path = executeCommandAndGetOutput("which bloaty").singleOrNull()
+        val path = path ?: executeCommandAndGetOutput("which bloaty").singleOrNull()
         return if (path.isNullOrEmpty()) {
             println("Could not find Bloaty. Install Bloaty for more information about native libraries.")
             null

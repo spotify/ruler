@@ -53,6 +53,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     private val resourceMappingFile: File? by option().file()
     private val unstrippedNativeFiles: List<File> by option().file().multiple()
     private val aapt2Tool: File? by option().file()
+    private val bloatyTool: File? by option().file()
 
     override fun print(content: String) = echo(content)
 
@@ -62,6 +63,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
 
     override fun rulerConfig(): RulerConfig = config
     override fun provideUnstrippedLibraryFiles() = unstrippedNativeFiles
+    override fun provideBloatyPath() = bloatyTool?.path
 
     private val config: RulerConfig by lazy {
         val json = Json.decodeFromStream<JsonRulerConfig>(rulerConfigJson.inputStream())
@@ -115,6 +117,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
         Using Proguard Mapping File: ${mappingFile?.path}
         Using Resource Mapping File: ${resourceMappingFile?.path}
         Using AAPT2: ${aapt2Tool?.path}
+        Using Bloaty: ${bloatyTool?.path}
         Writing reports to: ${reportDir.path}
         """.trimIndent())
         super.run()

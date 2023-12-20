@@ -45,6 +45,8 @@ interface BaseRulerTask {
     fun provideResourceMappingFile(): File?
     fun rulerConfig(): RulerConfig
     fun provideUnstrippedLibraryFiles(): List<File>
+    fun provideBloatyPath(): String?
+
     private val rulerConfig: RulerConfig
         get() = rulerConfig()
 
@@ -85,7 +87,7 @@ interface BaseRulerTask {
     }
 
     private fun getFilesFromBundle(): Map<String, List<AppFile>> {
-        val apkParser = ApkParser(provideUnstrippedLibraryFiles())
+        val apkParser = ApkParser(provideUnstrippedLibraryFiles(), provideBloatyPath())
         val classNameSanitizer = ClassNameSanitizer(provideMappingFile())
         val resourceNameSanitizer = ResourceNameSanitizer(provideResourceMappingFile())
         val apkSanitizer = ApkSanitizer(classNameSanitizer, resourceNameSanitizer)

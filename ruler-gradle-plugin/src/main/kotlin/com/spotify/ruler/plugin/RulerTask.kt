@@ -118,6 +118,9 @@ abstract class RulerTask : DefaultTask(), BaseRulerTask {
     override fun provideUnstrippedLibraryFiles(): List<File> = unstrippedNativeFiles.get().map {
         it.asFile
     }
+
+    override fun provideBloatyPath() = null
+
     private fun createApkFile(): Map<String, List<File>> {
         val apkCreator = ApkCreator(project.rootDir)
 

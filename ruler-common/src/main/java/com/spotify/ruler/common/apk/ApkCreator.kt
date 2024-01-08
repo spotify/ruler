@@ -1,4 +1,3 @@
-
 /*
 * Copyright 2021 Spotify AB
 *
@@ -33,20 +32,24 @@ import com.android.utils.StdLogger
 import com.spotify.ruler.common.models.DeviceSpec
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.BufferedReader
 import java.io.File
-import java.io.IOException
-import java.io.InputStreamReader
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.StringReader
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Optional
-import java.util.concurrent.TimeUnit
+import java.util.logging.Level
+import java.util.logging.Logger
+import java.util.zip.ZipInputStream
 
 /**
  * Responsible for creating APKs based on provided app bundle (AAB) files.
  *
  * @param rootDir Root directory of the Gradle project, needed to look up the path of certain binaries.
  */
+
+const val BUFFER_SIZE = 1024
 open class ApkCreator(private val rootDir: File) {
 
     private val rulerDebugKey = "rulerDebug.keystore"
@@ -61,7 +64,11 @@ open class ApkCreator(private val rootDir: File) {
      * @param targetDir Directory where the APKs should be located. Contents of this directory will be deleted
      * @return Map of modules from the AAB file with all the APKs belonging to each module
      */
-    fun createSplitApks(bundleFile: File, deviceSpec: DeviceSpec, targetDir: File): Map<String, List<File>> {
+    fun createSplitApks(
+        bundleFile: File,
+        deviceSpec: DeviceSpec,
+        targetDir: File
+    ): Map<String, List<File>> {
         targetDir.listFiles()?.forEach(File::deleteRecursively) // Overwrite existing files
 
         BuildApksCommand.builder()
@@ -74,14 +81,7 @@ open class ApkCreator(private val rootDir: File) {
             .build()
             .execute()
 
-        val result = BuildApksResult.parseFrom(targetDir.resolve("toc.pb").readBytes())
-        val variant = result.variantList.single() // We're targeting one device -> we only expect a single variant
-
-        return variant.apkSetList.associate { apkSet ->
-            val moduleName = apkSet.moduleMetadata.name
-            val moduleSplits = apkSet.apkDescriptionList.map { targetDir.resolve(it.path) }
-            moduleName to moduleSplits
-        }
+        return parseSplitApkDirectory(targetDir)
     }
 
     /** Converts the given [deviceSpec] into a format which bundletool understands. */
@@ -134,6 +134,62 @@ open class ApkCreator(private val rootDir: File) {
     }
 }
 
-class InjectedToolApkCreator(private val aapt2Tool: Path): ApkCreator(File("")) {
+class InjectedToolApkCreator(private val aapt2Tool: Path) : ApkCreator(File("")) {
     override fun getAapt2Location(): Path = aapt2Tool
+}
+
+@Suppress("NestedBlockDepth")
+fun unzipFile(zipFile: File, destDirectory: Path) {
+    val logger = Logger.getLogger("Ruler")
+    val buffer = ByteArray(BUFFER_SIZE)
+
+    // Create a temporary directory
+    Files.createDirectories(destDirectory)
+
+    // Create ZipInputStream to read the zip file
+    val zipInputStream = ZipInputStream(FileInputStream(zipFile))
+
+    // Loop through each entry in the zip file
+    var zipEntry = zipInputStream.nextEntry
+    while (zipEntry != null) {
+        val newFile = destDirectory.resolve(zipEntry.name)
+        logger.log(Level.INFO, "extracting $zipEntry to $newFile")
+
+        // Create necessary directories if they don't exist
+        if (zipEntry.isDirectory) {
+            Files.createDirectories(newFile)
+        } else {
+            newFile.toFile().parentFile.mkdirs()
+            // Create FileOutputStream to write the file
+            FileOutputStream(newFile.toFile()).use { fos ->
+                // Read and write the data
+                var len = zipInputStream.read(buffer)
+                while (len > 0) {
+                    fos.write(buffer, 0, len)
+                    len = zipInputStream.read(buffer)
+                }
+            }
+        }
+
+        // Move to the next entry in the zip file
+        zipEntry = zipInputStream.nextEntry
+    }
+
+    // Close the ZipInputStream
+    zipInputStream.closeEntry()
+    zipInputStream.close()
+
+    println("File successfully unzipped to $destDirectory")
+}
+
+fun parseSplitApkDirectory(targetDir: File): Map<String, List<File>> {
+    val result = BuildApksResult.parseFrom(targetDir.resolve("toc.pb").readBytes())
+    val variant =
+        result.variantList.single() // We're targeting one device -> we only expect a single variant
+
+    return variant.apkSetList.associate { apkSet ->
+        val moduleName = apkSet.moduleMetadata.name
+        val moduleSplits = apkSet.apkDescriptionList.map { targetDir.resolve(it.path) }
+        moduleName to moduleSplits
+    }
 }

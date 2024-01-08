@@ -26,6 +26,8 @@ import com.spotify.ruler.common.BaseRulerTask
 import com.spotify.ruler.common.FEATURE_NAME
 import com.spotify.ruler.common.apk.ApkCreator
 import com.spotify.ruler.common.apk.InjectedToolApkCreator
+import com.spotify.ruler.common.apk.parseSplitApkDirectory
+import com.spotify.ruler.common.apk.unzipFile
 import com.spotify.ruler.common.dependency.ArtifactResult
 import com.spotify.ruler.common.dependency.DependencyComponent
 import com.spotify.ruler.common.dependency.DependencyEntry
@@ -40,6 +42,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
+import java.nio.file.Files
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -47,7 +50,8 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     private val logger = Logger.getLogger("Ruler")
     private val dependencyMap by option().file().required()
     private val rulerConfigJson by option().file().required()
-    private val apkFile by option().file().required()
+    private val apkFile by option().file()
+    private val bundleFile by option().file()
     private val reportDir by option().file(canBeDir = true).required()
     private val mappingFile: File? by option().file()
     private val resourceMappingFile: File? by option().file()
@@ -69,7 +73,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
         val json = Json.decodeFromStream<JsonRulerConfig>(rulerConfigJson.inputStream())
         RulerConfig(
             projectPath = json.projectPath,
-            apkFilesMap = createApkFile(json.projectPath, json.deviceSpec!!),
+            apkFilesMap = apkFiles(config = json),
             reportDir = reportDir,
             ownershipFile = json.ownershipFile?.let { File(it) },
             staticDependenciesFile = json.staticComponentsPath?.let { File(it) },
@@ -106,6 +110,41 @@ class RulerCli : CliktCommand(), BaseRulerTask {
         dependencySanitizer.sanitize(entries)
     }
 
+    private fun apkFiles(config: JsonRulerConfig): Map<String, List<File>> {
+        return if (apkFile != null) {
+            if (apkFile!!.extension == "apk") {
+                logger.log(Level.INFO, "Using APK file ${apkFile?.path}")
+                mapOf(FEATURE_NAME to listOf(apkFile!!))
+            } else {
+                logger.log(Level.INFO, "Using Split APK file ${apkFile?.path}")
+                val directory = Files.createTempDirectory("split_apk_tmp")
+                unzipFile(apkFile!!, directory)
+                parseSplitApkDirectory(directory.toFile())
+            }
+        } else if (bundleFile != null) {
+            with(if (aapt2Tool != null) {
+                    logger.log(
+                        Level.INFO,
+                        "Creating InjectedToolApkCreator with ${aapt2Tool?.path}"
+                    )
+                    InjectedToolApkCreator(aapt2Tool!!.toPath())
+                } else {
+                    ApkCreator(File(config.projectPath))
+                }
+            ) {
+                createSplitApks(
+                    bundleFile!!,
+                    config.deviceSpec!!,
+                    File(config.projectPath).resolve(File("tmp")).apply {
+                        mkdir()
+                    }
+                )
+            }
+        } else {
+            throw IllegalArgumentException("No APK file or bundle file provided")
+        }
+    }
+
     override fun provideDependencies(): Map<String, List<DependencyComponent>> = dependencies
 
     override fun run() {
@@ -113,7 +152,8 @@ class RulerCli : CliktCommand(), BaseRulerTask {
         ~~~~~ Starting Ruler ~~~~~
         Using Dependency Map: ${dependencyMap.path}
         Using Ruler Config: ${rulerConfigJson.path}
-        Using App File: ${apkFile.path}
+        Using APK File: ${apkFile?.path}
+        Using Bundle File: ${bundleFile?.path}
         Using Proguard Mapping File: ${mappingFile?.path}
         Using Resource Mapping File: ${resourceMappingFile?.path}
         Using AAPT2: ${aapt2Tool?.path}
@@ -122,28 +162,6 @@ class RulerCli : CliktCommand(), BaseRulerTask {
         """.trimIndent())
         super.run()
     }
-
-    private fun createApkFile(projectPath: String, deviceSpec: DeviceSpec): Map<String, List<File>> {
-
-        val apkCreator = if (aapt2Tool != null) {
-            InjectedToolApkCreator(aapt2Tool!!.toPath())
-        } else {
-            ApkCreator(File(projectPath))
-        }
-
-        return if (apkFile.extension == "apk") {
-            mapOf(FEATURE_NAME to listOf(apkFile))
-        } else {
-            apkCreator.createSplitApks(
-                apkFile,
-                deviceSpec,
-                File(projectPath).resolve(File("tmp")).apply {
-                    mkdir()
-                }
-            )
-        }
-    }
-
 }
 
 @Serializable

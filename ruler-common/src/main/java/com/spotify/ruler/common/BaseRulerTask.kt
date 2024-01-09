@@ -91,10 +91,13 @@ interface BaseRulerTask {
         val classNameSanitizer = ClassNameSanitizer(provideMappingFile())
         val resourceNameSanitizer = ResourceNameSanitizer(provideResourceMappingFile())
         val apkSanitizer = ApkSanitizer(classNameSanitizer, resourceNameSanitizer)
-
-        return rulerConfig().apkFilesMap.mapValues { (_, apks) ->
-            val entries = apks.flatMap(apkParser::parse)
-            apkSanitizer.sanitize(entries)
+        val config = rulerConfig()
+        return config.apkFilesMap.mapValues { (name, apks) ->
+            val entries = apks.flatMap(apkParser::parse).toMutableList()
+            if (name == FEATURE_NAME && config.additionalEntries != null) {
+                entries += config.additionalEntries
+            }
+            apkSanitizer.sanitize(entries, config.ignoredFiles)
         }
     }
 

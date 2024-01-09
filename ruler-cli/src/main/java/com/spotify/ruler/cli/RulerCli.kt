@@ -18,6 +18,8 @@
 package com.spotify.ruler.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
@@ -25,6 +27,7 @@ import com.github.ajalt.clikt.parameters.types.file
 import com.spotify.ruler.common.BaseRulerTask
 import com.spotify.ruler.common.FEATURE_NAME
 import com.spotify.ruler.common.apk.ApkCreator
+import com.spotify.ruler.common.apk.ApkEntry
 import com.spotify.ruler.common.apk.InjectedToolApkCreator
 import com.spotify.ruler.common.apk.parseSplitApkDirectory
 import com.spotify.ruler.common.apk.unzipFile
@@ -49,7 +52,6 @@ import java.util.logging.Logger
 class RulerCli : CliktCommand(), BaseRulerTask {
     private val logger = Logger.getLogger("Ruler")
     private val dependencyMap by option().file().required()
-    private val rulerConfigJson by option().file().required()
     private val apkFile by option().file()
     private val bundleFile by option().file()
     private val reportDir by option().file(canBeDir = true).required()
@@ -58,6 +60,15 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     private val unstrippedNativeFiles: List<File> by option().file().multiple()
     private val aapt2Tool: File? by option().file()
     private val bloatyTool: File? by option().file()
+    private val defaultOwner by option().default("unknown")
+    private val staticComponentsFile by option().file()
+    private val ownershipFile by option().file()
+    private val omitFileBreakdown by option().flag()
+    private val projectPath by option().required()
+    private val deviceSpecFile by option().file()
+    private val appInfoFile by option().file().required()
+    private val additionalEntriesFile by option().file()
+    private val ignoreFile by option().multiple()
 
     override fun print(content: String) = echo(content)
 
@@ -70,17 +81,26 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     override fun provideBloatyPath() = bloatyTool?.path
 
     private val config: RulerConfig by lazy {
-        val json = Json.decodeFromStream<JsonRulerConfig>(rulerConfigJson.inputStream())
+        val deviceSpec = deviceSpecFile?.let {
+            Json.decodeFromStream<DeviceSpec>(it.inputStream())
+        }
+        val appInfo = Json.decodeFromStream<AppInfo>(appInfoFile.inputStream())
+
+        val additionalEntries =
+            additionalEntriesFile?.let { Json.decodeFromStream<List<ApkEntry.Default>>(it.inputStream()) }
+        logger.log(Level.INFO, "Got ${additionalEntries?.size} additional entries")
         RulerConfig(
-            projectPath = json.projectPath,
-            apkFilesMap = apkFiles(config = json),
+            projectPath = projectPath,
+            apkFilesMap = apkFiles(projectPath, deviceSpec),
             reportDir = reportDir,
-            ownershipFile = json.ownershipFile?.let { File(it) },
-            staticDependenciesFile = json.staticComponentsPath?.let { File(it) },
-            appInfo = json.appInfo,
-            deviceSpec = json.deviceSpec,
-            defaultOwner = json.defaultOwner,
-            omitFileBreakdown = json.omitFileBreakdown
+            ownershipFile = ownershipFile,
+            staticDependenciesFile = staticComponentsFile,
+            appInfo = appInfo,
+            deviceSpec = deviceSpec,
+            defaultOwner = defaultOwner,
+            omitFileBreakdown = omitFileBreakdown,
+            additionalEntries = additionalEntries,
+            ignoredFiles = ignoreFile
         )
     }
 
@@ -110,7 +130,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
         dependencySanitizer.sanitize(entries)
     }
 
-    private fun apkFiles(config: JsonRulerConfig): Map<String, List<File>> {
+    private fun apkFiles(projectPath: String, deviceSpec: DeviceSpec?): Map<String, List<File>> {
         return if (apkFile != null) {
             if (apkFile!!.extension == "apk") {
                 logger.log(Level.INFO, "Using APK file ${apkFile?.path}")
@@ -122,20 +142,21 @@ class RulerCli : CliktCommand(), BaseRulerTask {
                 parseSplitApkDirectory(directory.toFile())
             }
         } else if (bundleFile != null) {
-            with(if (aapt2Tool != null) {
+            with(
+                if (aapt2Tool != null) {
                     logger.log(
                         Level.INFO,
                         "Creating InjectedToolApkCreator with ${aapt2Tool?.path}"
                     )
                     InjectedToolApkCreator(aapt2Tool!!.toPath())
                 } else {
-                    ApkCreator(File(config.projectPath))
+                    ApkCreator(File(projectPath))
                 }
             ) {
                 createSplitApks(
                     bundleFile!!,
-                    config.deviceSpec!!,
-                    File(config.projectPath).resolve(File("tmp")).apply {
+                    deviceSpec!!,
+                    File(projectPath).resolve(File("tmp")).apply {
                         mkdir()
                     }
                 )
@@ -148,10 +169,12 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     override fun provideDependencies(): Map<String, List<DependencyComponent>> = dependencies
 
     override fun run() {
-        logger.log(Level.INFO,  """
+
+        logger.log(
+            Level.INFO, """
         ~~~~~ Starting Ruler ~~~~~
+       
         Using Dependency Map: ${dependencyMap.path}
-        Using Ruler Config: ${rulerConfigJson.path}
         Using APK File: ${apkFile?.path}
         Using Bundle File: ${bundleFile?.path}
         Using Proguard Mapping File: ${mappingFile?.path}
@@ -159,21 +182,11 @@ class RulerCli : CliktCommand(), BaseRulerTask {
         Using AAPT2: ${aapt2Tool?.path}
         Using Bloaty: ${bloatyTool?.path}
         Writing reports to: ${reportDir.path}
-        """.trimIndent())
+        """.trimIndent()
+        )
         super.run()
     }
 }
-
-@Serializable
-data class JsonRulerConfig(
-    val projectPath: String,
-    val ownershipFile: String? = null,
-    val staticComponentsPath: String? = null,
-    val appInfo: AppInfo,
-    val deviceSpec: DeviceSpec? = null,
-    val defaultOwner: String,
-    val omitFileBreakdown: Boolean
-)
 
 @Serializable
 data class ModuleMap(

@@ -16,11 +16,11 @@
 
 package com.spotify.ruler.common.apk
 
+import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
+import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
 import com.spotify.ruler.models.ResourceType
-import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
-import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
 
 /**
  * Responsible for sanitizing APK entries, so they can be attributed easier.
@@ -40,7 +40,7 @@ class ApkSanitizer(
      * @param entries List of raw entries parsed from an APK file
      * @return Sanitized list of entries
      */
-    fun sanitize(entries: List<ApkEntry>): List<AppFile> {
+    fun sanitize(entries: List<ApkEntry>, ignoredFiles: List<String> = emptyList()): List<AppFile> {
         val buckets = listOf(
             NativeLibAssigningBucket(),
             DexFileBucket(),
@@ -52,7 +52,7 @@ class ApkSanitizer(
         )
 
         // Separate entries into their different sanitization bucket
-        entries.forEach { entry ->
+        entries.filterNot { it.name in ignoredFiles }.forEach { entry ->
             val bucket = buckets.first { it.isApplicable(entry) }
             bucket.add(entry)
         }

@@ -16,6 +16,7 @@
 
 package com.spotify.ruler.common.models
 
+import com.spotify.ruler.common.apk.ApkEntry
 import java.io.File
 
 data class RulerConfig(
@@ -27,5 +28,7 @@ data class RulerConfig(
     val appInfo: AppInfo,
     val deviceSpec: DeviceSpec?,
     val defaultOwner: String,
-    val omitFileBreakdown: Boolean
+    val omitFileBreakdown: Boolean,
+    val additionalEntries: List<ApkEntry.Default>?,
+    val ignoredFiles: List<String>
 )

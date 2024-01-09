@@ -16,15 +16,15 @@
 
 package com.spotify.ruler.plugin
 
-import com.spotify.ruler.common.apk.ApkCreator
-import com.spotify.ruler.plugin.dependency.EntryParser
 import com.spotify.ruler.common.BaseRulerTask
+import com.spotify.ruler.common.apk.ApkCreator
 import com.spotify.ruler.common.dependency.DependencyComponent
 import com.spotify.ruler.common.dependency.DependencySanitizer
 import com.spotify.ruler.common.models.AppInfo
 import com.spotify.ruler.common.models.DeviceSpec
 import com.spotify.ruler.common.models.RulerConfig
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
+import com.spotify.ruler.plugin.dependency.EntryParser
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
@@ -97,7 +97,9 @@ abstract class RulerTask : DefaultTask(), BaseRulerTask {
             appInfo = appInfo.get(),
             deviceSpec = deviceSpec.get(),
             defaultOwner = defaultOwner.get(),
-            omitFileBreakdown = omitFileBreakdown.get()
+            omitFileBreakdown = omitFileBreakdown.get(),
+            additionalEntries = emptyList(),
+            ignoredFiles = emptyList()
         )
     }
 

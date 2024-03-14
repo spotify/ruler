@@ -41,7 +41,9 @@ val browserDist by configurations.creating {
 }
 
 dependencies {
-    implementation(Dependencies.ANDROID_GRADLE_PLUGIN)
+    compileOnly(Dependencies.ANDROID_GRADLE_PLUGIN)
+    testRuntimeOnly(Dependencies.ANDROID_GRADLE_PLUGIN)
+
     compileOnly(Dependencies.BUNDLETOOL)
     compileOnly(Dependencies.PROTOBUF_CORE)
     compileOnly(Dependencies.ANDROID_TOOLS_COMMON)

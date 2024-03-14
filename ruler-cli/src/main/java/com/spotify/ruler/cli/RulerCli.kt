@@ -151,7 +151,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
                     )
                     InjectedToolApkCreator(aapt2Tool!!.toPath())
                 } else {
-                    ApkCreator(File(projectPath))
+                    ApkCreator()
                 }
             ) {
                 createSplitApks(

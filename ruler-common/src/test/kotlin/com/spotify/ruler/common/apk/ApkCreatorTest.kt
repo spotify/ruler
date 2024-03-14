@@ -24,7 +24,7 @@ import java.io.File
 import java.nio.file.Paths
 
 class ApkCreatorTest {
-    private val creator = ApkCreator(File(""))
+    private val creator = ApkCreator()
     private val bundleFile = Paths.get("src", "test", "resources", "test.aab").toFile()
     private val deviceSpec = DeviceSpec("arm64-v8a", "en", 480, 27)
 

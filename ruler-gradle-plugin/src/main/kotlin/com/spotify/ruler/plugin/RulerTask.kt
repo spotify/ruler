@@ -16,6 +16,7 @@
 
 package com.spotify.ruler.plugin
 
+import com.android.build.gradle.BaseExtension
 import com.spotify.ruler.common.BaseRulerTask
 import com.spotify.ruler.common.apk.ApkCreator
 import com.spotify.ruler.common.dependency.DependencyComponent
@@ -124,7 +125,8 @@ abstract class RulerTask : DefaultTask(), BaseRulerTask {
     override fun provideBloatyPath() = null
 
     private fun createApkFile(): Map<String, List<File>> {
-        val apkCreator = ApkCreator(project.rootDir)
+        val android = project.extensions.findByName("android") as BaseExtension?
+        val apkCreator = ApkCreator(android?.sdkDirectory)
 
         val apkFile = bundleFile.asFile.get()
         return if (apkFile.extension == "apk") {

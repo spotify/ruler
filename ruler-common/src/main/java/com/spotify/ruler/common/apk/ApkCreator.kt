@@ -16,8 +16,6 @@
 package com.spotify.ruler.common.apk
 
 import com.android.SdkConstants
-import com.android.build.gradle.internal.SdkLocator
-import com.android.builder.errors.DefaultIssueReporter
 import com.android.bundle.Commands.BuildApksResult
 import com.android.bundle.Devices
 import com.android.prefs.AndroidLocationsSingleton
@@ -28,7 +26,6 @@ import com.android.tools.build.bundletool.commands.BuildApksCommand
 import com.android.tools.build.bundletool.device.DeviceSpecParser
 import com.android.tools.build.bundletool.model.Password
 import com.android.tools.build.bundletool.model.SigningConfiguration
-import com.android.utils.StdLogger
 import com.spotify.ruler.common.models.DeviceSpec
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -50,7 +47,7 @@ import java.util.zip.ZipInputStream
  */
 
 const val BUFFER_SIZE = 1024
-open class ApkCreator(private val rootDir: File) {
+open class ApkCreator(private val androidSDKDir: File? = null) {
 
     private val rulerDebugKey = "rulerDebug.keystore"
     private val rulerKeystorePassword = "rulerpassword"
@@ -92,18 +89,13 @@ open class ApkCreator(private val rootDir: File) {
 
     /** Finds and returns the location of the aapt2 executable. */
     open fun getAapt2Location(): Path {
-        val sdkLocation = getAndroidSdkLocation()
-        val sdkHandler = AndroidSdkHandler.getInstance(AndroidLocationsSingleton, sdkLocation)
+        val sdkLocation = (androidSDKDir ?: File(checkNotNull(System.getenv("ANDROID_HOME")) {
+            "Missing 'ANDROID_HOME' environment variable"
+        }))
+        val sdkHandler = AndroidSdkHandler.getInstance(AndroidLocationsSingleton, sdkLocation.toPath())
         val progressIndicator = object : ProgressIndicatorAdapter() { /* No progress reporting */ }
         val buildToolInfo = sdkHandler.getLatestBuildTool(progressIndicator, true)
         return buildToolInfo.location.resolve(SdkConstants.FN_AAPT2)
-    }
-
-    /** Finds and returns the location of the Android SDK. */
-    private fun getAndroidSdkLocation(): Path {
-        val logger = StdLogger(StdLogger.Level.WARNING)
-        val issueReporter = DefaultIssueReporter(logger)
-        return SdkLocator.getSdkDirectory(rootDir, issueReporter).toPath()
     }
 
     /**
@@ -134,7 +126,7 @@ open class ApkCreator(private val rootDir: File) {
     }
 }
 
-class InjectedToolApkCreator(private val aapt2Tool: Path) : ApkCreator(File("")) {
+class InjectedToolApkCreator(private val aapt2Tool: Path) : ApkCreator() {
     override fun getAapt2Location(): Path = aapt2Tool
 }
 

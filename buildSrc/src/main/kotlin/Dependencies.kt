@@ -19,7 +19,6 @@ object Dependencies {
 
     const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:${Versions.ANDROID_GRADLE_PLUGIN}"
     const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.KOTLIN}"
-    const val PROGUARD_GRADLE_PLUGIN = "com.guardsquare:proguard-gradle:${Versions.PROGUARD_GRADLE_PLUGIN}"
     const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-serialization:${Versions.KOTLIN}"
     const val DETEKT_GRADLE_PLUGIN = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${Versions.DETEKT_GRADLE_PLUGIN}"
     const val NEXUS_PUBLISH_GRADLE_PLUGIN = "io.github.gradle-nexus.publish-plugin:io.github.gradle-nexus.publish-plugin.gradle.plugin:${Versions.NEXUS_PUBLISH_GRADLE_PLUGIN}"
@@ -60,7 +59,6 @@ object Dependencies {
     object Versions {
         const val ANDROID_GRADLE_PLUGIN = "7.4.2" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
         const val KOTLIN = "1.8.20" // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
-        const val PROGUARD_GRADLE_PLUGIN = "7.2.1" // https://mvnrepository.com/artifact/com.guardsquare/proguard-gradle
         const val DETEKT_GRADLE_PLUGIN = "1.21.0" // https://mvnrepository.com/artifact/io.gitlab.arturbosch.detekt/detekt-gradle-plugin
         const val NEXUS_PUBLISH_GRADLE_PLUGIN = "1.1.0" // https://mvnrepository.com/artifact/io.github.gradle-nexus.publish-plugin/io.github.gradle-nexus.publish-plugin.gradle.plugin
         const val SHADOW_GRADLE_PLUGIN = "7.1.2" // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow

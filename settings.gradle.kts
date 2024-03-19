@@ -28,7 +28,6 @@ if (!startParameter.projectProperties.containsKey("withoutSample")) {
     include(":sample:app")
     include(":sample:dynamic")
     include(":sample:lib")
-    include(":sample:proguard")
 }
 
 plugins {

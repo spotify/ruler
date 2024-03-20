@@ -23,7 +23,6 @@ jobs:
           java-version: |
             11
             17
-          cache: gradle
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3

@@ -129,7 +129,7 @@ The latest version of this plugin is compatible with
 - Gradle 7.0 or above and
 - Android Gradle Plugin 7.0.0 or above.
 
-Earlier versions might also work, but compatibility can't be guaranteed.
+Earlier or later versions might also work, but compatibility can't be guaranteed.
 
 ## How to contribute
 

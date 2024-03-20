@@ -28,7 +28,10 @@ extra[EXT_POM_DESCRIPTION] = "Common code used by the Ruler Gradle plugin & Rule
 java {
     withSourcesJar()
 
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 // Required for copying resources from Kotln JS (ruler-frontend) module.

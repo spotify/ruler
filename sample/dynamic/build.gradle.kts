@@ -34,3 +34,7 @@ android {
 dependencies {
     implementation(project(":sample:app"))
 }
+
+kotlin {
+    jvmToolchain(17)
+}

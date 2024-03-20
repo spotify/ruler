@@ -131,6 +131,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     }
 
     private fun apkFiles(projectPath: String, deviceSpec: DeviceSpec?): Map<String, List<File>> {
+        require((apkFile != null || bundleFile != null)) { "No APK file or bundle file provided" }
         return if (apkFile != null) {
             if (apkFile!!.extension == "apk") {
                 logger.log(Level.INFO, "Using APK file ${apkFile?.path}")
@@ -141,7 +142,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
                 unzipFile(apkFile!!, directory)
                 parseSplitApkDirectory(directory.toFile())
             }
-        } else if (bundleFile != null) {
+        } else {
             with(
                 if (aapt2Tool != null) {
                     logger.log(
@@ -161,8 +162,6 @@ class RulerCli : CliktCommand(), BaseRulerTask {
                     }
                 )
             }
-        } else {
-            throw IllegalArgumentException("No APK file or bundle file provided")
         }
     }
 

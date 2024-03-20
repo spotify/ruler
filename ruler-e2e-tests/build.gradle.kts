@@ -35,9 +35,10 @@ tasks.withType<Test> {
     // Make reports of the sample project available
     dependsOn(":sample:app:analyzeDebugBundle")
     dependsOn(":sample:app:analyzeReleaseBundle")
-    dependsOn(":sample:proguard:analyzeReleaseBundle")
 }
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+kotlin {
+    jvmToolchain(17)
 }
+
+

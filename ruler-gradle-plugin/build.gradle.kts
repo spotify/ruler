@@ -82,8 +82,10 @@ tasks.withType<Test> {
 
 java {
     withSourcesJar()
+}
 
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+kotlin {
+    jvmToolchain(17)
 }
 
 publishing {

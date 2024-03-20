@@ -26,7 +26,7 @@ import java.io.Serializable
 @kotlinx.serialization.Serializable(with = DeviceSpec.Serializer::class)
 data class DeviceSpec(val abi: String, val locale: String, val screenDensity: Int, val sdkVersion: Int) : Serializable {
     companion object {
-        const val serialVersionUID = 1L
+        private const val serialVersionUID = 1L
     }
 
     @SerialName("DeviceSpec")

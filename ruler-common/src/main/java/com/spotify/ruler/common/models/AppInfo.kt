@@ -24,6 +24,6 @@ import kotlinx.serialization.Serializable as KSerializable
 data class AppInfo(val variantName: String, val applicationId: String, val versionName: String) :
     Serializable {
     companion object {
-        const val serialVersionUID = 1L
+        private const val serialVersionUID = 1L
     }
 }

@@ -30,8 +30,12 @@ extra[EXT_POM_DESCRIPTION] = "Command line interface for Ruler"
 java {
     withSourcesJar()
 
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
 }
+
+kotlin {
+    jvmToolchain(17)
+}
+
 
 dependencies {
     implementation(project(":ruler-models"))

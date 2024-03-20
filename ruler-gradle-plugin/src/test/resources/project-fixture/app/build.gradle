@@ -21,11 +21,11 @@ plugins {
 
 android {
     namespace "com.spotify.ruler.test"
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         applicationId = "com.spotify.ruler.test"
         minSdk = 23
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
     }

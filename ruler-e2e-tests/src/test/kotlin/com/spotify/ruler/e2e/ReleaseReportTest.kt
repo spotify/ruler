@@ -60,6 +60,10 @@ class ReleaseReportTest {
             FileMatcher("/AndroidManifest.xml", FileType.OTHER, "default-team"),
             FileMatcher("/resources.arsc", FileType.OTHER, "default-team"),
             FileMatcher("/META-INF/com/android/build/gradle/app-metadata.properties", FileType.OTHER, "default-team"),
+            FileMatcher("androidx.appcompat.R\$styleable", FileType.CLASS, "default-team"),
+            FileMatcher("androidx.core.R\$styleable", FileType.CLASS, "default-team"),
+            FileMatcher("androidx.appcompat.resources.R\$styleable", FileType.CLASS, "default-team")
+
         )
     }
 

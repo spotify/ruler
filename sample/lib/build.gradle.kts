@@ -22,10 +22,10 @@ plugins {
 
 android {
     namespace = "com.spotify.ruler.sample.lib"
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
     }
     lint {
         warningsAsErrors = true
@@ -34,4 +34,8 @@ android {
 
 dependencies {
     implementation(Dependencies.ANDROID_CONSTRAINT_LAYOUT)
+}
+
+kotlin {
+    jvmToolchain(17)
 }

@@ -19,7 +19,6 @@ object Dependencies {
 
     const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:${Versions.ANDROID_GRADLE_PLUGIN}"
     const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.KOTLIN}"
-    const val PROGUARD_GRADLE_PLUGIN = "com.guardsquare:proguard-gradle:${Versions.PROGUARD_GRADLE_PLUGIN}"
     const val KOTLINX_SERIALIZATION_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-serialization:${Versions.KOTLIN}"
     const val DETEKT_GRADLE_PLUGIN = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${Versions.DETEKT_GRADLE_PLUGIN}"
     const val NEXUS_PUBLISH_GRADLE_PLUGIN = "io.github.gradle-nexus.publish-plugin:io.github.gradle-nexus.publish-plugin.gradle.plugin:${Versions.NEXUS_PUBLISH_GRADLE_PLUGIN}"
@@ -58,10 +57,9 @@ object Dependencies {
     const val APEX_CHARTS = "apexcharts"
 
     object Versions {
-        const val ANDROID_GRADLE_PLUGIN = "7.4.2" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
-        const val KOTLIN = "1.8.20" // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
-        const val PROGUARD_GRADLE_PLUGIN = "7.2.1" // https://mvnrepository.com/artifact/com.guardsquare/proguard-gradle
-        const val DETEKT_GRADLE_PLUGIN = "1.21.0" // https://mvnrepository.com/artifact/io.gitlab.arturbosch.detekt/detekt-gradle-plugin
+        const val ANDROID_GRADLE_PLUGIN = "8.2.0" // https://mvnrepository.com/artifact/com.android.tools.build/gradle?repo=google
+        const val KOTLIN = "1.9.10" // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
+        const val DETEKT_GRADLE_PLUGIN = "1.23.3" // https://mvnrepository.com/artifact/io.gitlab.arturbosch.detekt/detekt-gradle-plugin
         const val NEXUS_PUBLISH_GRADLE_PLUGIN = "1.1.0" // https://mvnrepository.com/artifact/io.github.gradle-nexus.publish-plugin/io.github.gradle-nexus.publish-plugin.gradle.plugin
         const val SHADOW_GRADLE_PLUGIN = "7.1.2" // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
 
@@ -83,8 +81,8 @@ object Dependencies {
         const val KOTLIN_REACT_ROUTER = "6.11.0-pre.545" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-react-router-dom
         const val KOTLIN_JS_EXTENSIONS = "1.0.1-pre.545" // https://mvnrepository.com/artifact/org.jetbrains.kotlin-wrappers/kotlin-extensions
 
-        const val SELENIUM_WEBDRIVER = "4.11.0" // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
-        const val SELENIUM_WEBDRIVER_MANAGER = "5.5.2" // https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager
+        const val SELENIUM_WEBDRIVER = "4.18.1" // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+        const val SELENIUM_WEBDRIVER_MANAGER = "5.7.0" // https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager
 
         const val REACT = "18.2.0" // https://www.npmjs.com/package/react
         const val BOOTSTRAP = "5.2.1" // https://www.npmjs.com/package/bootstrap

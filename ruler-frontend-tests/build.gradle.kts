@@ -35,6 +35,6 @@ tasks.withType<Test> {
     dependsOn(":ruler-frontend:browserDevelopmentWebpack")
 }
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+kotlin {
+    jvmToolchain(17)
 }

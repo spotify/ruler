@@ -23,12 +23,12 @@ plugins {
 
 android {
     namespace = "com.spotify.ruler.sample.app"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.spotify.ruler.sample"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
     }
@@ -66,4 +66,8 @@ ruler {
 tasks.named("check").configure {
     dependsOn("analyzeDebugBundle")
     dependsOn("analyzeReleaseBundle")
+}
+
+kotlin {
+    jvmToolchain(17)
 }

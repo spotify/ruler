@@ -57,3 +57,17 @@ val browserDist by configurations.creating {
 artifacts {
     add(browserDist.name, tasks.named("browserDistribution").map { it.outputs.files.files.single() })
 }
+
+tasks.named("browserDevelopmentRun") {
+    dependsOn("developmentExecutableCompileSync")
+}
+
+tasks.named("browserDevelopmentWebpack") {
+    dependsOn("productionExecutableCompileSync")
+}
+
+tasks.named("browserProductionWebpack") {
+    dependsOn("developmentExecutableCompileSync")
+}
+
+

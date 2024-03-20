@@ -21,9 +21,11 @@ plugins {
     id("com.spotify.ruler")
 }
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(11)
+
 android {
     namespace = "com.spotify.ruler.sample.app"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.spotify.ruler.sample"

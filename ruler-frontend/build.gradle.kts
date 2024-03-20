@@ -19,6 +19,8 @@ plugins {
     id("io.gitlab.arturbosch.detekt")
 }
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(11)
+
 kotlin {
     js(IR) {
         browser {
@@ -56,4 +58,10 @@ val browserDist by configurations.creating {
 
 artifacts {
     add(browserDist.name, tasks.named("browserDistribution").map { it.outputs.files.files.single() })
+}
+
+// FIXME Reason: Task ':ruler-frontend:browserDevelopmentWebpack' uses this output of
+//  task ':ruler-frontend:productionExecutableCompileSync' without declaring an explicit or implicit dependency.
+tasks.named("productionExecutableCompileSync") {
+    mustRunAfter("browserDevelopmentWebpack")
 }

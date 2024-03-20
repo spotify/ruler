@@ -78,6 +78,7 @@ tasks.withType<Test> {
 
     // Make plugin available to integration tests
     dependsOn("publishToMavenLocal", ":ruler-models:publishToMavenLocal")
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
 }
 
 java {

@@ -55,11 +55,15 @@ class ReleaseReportTest {
 
         assertThat(files).comparingElementsUsing(Correspondence.file()).containsExactly(
             FileMatcher("com.spotify.ruler.sample.app.MainActivity", FileType.CLASS, "main-team"),
+            FileMatcher("androidx.appcompat.R\$styleable", FileType.CLASS, "default-team"),
+            FileMatcher("androidx.core.R\$styleable", FileType.CLASS, "default-team"),
+            FileMatcher("androidx.appcompat.resources.R\$styleable", FileType.CLASS, "default-team"),
             FileMatcher("/res/layout/activity_main.xml", FileType.RESOURCE, "main-team", ResourceType.LAYOUT),
             FileMatcher("/res/drawable/test_drawable.xml", FileType.RESOURCE, "default-team", ResourceType.DRAWABLE),
             FileMatcher("/AndroidManifest.xml", FileType.OTHER, "default-team"),
             FileMatcher("/resources.arsc", FileType.OTHER, "default-team"),
             FileMatcher("/META-INF/com/android/build/gradle/app-metadata.properties", FileType.OTHER, "default-team"),
+            FileMatcher("/META-INF/version-control-info.textproto", FileType.OTHER, "default-team"),
         )
     }
 

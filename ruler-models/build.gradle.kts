@@ -22,6 +22,8 @@ plugins {
     id("io.gitlab.arturbosch.detekt")
 }
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(11)
+
 extra[EXT_POM_NAME] = "Ruler models"
 extra[EXT_POM_DESCRIPTION] = "Common models used by the Ruler Gradle plugin"
 

@@ -20,9 +20,11 @@ plugins {
     id("io.gitlab.arturbosch.detekt")
 }
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(11)
+
 android {
     namespace = "com.spotify.ruler.sample.lib"
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         minSdk = 21
         targetSdk = 33

@@ -16,7 +16,6 @@
 
 package com.spotify.ruler.common.apk
 
-import com.android.tools.profgen.Apk
 import com.google.common.truth.Truth.assertThat
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
 import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer

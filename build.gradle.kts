@@ -62,3 +62,10 @@ extensions.configure(NexusPublishExtension::class) {
         }
     }
 }
+
+allprojects {
+    tasks.withType<AbstractPublishToMaven>().configureEach {
+        val signingTasks = tasks.withType<Sign>()
+        mustRunAfter(signingTasks)
+    }
+}

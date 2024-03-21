@@ -63,7 +63,7 @@ object Dependencies {
         const val NEXUS_PUBLISH_GRADLE_PLUGIN = "1.1.0" // https://mvnrepository.com/artifact/io.github.gradle-nexus.publish-plugin/io.github.gradle-nexus.publish-plugin.gradle.plugin
         const val SHADOW_GRADLE_PLUGIN = "7.1.2" // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
 
-        const val BUNDLETOOL = "1.11.0" // https://mvnrepository.com/artifact/com.android.tools.build/bundletool
+        const val BUNDLETOOL = "1.15.6" // https://mvnrepository.com/artifact/com.android.tools.build/bundletool
         const val PROTOBUF = "3.21.6" // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
         const val DEXLIB = "2.5.2" // https://mvnrepository.com/artifact/org.smali/dexlib2
 

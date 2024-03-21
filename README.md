@@ -33,7 +33,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.spotify.ruler:ruler-gradle-plugin:1.4.0")
+        classpath("com.spotify.ruler:ruler-gradle-plugin:2.0.0-beta-1")
     }
 }
 ```
@@ -125,9 +125,9 @@ When working on the frontend, you can start a development server by running `./g
 
 The latest version of this plugin is compatible with
 
-- Java 11 or above,
-- Gradle 7.0 or above and
-- Android Gradle Plugin 7.0.0 or above.
+- Java 17 or above,
+- Gradle 8.4 or above and
+- Android Gradle Plugin 8.2.0 or above.
 
 Earlier versions might also work, but compatibility can't be guaranteed.
 

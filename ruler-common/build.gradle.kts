@@ -34,7 +34,7 @@ kotlin {
     jvmToolchain(17)
 }
 
-// Required for copying resources from Kotln JS (ruler-frontend) module.
+// Required for copying resources from Kotlin JS (ruler-frontend) module.
 val browserDist by configurations.creating {
     isCanBeConsumed = false
     isCanBeResolved = true

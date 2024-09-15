@@ -88,6 +88,30 @@ class RulerIntegrationTest {
         gradlew(task, expectFailure = true)
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = [":app:analyzeDebugBundle", ":app:analyzeReleaseBundle"])
+    fun `Bundle analysis fails if the download size threshold is set and breached`(task: String) {
+        val buildGradle = projectDir.resolve("app/build.gradle")
+        buildGradle.writeText(
+            buildGradle.readText()
+                .substringBeforeLast("}") + "verification { downloadSizeThreshold = 100L } }"
+        )
+
+        gradlew(task, expectFailure = true)
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [":app:analyzeDebugBundle", ":app:analyzeReleaseBundle"])
+    fun `Bundle analysis fails if the install size threshold is set and breached`(task: String) {
+        val buildGradle = projectDir.resolve("app/build.gradle")
+        buildGradle.writeText(
+            buildGradle.readText()
+                .substringBeforeLast("}") + "verification { installSizeThreshold = 100L } }"
+        )
+
+        gradlew(task, expectFailure = true)
+    }
+
     private fun gradlew(vararg arguments: String, expectFailure: Boolean = false): BuildResult {
          val runner = GradleRunner.create()
             .withProjectDir(projectDir)

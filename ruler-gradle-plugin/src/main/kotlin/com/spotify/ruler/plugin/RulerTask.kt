@@ -25,6 +25,7 @@ import com.spotify.ruler.common.models.AppInfo
 import com.spotify.ruler.common.models.DeviceSpec
 import com.spotify.ruler.common.models.RulerConfig
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
+import com.spotify.ruler.common.veritication.VerificationConfig
 import com.spotify.ruler.plugin.dependency.EntryParser
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -77,6 +78,9 @@ abstract class RulerTask : DefaultTask(), BaseRulerTask {
     @get:InputFile
     abstract val staticDependenciesFile: RegularFileProperty
 
+    @get:Input
+    abstract val verificationConfig: Property<VerificationConfig>
+
     @get:OutputDirectory
     abstract val workingDir: DirectoryProperty
 
@@ -101,7 +105,7 @@ abstract class RulerTask : DefaultTask(), BaseRulerTask {
             omitFileBreakdown = omitFileBreakdown.get(),
             additionalEntries = emptyList(),
             ignoredFiles = emptyList(),
-            verificationConfig = null
+            verificationConfig = verificationConfig.get()
         )
     }
 

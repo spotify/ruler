@@ -14,17 +14,17 @@
 * limitations under the License.
 */
 
-package com.spotify.ruler.common.veritication
+package com.spotify.ruler.plugin
 
-import java.io.Serializable
-import kotlinx.serialization.Serializable as KSerializable
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 
-@KSerializable
-data class VerificationConfig(
-    val downloadSizeThreshold: Long = Long.MAX_VALUE,
-    val installSizeThreshold: Long = Long.MAX_VALUE
-) : Serializable {
-    companion object {
-        private const val serialVersionUID = 1L
+open class RulerVerificationExtension(objects: ObjectFactory) {
+    val downloadSizeThreshold: Property<Long> = objects.property(Long::class.java)
+    val installSizeThreshold: Property<Long> = objects.property(Long::class.java)
+
+    init {
+        downloadSizeThreshold.convention(Long.MAX_VALUE)
+        installSizeThreshold.convention(Long.MAX_VALUE)
     }
 }

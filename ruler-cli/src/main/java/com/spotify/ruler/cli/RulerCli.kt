@@ -24,6 +24,7 @@ import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.file
+import com.github.ajalt.clikt.parameters.types.long
 import com.spotify.ruler.common.BaseRulerTask
 import com.spotify.ruler.common.FEATURE_NAME
 import com.spotify.ruler.common.apk.ApkCreator
@@ -40,6 +41,7 @@ import com.spotify.ruler.common.models.AppInfo
 import com.spotify.ruler.common.models.DeviceSpec
 import com.spotify.ruler.common.models.RulerConfig
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
+import com.spotify.ruler.common.veritication.VerificationConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -69,6 +71,8 @@ class RulerCli : CliktCommand(), BaseRulerTask {
     private val appInfoFile by option().file().required()
     private val additionalEntriesFile by option().file()
     private val ignoreFile by option().multiple()
+    private val downloadSizeThreshold by option().long().default(Long.MAX_VALUE)
+    private val installSizeThreshold by option().long().default(Long.MAX_VALUE)
 
     override fun print(content: String) = echo(content)
 
@@ -89,6 +93,9 @@ class RulerCli : CliktCommand(), BaseRulerTask {
         val additionalEntries =
             additionalEntriesFile?.let { Json.decodeFromStream<List<ApkEntry.Default>>(it.inputStream()) }
         logger.log(Level.INFO, "Got ${additionalEntries?.size} additional entries")
+
+        val verificationConfig = VerificationConfig(downloadSizeThreshold, installSizeThreshold)
+
         RulerConfig(
             projectPath = projectPath,
             apkFilesMap = apkFiles(projectPath, deviceSpec),
@@ -101,7 +108,7 @@ class RulerCli : CliktCommand(), BaseRulerTask {
             omitFileBreakdown = omitFileBreakdown,
             additionalEntries = additionalEntries,
             ignoredFiles = ignoreFile,
-            verificationConfig = null
+            verificationConfig = verificationConfig
         )
     }
 
@@ -182,6 +189,8 @@ class RulerCli : CliktCommand(), BaseRulerTask {
         Using AAPT2: ${aapt2Tool?.path}
         Using Bloaty: ${bloatyTool?.path}
         Writing reports to: ${reportDir.path}
+        Verifying download size under: $downloadSizeThreshold
+        Verifying install size under: $installSizeThreshold
         """.trimIndent()
         )
         super.run()

@@ -86,8 +86,8 @@ interface BaseRulerTask {
         val ownershipInfo = getOwnershipInfo() // Get ownership information for all components
         generateReports(components, featureFiles, ownershipInfo)
 
-        val verificator = rulerConfig.verificationConfig?.let(::Verificator)
-        verificator?.verify(components.values.flatten())
+        val verificator = rulerConfig.verificationConfig.let(::Verificator)
+        verificator.verify(components.values.flatten())
     }
 
     private fun getFilesFromBundle(): Map<String, List<AppFile>> {

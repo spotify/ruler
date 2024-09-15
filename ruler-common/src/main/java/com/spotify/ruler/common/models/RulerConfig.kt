@@ -32,5 +32,5 @@ data class RulerConfig(
     val omitFileBreakdown: Boolean,
     val additionalEntries: List<ApkEntry.Default>?,
     val ignoredFiles: List<String>,
-    val verificationConfig: VerificationConfig?
+    val verificationConfig: VerificationConfig
 )

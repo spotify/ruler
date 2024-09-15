@@ -100,7 +100,8 @@ class RulerCli : CliktCommand(), BaseRulerTask {
             defaultOwner = defaultOwner,
             omitFileBreakdown = omitFileBreakdown,
             additionalEntries = additionalEntries,
-            ignoredFiles = ignoreFile
+            ignoredFiles = ignoreFile,
+            verificationConfig = null
         )
     }
 

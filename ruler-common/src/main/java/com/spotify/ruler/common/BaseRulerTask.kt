@@ -29,6 +29,7 @@ import com.spotify.ruler.common.report.JsonReporter
 import com.spotify.ruler.common.sanitizer.ClassNameSanitizer
 import com.spotify.ruler.common.sanitizer.ResourceNameSanitizer
 import com.spotify.ruler.common.util.toEscapeCharRegex
+import com.spotify.ruler.common.veritication.Verificator
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.ComponentType
 import kotlinx.serialization.decodeFromString
@@ -84,6 +85,9 @@ interface BaseRulerTask {
 
         val ownershipInfo = getOwnershipInfo() // Get ownership information for all components
         generateReports(components, featureFiles, ownershipInfo)
+
+        val verificator = rulerConfig.verificationConfig?.let(::Verificator)
+        verificator?.verify(components.values.flatten())
     }
 
     private fun getFilesFromBundle(): Map<String, List<AppFile>> {

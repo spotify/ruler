@@ -17,6 +17,7 @@
 package com.spotify.ruler.common.models
 
 import com.spotify.ruler.common.apk.ApkEntry
+import com.spotify.ruler.common.veritication.VerificationConfig
 import java.io.File
 
 data class RulerConfig(
@@ -30,5 +31,6 @@ data class RulerConfig(
     val defaultOwner: String,
     val omitFileBreakdown: Boolean,
     val additionalEntries: List<ApkEntry.Default>?,
-    val ignoredFiles: List<String>
+    val ignoredFiles: List<String>,
+    val verificationConfig: VerificationConfig?
 )

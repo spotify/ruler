@@ -100,7 +100,8 @@ abstract class RulerTask : DefaultTask(), BaseRulerTask {
             defaultOwner = defaultOwner.get(),
             omitFileBreakdown = omitFileBreakdown.get(),
             additionalEntries = emptyList(),
-            ignoredFiles = emptyList()
+            ignoredFiles = emptyList(),
+            verificationConfig = null
         )
     }
 

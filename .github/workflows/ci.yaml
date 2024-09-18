@@ -37,6 +37,6 @@ jobs:
       - name: Archive sample HTML report
         uses: actions/upload-artifact@v4
         with:
-          name: report
+          name: report_${{ matrix.os }}_${{ matrix.android-gradle-plugin }}
           path: sample/app/build/reports/ruler/release/report.html
           retention-days: 7

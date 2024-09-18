@@ -16,5 +16,5 @@
 
 package com.spotify.ruler.common.veritication
 
-class VerificationException(label: String, size: Long, threshold: Long) :
+class SizeExceededException(label: String, size: Long, threshold: Long) :
     Exception("$label size exceeds the threshold by ${size - threshold} bytes.")

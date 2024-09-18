@@ -16,8 +16,8 @@
 
 package com.spotify.ruler.common.verificator
 
+import com.spotify.ruler.common.veritication.SizeExceededException
 import com.spotify.ruler.common.veritication.VerificationConfig
-import com.spotify.ruler.common.veritication.VerificationException
 import com.spotify.ruler.common.veritication.Verificator
 import com.spotify.ruler.models.AppFile
 import com.spotify.ruler.models.FileType
@@ -31,7 +31,7 @@ class VerificatorTest {
     private val verificator = Verificator(config)
 
     @Test
-    fun `Download size under threshold does not trigger VerificationException`() {
+    fun `Download size under threshold does not trigger SizeExceededException`() {
         val downloadSize = config.downloadSizeThreshold / 2
         val appFiles = generateAppFiles(downloadSize)
 
@@ -39,15 +39,15 @@ class VerificatorTest {
     }
 
     @Test
-    fun `Download size exceeding threshold triggers VerificationException`() {
+    fun `Download size exceeding threshold triggers SizeExceededException`() {
         val downloadSize = config.downloadSizeThreshold * 2
         val appFiles = generateAppFiles(downloadSize)
 
-        assertThrows<VerificationException> { verificator.verify(appFiles) }
+        assertThrows<SizeExceededException> { verificator.verify(appFiles) }
     }
 
     @Test
-    fun `Install size under threshold does not trigger VerificationException`() {
+    fun `Install size under threshold does not trigger SizeExceededException`() {
         val installSize = config.installSizeThreshold / 2
         val appFiles = generateAppFiles(config.downloadSizeThreshold, installSize)
 
@@ -55,11 +55,11 @@ class VerificatorTest {
     }
 
     @Test
-    fun `Install size exceeding threshold triggers VerificationException`() {
+    fun `Install size exceeding threshold triggers SizeExceededException`() {
         val installSize = config.downloadSizeThreshold * 2
         val appFiles = generateAppFiles(config.downloadSizeThreshold, installSize)
 
-        assertThrows<VerificationException> { verificator.verify(appFiles) }
+        assertThrows<SizeExceededException> { verificator.verify(appFiles) }
     }
 
     private fun generateAppFiles(

@@ -29,6 +29,15 @@ class AttributorTest {
         Regex("ComponentA") to listOf(DependencyComponent("Component A", ComponentType.INTERNAL)),
         Regex("test/componentB") to listOf(
             DependencyComponent("Component B", ComponentType.INTERNAL)
+        ),
+        Regex("client-core") to listOf(
+            DependencyComponent("dev-tools", ComponentType.INTERNAL),
+        ),
+        Regex("client-core/shared/playlist") to listOf(
+            DependencyComponent(
+                "client-core/shared/playlist",
+                ComponentType.INTERNAL
+            )
         )
     )
 
@@ -165,6 +174,25 @@ class AttributorTest {
         val map = attributor.attribute(files, dependencies)
 
         assertThat(map).containsEntry(DependencyComponent(":lib", ComponentType.INTERNAL), files)
+    }
+
+    @Test
+    fun `Native libs with similar path are attributed correctly`() {
+        val files = listOf(AppFile("client-core/shared/playlist", FileType.NATIVE_FILE, 100, 200))
+        val dependencies = mapOf(
+            "client-core" to listOf(
+                DependencyComponent("dev-tools", ComponentType.INTERNAL),
+            ),
+            "client-core/shared/playlist" to listOf(
+                DependencyComponent(
+                    "client-core/shared/playlist",
+                    ComponentType.INTERNAL
+                )
+            )
+        )
+        val map = attributor.attribute(files, dependencies)
+
+        assertThat(map).containsEntry(DependencyComponent("client-core/shared/playlist", ComponentType.INTERNAL), files)
     }
 
     @Test

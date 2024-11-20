@@ -38,6 +38,6 @@ class ApkParserTest {
         val entries = parser.parse(apkFile)
         val dex = entries.filterIsInstance<ApkEntry.Dex>().single()
 
-        assertThat(dex.classes).contains(ApkEntry.Default("Lcom/spotify/ruler/sample/MainActivity;", 154, 154))
+        assertThat(dex.classes).contains(ApkEntry.Default("Lcom/spotify/ruler/sample/MainActivity;", 124, 124))
     }
 }

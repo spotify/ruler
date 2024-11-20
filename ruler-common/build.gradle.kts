@@ -44,11 +44,11 @@ dependencies {
     compileOnly(Dependencies.ANDROID_GRADLE_PLUGIN)
     testRuntimeOnly(Dependencies.ANDROID_GRADLE_PLUGIN)
 
-    compileOnly(Dependencies.BUNDLETOOL)
-    compileOnly(Dependencies.PROTOBUF_CORE)
-    compileOnly(Dependencies.ANDROID_TOOLS_COMMON)
-    compileOnly(Dependencies.ANDROID_TOOLS_SDKLIB)
-    compileOnly(Dependencies.DEXLIB)
+    implementation(Dependencies.BUNDLETOOL)
+    implementation(Dependencies.PROTOBUF_CORE)
+    implementation(Dependencies.ANDROID_TOOLS_COMMON)
+    implementation(Dependencies.ANDROID_TOOLS_SDKLIB)
+    implementation(Dependencies.DEXLIB)
 
     implementation(project(":ruler-models"))
 

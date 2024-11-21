@@ -44,20 +44,50 @@ class Attributor(
      */
     fun attribute(files: List<AppFile>, dependencies: Dependencies): Map<DependencyComponent, List<AppFile>> {
         val components = mutableMapOf<DependencyComponent, MutableList<AppFile>>()
+        val sortedDependenciesMap = sortStaticDependenciesMap()
         files.forEach { file ->
             val component = when (file.type) {
                 FileType.CLASS -> getComponentForClass(file.name, dependencies)
                 FileType.RESOURCE -> getComponentForResource(file.name, dependencies)
                 FileType.ASSET -> getComponentForAsset(file.name, dependencies)
                 FileType.NATIVE_LIB -> getComponentForNativeLib(file.name, dependencies)
-                FileType.NATIVE_FILE -> getComponentFromStaticDependenciesMap(file.name)
+                FileType.NATIVE_FILE -> getComponentFromStaticDependenciesMap(sortedDependenciesMap, file.name)
                 FileType.OTHER -> getComponentForFile(file.name, dependencies)
-            } ?: getComponentFromStaticDependenciesMap(file.name) ?: defaultComponent
+            } ?: getComponentFromStaticDependenciesMap(sortedDependenciesMap, file.name) ?: defaultComponent
 
             components.getOrPut(component) { ArrayList() }.add(file)
         }
         return components
     }
+
+
+    /**
+     * This method organizes the provided `Regex` patterns to prioritize more specific patterns over
+     * general ones, using the length of each pattern as an approximation of specificity. Patterns with
+     * longer lengths are considered more specific and are sorted to appear earlier in the list.
+     *
+     * The sorting is necessary in the attribution step to always try to match more specific paths first.
+     *
+     * @return A new sorted map of StaticRegexDependencies
+     *
+     * Example:
+     * ```
+     * val patterns = listOf(
+     *     Regex("client-core"),
+     *     Regex("client-core/shared/playlist")
+     * )
+     *
+     * val sortedPatterns = sortPatternsBySpecificity(patterns)
+     * // Returns: [Regex("client-core/shared/playlist"), Regex("client-core")]
+     * ```
+     */
+    private fun sortStaticDependenciesMap(): StaticRegexDependencies {
+        return staticDependencies
+            .toList() // Convert to a list of pairs (to enable sorting)
+            .sortedByDescending { it.first.pattern.length } // Sort by regex pattern length
+            .toMap() // Convert back to a map
+    }
+
 
     /** Tries to determine the component for a certain class. */
     @Suppress("ReturnCount")
@@ -164,8 +194,9 @@ class Attributor(
     }
 
     private fun getComponentFromStaticDependenciesMap(
+        map: StaticRegexDependencies,
         name: String
     ): DependencyComponent? {
-        return staticDependencies[staticDependencies.keys.find { it.containsMatchIn(name) }]?.firstOrNull()
+        return map[map.keys.find { it.containsMatchIn(name) }]?.firstOrNull()
     }
 }

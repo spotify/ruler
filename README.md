@@ -60,6 +60,20 @@ ruler {
 }
 ```
 
+#### Verification
+
+Optionally, you can also configure Ruler to verify that your application size is under a given
+threshold.
+
+```kotlin
+ruler {
+    verification {
+        downloadSizeThreshold = 2 * 1024 * 1024 // 2 MB in bytes
+        installSizeThreshold = 2 * 1024 * 1024 // 2 MB in bytes
+    }
+}
+```
+
 ### Running the task
 
 Once this is done, `analyze<VariantName>Bundle` tasks will be added for each of your app variants. Running this task will build the app and generate a HTML report, which you can use to analyze your app size. It will also generate a JSON report, in case you want to further process the data.

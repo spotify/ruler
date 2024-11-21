@@ -21,10 +21,12 @@ import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.ApplicationVariant
 import com.spotify.ruler.common.models.AppInfo
 import com.spotify.ruler.common.models.DeviceSpec
+import com.spotify.ruler.common.veritication.VerificationConfig
 import org.codehaus.groovy.runtime.StringGroovyMethods
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Provider
 
 class RulerPlugin : Plugin<Project> {
@@ -34,6 +36,10 @@ class RulerPlugin : Plugin<Project> {
     @Suppress("UnstableApiUsage")
     override fun apply(project: Project) {
         val rulerExtension = project.extensions.create(name, RulerExtension::class.java)
+        val rulerVerificationExtension = (rulerExtension as ExtensionAware).extensions.create(
+            "verification",
+            RulerVerificationExtension::class.java
+        )
 
         project.plugins.withId("com.android.application") {
             val androidComponents =
@@ -60,6 +66,8 @@ class RulerPlugin : Plugin<Project> {
                     task.staticDependenciesFile.set(rulerExtension.staticDependenciesFile)
                     task.omitFileBreakdown.set(rulerExtension.omitFileBreakdown)
                     task.unstrippedNativeFiles.set(rulerExtension.unstrippedNativeFiles)
+
+                    task.verificationConfig.set(getVerificationConfig(rulerVerificationExtension))
 
                     // Add explicit dependency to support DexGuard
                     task.dependsOn("bundle$variantName")
@@ -159,6 +167,13 @@ class RulerPlugin : Plugin<Project> {
                 defaultResourceMappingFile // File doesn't exist -> fall back to default
             }
         }
+    }
+
+    private fun getVerificationConfig(extension: RulerVerificationExtension): VerificationConfig {
+        return VerificationConfig(
+            downloadSizeThreshold = extension.downloadSizeThreshold.get(),
+            installSizeThreshold = extension.installSizeThreshold.get()
+        )
     }
 
     /** Checks if the given [project] is using DexGuard for obfuscation, instead of R8. */

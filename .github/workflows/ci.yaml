@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew check --no-daemon --stacktrace "-Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=2048m"
 
       - name: Archive sample HTML report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: report
           path: sample/app/build/reports/ruler/release/report.html

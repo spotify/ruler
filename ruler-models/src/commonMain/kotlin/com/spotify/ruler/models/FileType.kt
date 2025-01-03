@@ -16,7 +16,7 @@
 
 package com.spotify.ruler.models
 
-/** Type of an [AppFile]. */
+/** Type of [AppFile]. */
 enum class FileType {
     CLASS,
     RESOURCE,

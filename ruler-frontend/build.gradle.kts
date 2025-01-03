@@ -22,11 +22,11 @@ plugins {
 kotlin {
     js(IR) {
         browser {
-            commonWebpackConfig {
+            commonWebpackConfig (Action {
                 cssSupport {
                     enabled.set(true)
                 }
-            }
+            })
         }
         binaries.executable()
     }

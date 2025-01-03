@@ -27,7 +27,6 @@ extra[EXT_POM_DESCRIPTION] = "Common code used by the Ruler Gradle plugin & Rule
 
 java {
     withSourcesJar()
-
 }
 
 kotlin {
@@ -51,7 +50,6 @@ dependencies {
     implementation(Dependencies.DEXLIB)
 
     implementation(project(":ruler-models"))
-
 
     implementation(Dependencies.APK_ANALYZER) {
         exclude(group = "com.android.tools.lint") // Avoid leaking incompatible Lint versions to consumers
@@ -88,7 +86,6 @@ publishing {
     }
     configurePublications(project)
 }
-
 
 tasks.withType<Test> {
     useJUnitPlatform()

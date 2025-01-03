@@ -69,5 +69,3 @@ tasks.named("browserDevelopmentWebpack") {
 tasks.named("browserProductionWebpack") {
     dependsOn("developmentExecutableCompileSync")
 }
-
-

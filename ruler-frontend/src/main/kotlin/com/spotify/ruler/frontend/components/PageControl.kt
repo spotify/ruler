@@ -23,7 +23,6 @@ import react.dom.html.ReactHTML.li
 import react.dom.html.ReactHTML.ul
 import web.cssom.ClassName
 
-
 val PageControl = FC<PageControlProps> { props ->
     ul {
         className = ClassName("pagination justify-content-center")
@@ -40,6 +39,7 @@ val PageControl = FC<PageControlProps> { props ->
         }
     }
 }
+
 external interface PageControlProps : Props {
     var pageCount: Int
     var activePage: Int

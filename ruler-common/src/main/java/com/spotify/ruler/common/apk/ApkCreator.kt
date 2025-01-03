@@ -40,13 +40,13 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.zip.ZipInputStream
 
+const val BUFFER_SIZE = 1024
+
 /**
  * Responsible for creating APKs based on provided app bundle (AAB) files.
  *
- * @param rootDir Root directory of the Gradle project, needed to look up the path of certain binaries.
+ * @param androidSDKDir Root directory of the Gradle project, needed to look up the path of certain binaries.
  */
-
-const val BUFFER_SIZE = 1024
 open class ApkCreator(private val androidSDKDir: File? = null) {
 
     private val rulerDebugKey = "rulerDebug.keystore"

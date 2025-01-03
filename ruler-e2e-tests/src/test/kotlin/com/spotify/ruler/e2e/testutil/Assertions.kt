@@ -29,7 +29,7 @@ data class FileMatcher(
 )
 
 object Correspondence {
-    fun file() = Correspondence.from(::compareFiles, "matches")
+    fun file(): Correspondence<AppFile?, FileMatcher?>? = Correspondence.from(::compareFiles, "matches")
 
     // Makes it possible to assert files without matching download/install size
     private fun compareFiles(actual: AppFile?, expected: FileMatcher?): Boolean = when {

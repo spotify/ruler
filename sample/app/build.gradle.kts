@@ -41,7 +41,7 @@ android {
     lint {
         warningsAsErrors = true
     }
-    packagingOptions {
+    packaging {
         resources.excludes.add("**/*.kotlin_builtins")
         resources.excludes.add("kotlin-tooling-metadata.json")
     }

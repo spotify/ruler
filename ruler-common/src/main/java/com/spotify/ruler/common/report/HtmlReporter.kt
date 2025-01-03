@@ -22,7 +22,7 @@ import java.io.File
 class HtmlReporter {
 
     /**
-     * Generates a HTML report.
+     * Generates an HTML report.
      *
      * @param json JSON report data on which the report will be based.
      * @param targetDir Directory where the generated report will be located

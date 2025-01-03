@@ -36,7 +36,6 @@ import kotlin.math.min
 
 const val PAGE_SIZE = 10
 
-
 external interface OwnershipProps : Props {
     var components: List<AppComponent>
     var hasFileLevelInfo: Boolean

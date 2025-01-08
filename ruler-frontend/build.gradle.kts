@@ -15,7 +15,7 @@
  */
 
 plugins {
-    id("org.jetbrains.kotlin.js")
+    id("org.jetbrains.kotlin.multiplatform")
     id("io.gitlab.arturbosch.detekt")
 }
 
@@ -33,39 +33,39 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":ruler-models"))
+    "jsMainImplementation"(project(":ruler-models"))
 
-    implementation(Dependencies.KOTLIN_REACT)
-    implementation(Dependencies.KOTLIN_REACT_DOM)
-    implementation(Dependencies.KOTLIN_REACT_ROUTER)
-    implementation(Dependencies.KOTLIN_JS_EXTENSIONS)
-    implementation(Dependencies.KOTLINX_SERIALIZATION_JSON)
+    "jsMainImplementation"(Dependencies.KOTLIN_REACT)
+    "jsMainImplementation"(Dependencies.KOTLIN_REACT_DOM)
+    "jsMainImplementation"(Dependencies.KOTLIN_REACT_ROUTER)
+    "jsMainImplementation"(Dependencies.KOTLIN_JS_EXTENSIONS)
+    "jsMainImplementation"(Dependencies.KOTLINX_SERIALIZATION_JSON)
 
-    implementation(npm(Dependencies.REACT, Dependencies.Versions.REACT))
-    implementation(npm(Dependencies.REACT_DOM, Dependencies.Versions.REACT))
-    implementation(npm(Dependencies.BOOTSTRAP, Dependencies.Versions.BOOTSTRAP))
-    implementation(npm(Dependencies.APEX_CHARTS, Dependencies.Versions.APEX_CHARTS))
+    "jsMainImplementation"(npm(Dependencies.REACT, Dependencies.Versions.REACT))
+    "jsMainImplementation"(npm(Dependencies.REACT_DOM, Dependencies.Versions.REACT))
+    "jsMainImplementation"(npm(Dependencies.BOOTSTRAP, Dependencies.Versions.BOOTSTRAP))
+    "jsMainImplementation"(npm(Dependencies.APEX_CHARTS, Dependencies.Versions.APEX_CHARTS))
 
-    testImplementation(kotlin("test-js"))
+    "jsTestImplementation"(kotlin("test-js"))
 }
 
-val browserDist by configurations.creating {
+val browserDist: Configuration by configurations.creating {
     isCanBeConsumed = true
     isCanBeResolved = false
 }
 
 artifacts {
-    add(browserDist.name, tasks.named("browserDistribution").map { it.outputs.files.files.single() })
+    add(browserDist.name, tasks.named("jsBrowserDistribution").map { it.outputs.files.files.single() })
 }
 
-tasks.named("browserDevelopmentRun") {
-    dependsOn("developmentExecutableCompileSync")
+tasks.named("jsBrowserDevelopmentRun") {
+    dependsOn("jsDevelopmentExecutableCompileSync")
 }
 
-tasks.named("browserDevelopmentWebpack") {
-    dependsOn("productionExecutableCompileSync")
+tasks.named("jsBrowserDevelopmentWebpack") {
+    dependsOn("jsProductionExecutableCompileSync")
 }
 
-tasks.named("browserProductionWebpack") {
-    dependsOn("developmentExecutableCompileSync")
+tasks.named("jsBrowserProductionWebpack") {
+    dependsOn("jsDevelopmentExecutableCompileSync")
 }

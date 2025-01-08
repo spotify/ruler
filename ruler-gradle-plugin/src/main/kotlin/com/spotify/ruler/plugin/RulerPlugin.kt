@@ -16,18 +16,16 @@
 
 package com.spotify.ruler.plugin
 
-import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.ApplicationVariant
 import com.spotify.ruler.common.models.AppInfo
 import com.spotify.ruler.common.models.DeviceSpec
 import com.spotify.ruler.common.veritication.VerificationConfig
+import com.spotify.ruler.plugin.dependency.EntryParser.Companion.resolveDependencies
 import org.codehaus.groovy.runtime.StringGroovyMethods
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.RegularFile
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.provider.Provider
 
 class RulerPlugin : Plugin<Project> {
 
@@ -50,6 +48,12 @@ class RulerPlugin : Plugin<Project> {
                     RulerTask::class.java
                 ) { task ->
                     task.group = name
+
+                    task.dependencies.set(resolveDependencies(variant))
+
+                    task.projectPath.set(project.path)
+                    task.sdkDirectory.set(androidComponents.sdkComponents.sdkDirectory)
+
                     task.appInfo.set(getAppInfo(project, variant))
                     task.deviceSpec.set(getDeviceSpec(rulerExtension))
 

@@ -31,7 +31,7 @@ if (!startParameter.projectProperties.containsKey("withoutSample")) {
 }
 
 plugins {
-    id("com.gradle.enterprise") version "3.10" // https://mvnrepository.com/artifact/com.gradle.enterprise/com.gradle.enterprise.gradle.plugin
+    id("com.gradle.enterprise") version "3.12" // https://mvnrepository.com/artifact/com.gradle.enterprise/com.gradle.enterprise.gradle.plugin
 }
 
 gradleEnterprise {

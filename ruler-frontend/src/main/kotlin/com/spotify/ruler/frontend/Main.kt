@@ -29,8 +29,9 @@ import react.dom.client.createRoot
 fun main() {
     require("./style.css")
 
-    require("bootstrap/dist/css/bootstrap.css")
-    require("bootstrap/dist/js/bootstrap.bundle.js")
+    // use cdn files
+//    require("bootstrap/dist/css/bootstrap.css")
+//    require("bootstrap/dist/js/bootstrap.bundle.js")
 
     // Load and show the favicon
     val favicon = require("./favicon.svg").toString()

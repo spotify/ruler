@@ -16,11 +16,10 @@
 
 package com.spotify.ruler.plugin.dependency
 
+import com.android.build.api.variant.Variant
 import com.spotify.ruler.common.dependency.ArtifactResult
 import com.spotify.ruler.common.dependency.DependencyEntry
 import com.spotify.ruler.common.dependency.DependencyParser
-import com.spotify.ruler.common.models.AppInfo
-import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.result.ResolvedArtifactResult
 import org.gradle.api.attributes.Attribute
@@ -29,10 +28,12 @@ import java.io.File
 /** Responsible for parsing and extracting entries from dependencies. */
 class EntryParser {
 
-    /** Parses and returns the list of entries contained in all dependencies of the given [project]. */
-    fun parse(project: Project, appInfo: AppInfo): List<DependencyEntry> {
-        val configuration =
-            project.configurations.getByName("${appInfo.variantName}RuntimeClasspath")
+    companion object {
+        fun resolveDependencies(variant: Variant) = EntryParser().parse(variant.runtimeConfiguration)
+    }
+
+    /** Parses and returns the list of entries contained in all dependencies of the given [configuration]. */
+    fun parse(configuration: Configuration): List<DependencyEntry> {
         val entries = mutableListOf<ArtifactResult>()
         val parser = DependencyParser()
         listOf("android-classes").forEach { artifactType ->

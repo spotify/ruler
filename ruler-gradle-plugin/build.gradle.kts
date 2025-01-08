@@ -70,7 +70,7 @@ dependencies {
 
 // Include the output of the frontend JS compilation in the plugin resources
 sourceSets.main {
-    resources.srcDir(project(":ruler-frontend").tasks.named("browserDistribution"))
+    resources.srcDir(project(":ruler-frontend").tasks.named("jsBrowserDistribution"))
 }
 
 tasks.withType<Test> {

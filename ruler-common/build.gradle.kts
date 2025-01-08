@@ -34,7 +34,7 @@ kotlin {
 }
 
 // Required for copying resources from Kotlin JS (ruler-frontend) module.
-val browserDist by configurations.creating {
+val browserDist: Configuration by configurations.creating {
     isCanBeConsumed = false
     isCanBeResolved = true
 }

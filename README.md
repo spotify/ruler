@@ -76,7 +76,7 @@ ruler {
 
 ### Running the task
 
-Once this is done, `analyze<VariantName>Bundle` tasks will be added for each of your app variants. Running this task will build the app and generate a HTML report, which you can use to analyze your app size. It will also generate a JSON report, in case you want to further process the data.
+Once this is done, `analyze<VariantName>Bundle` tasks will be added for each of your app variants. Running this task will build the app and generate an HTML report, which you can use to analyze your app size. It will also generate a JSON report, in case you want to further process the data.
 
 ## Ownership
 
@@ -133,7 +133,7 @@ The project is set up like a standard Gradle project. You can build it using `./
 
 There is also a sample project, which shows the usage of the plugin. Because the way this sample project is set up, the initial build can fail if you bump the plugin version. To fix this, you have to publish the plugin to your local Maven repository by running `./gradlew publishToMavenLocal -PwithoutSample`.
 
-When working on the frontend, you can start a development server by running `./gradlew browserRun`, which will show a report filled with dummy data to make development easier.
+When working on the frontend, you can start a development server by running `./gradlew jsBrowserRun`, which will show a report filled with dummy data to make development easier.
 
 ## Compatibility
 
